@@ -1,0 +1,42 @@
+#create tables based on entities
+npm run typeorm schema:sync
+
+#create new migration
+npm run typeorm migration:create -- -n InsertAccountsMainAdmin
+
+#run migration
+npm run typeorm migration:run
+
+#rollback migration
+npm run typeorm migration:revert
+
+
+
+
+
+#generate cron
+nest generate service cron/check
+
+
+# Built-in HTTP exceptions
+
+BadRequestException
+UnauthorizedException
+NotFoundException
+ForbiddenException
+NotAcceptableException
+RequestTimeoutException
+ConflictException
+GoneException
+HttpVersionNotSupportedException
+PayloadTooLargeException
+UnsupportedMediaTypeException
+UnprocessableEntityException
+InternalServerErrorException
+NotImplementedException
+ImATeapotException
+MethodNotAllowedException
+BadGatewayException
+ServiceUnavailableException
+GatewayTimeoutException
+PreconditionFailedException

@@ -1,0 +1,102 @@
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
+import { v4 as uuidv4 } from 'uuid';
+import { AccountsService } from 'src/accounts/accounts.service';
+import { EmailsService } from 'src/emails/emails.service';
+import { SessionsService } from 'src/sessions/sessions.service';
+import { UsersService } from 'src/users/users.service';
+import { getRepository, Repository } from 'typeorm';
+import { Account } from 'src/accounts/entities/account.entity';
+import { DateTime } from "luxon";
+
+@Injectable()
+export class AuthService {
+
+    constructor(
+        private accountsService: AccountsService,
+        private sessionsService: SessionsService,
+        private emailsService: EmailsService,
+        private usersService: UsersService,
+        private jwtService: JwtService
+    ) { }
+
+    async validateUser(username: string, password: string): Promise<any> {
+        const account = await this.accountsService.findByUserName(username);
+
+        if (account && await this.accountsService.compareHash(password, account.password)) {
+            return account;
+        }
+    }
+
+    async login(account: any) {
+        // const payload = { name: { username: account.username, company_pk: account.company_pk }, sub: account.pk };
+        const payload = { name: account.username, sub: account.pk };
+
+        account.access_token = this.jwtService.sign(payload);
+        account.expiration = DateTime.now().plus({ seconds: Number.parseInt(process.env.EXPIRES) }).toFormat('y-LL-dd HH:mm:ss');
+
+        this.sessionsService.create(account);
+
+        // IMPROVE
+        // websocket
+        // send to all logged user that they are logged out
+
+        const { pk, password, verified, active, date_created, archived, password_reset, ...others } = account;
+        return others;
+    }
+
+    async logout(account: any) {
+        this.sessionsService.removeByAccount(account.pk);
+    }
+
+    async forgotPassword(data: any) {
+        const user = await this.usersService.findByEmail(data.email);
+        if (user) {
+            const uuid = uuidv4();
+            const fields = { password_reset: { token: uuid, expiration: DateTime.now().plus({ hours: 1 }) } };
+            const updated = await this.accountsService.update(user.account_pk, fields);
+
+            if (updated) {
+                this.emailsService.account_pk = user.account_pk;
+                this.emailsService.user_pk = user.pk;
+                this.emailsService.from = process.env.SEND_FROM;
+                this.emailsService.from_name = process.env.SENDER;
+                this.emailsService.to = data.email;
+                this.emailsService.to_name = user.first_name + ' ' + user.last_name;
+                this.emailsService.subject = 'Password Reset';
+                this.emailsService.body = '<a href="' + data.url + '/auth/reset-password/' + uuid + '">Please follow this link to reset your password</a>'; // MODIFY: must be a template from the database
+
+                const newEmail = await this.emailsService.create();
+                if (newEmail) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
+    async resetPassword(data: any): Promise<any> {
+        const password = await this.accountsService.getHash(data.password);
+        const account = await this.resetToken(data.token);
+
+        const fields = { password };
+        return await this.accountsService.update(account.pk, fields);
+    }
+
+    async resetToken(token: string): Promise<any> {
+        return await this.accountsService.findToken(token);
+    }
+
+    async register(account: any): Promise<any> {
+        account.password = await this.accountsService.getHash(account.password);
+        const newAccount = await this.accountsService.create(account);
+
+        if (newAccount) {
+            const newUser = await this.usersService.create(account, newAccount.pk);
+        }
+
+        return newAccount;
+    }
+}
