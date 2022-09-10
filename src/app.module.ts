@@ -12,12 +12,9 @@ import { GarbageCollectorService } from './cron/garbage-collector/garbage-collec
 import { TicketsModule } from './tickets/tickets.module';
 import { InquiriesModule } from './inquiries/inquiries.module';
 import { ValidationModule } from './validation/validation.module';
-import { CompaniesModule } from './companies/companies.module';
 import { LogsModule } from './logs/logs.module';
-import { CutoffsModule } from './cutoffs/cutoffs.module';
-import { SettingsModule } from './settings/settings.module';
-import { DepartmentsModule } from './departments/departments.module';
 import { GenderModule } from './gender/gender.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
     imports: [
@@ -29,12 +26,9 @@ import { GenderModule } from './gender/gender.module';
         TicketsModule,
         InquiriesModule,
         ValidationModule,
-        CompaniesModule,
         LogsModule,
-        CutoffsModule,
-        SettingsModule,
-        DepartmentsModule,
-        GenderModule
+        GenderModule,
+        ConfigModule.forRoot(),
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],

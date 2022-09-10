@@ -12,6 +12,7 @@ export class AppController {
     @UseGuards(LocalAuthGuard)
     @Post('login')
     login(@Request() req): any {
+        console.log('login');
         const user = this.authService.login(req.user);
         console.log(user);
         return user;

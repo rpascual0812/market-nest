@@ -33,7 +33,7 @@ export class UsersService {
             middle_name: user.middle_name,
             birthdate: user.year + '-' + user.month + '-' + user.day,
             mobile_number: user.mobile,
-            email: user.email,
+            email_address: user.email,
             account: account_id
         }
 
@@ -46,15 +46,10 @@ export class UsersService {
             const users = await getRepository(User)
                 .createQueryBuilder('users')
                 .leftJoinAndSelect("users.account", "accounts")
-                .leftJoinAndSelect("users.company", "companies")
-                .leftJoinAndSelect("users.department", "departments")
                 .leftJoinAndSelect("users.gender", "genders")
                 .select('users')
                 .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified", "accounts.last_login", "accounts.date_created"])
-                .addSelect(['companies.pk', 'companies.name'])
-                .addSelect(['departments.pk', 'departments.name'])
                 .addSelect(['genders.pk', 'genders.name'])
-                .where("users.company_pk = :company_pk", { company_pk: data.company_pk })
                 .andWhere(new Brackets(qb => {
                     qb.where('users.first_name ILIKE :search', { search: `%${filters.search}%` })
                         .orWhere('users.last_name ILIKE :search', { search: `%${filters.search}%` });
@@ -91,7 +86,7 @@ export class UsersService {
     async findByEmail(email_address: String): Promise<User | undefined> {
         return await getRepository(User)
             .createQueryBuilder('users')
-            .where("email = :email", { email: email_address })
+            .where("email_address = :email_address", { email_address })
             .orderBy('pk', 'DESC')
             .getOne()
             ;
@@ -112,7 +107,6 @@ export class UsersService {
             .leftJoinAndSelect("users.account", "accounts")
             .select('users')
             .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified", "accounts.last_login", "accounts.date_created"])
-            .where("users.company_pk = :company_pk", { company_pk: user.company_pk })
             .orderBy('users.pk', 'DESC')
             .getOne()
             ;
