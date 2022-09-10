@@ -32,7 +32,6 @@ export class TicketsService {
                     const uuid = uuidv4();
                     const ticket = new Ticket();
                     ticket.user_pk = user.pk;
-                    ticket.company_pk = user.name.company_pk;
                     ticket.uuid = uuid;
                     ticket.category = form.category;
                     ticket.subject = form.subject;
@@ -41,7 +40,6 @@ export class TicketsService {
 
                     const message = new TicketMessage();
                     message.user_pk = user.pk;
-                    message.company_pk = user.name.company_pk;
                     message.ticket_pk = newTicket.pk;
                     message.message = form.message;
                     const newTicketMessage = await EntityManager.save(message);
@@ -52,14 +50,12 @@ export class TicketsService {
                     log.model_pk = newTicketMessage.pk;
                     log.details = JSON.stringify({
                         account_pk: user.pk,
-                        company_pk: user.name.company_pk,
                         uuid: uuid,
                         category: form.category,
                         subject: form.subject,
                         status: 'Pending'
                     });
                     log.account_pk = user.pk;
-                    log.company_pk = user.name.company_pk;
                     await EntityManager.save(log);
 
                     const log2 = new Log();
@@ -67,12 +63,10 @@ export class TicketsService {
                     log2.model_pk = newTicket.pk;
                     log2.details = JSON.stringify({
                         account_pk: user.pk,
-                        company_pk: user.name.company_pk,
                         ticket_pk: newTicket.pk,
                         message: form.message
                     });
                     log2.account_pk = user.pk;
-                    log2.company_pk = user.name.company_pk;
                     await EntityManager.save(log2);
 
                     return { status: true, uuid: newTicket.uuid };
@@ -133,40 +127,11 @@ export class TicketsService {
                         log.model_pk = body.pk;
                         log.details = JSON.stringify(body);
                         log.account_pk = user['pk'];
-                        log.company_pk = user['name'].company_pk;
                         await EntityManager.save(log);
                     }
 
                     const updatedTicket = await EntityManager.findOne(Ticket, body.pk);
                     return { status: ticket.affected > 0 ? true : false, uuid: updatedTicket.uuid };
-                    // return ticket;
-                    // const uuid = uuidv4();
-                    // const ticket = new Ticket();
-                    // ticket.account_pk = user.pk;
-                    // ticket.company_pk = user.name.company_pk;
-                    // ticket.uuid = uuid;
-                    // ticket.category = form.category;
-                    // ticket.subject = form.subject;
-                    // ticket.status = 'Pending';
-                    // const newTicket = await EntityManager.save(ticket);
-
-                    // // LOGS                                 
-                    // const log = new Log();
-                    // log.model = 'ticket_messages';
-                    // log.model_pk = newTicketMessage.pk;
-                    // log.details = JSON.stringify({
-                    //     account_pk: user.pk,
-                    //     company_pk: user.name.company_pk,
-                    //     uuid: uuid,
-                    //     category: form.category,
-                    //     subject: form.subject,
-                    //     status: 'Pending'
-                    // });
-                    // log.account_pk = user.pk;
-                    // log.company_pk = user.name.company_pk;
-                    // await EntityManager.save(log);
-
-                    // return { status: true, uuid: newTicket.uuid };
                 }
             );
 
@@ -176,21 +141,6 @@ export class TicketsService {
         } finally {
             // console.log('finally...');
         }
-
-
-        // console.log({ body });
-        // const result = await getRepository(Ticket)
-        //     .createQueryBuilder('tickets')
-        //     .update()
-        //     .set(body)
-        //     .where("pk = :pk", { pk })
-        //     .execute();
-
-        // if (result) {
-
-        // }
-
-        // return result;
     }
 
     remove(id: number) {
@@ -202,7 +152,6 @@ export class TicketsService {
         // console.log(form, user);
         const obj: any = {
             account_pk: user.pk,
-            company_pk: user.name.company_pk,
             ticket_pk: form.ticket_pk,
             uuid: form.uuid,
             message: form.message
@@ -230,15 +179,5 @@ export class TicketsService {
                 pk: 'DESC'
             }
         });
-
-        // return await getRepository(TicketMessage)
-        //     .createQueryBuilder('ticket_messages')
-        //     .leftJoinAndSelect("ticket_messages.account", "accounts")
-        //     .leftJoinAndSelect("ticket_messages.ticket", "tickets")
-        //     // .where("ticket_messages.account_pk = :account_pk", { account_pk: filter.account.pk })
-        //     .andWhere("ticket_messages.ticket_pk = :ticket_pk", { ticket_pk: filter.ticket_pk })
-        //     .orderBy('ticket_messages.pk', 'DESC')
-        //     .getManyAndCount()
-        //     ;
     }
 }

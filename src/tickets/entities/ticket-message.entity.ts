@@ -1,5 +1,4 @@
 import { Account } from 'src/accounts/entities/account.entity';
-import { Company } from 'src/companies/entities/company.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity } from 'typeorm';
@@ -11,9 +10,6 @@ export class TicketMessage extends BaseEntity {
 
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
-
-    @Column({ name: 'company_pk' })
-    company_pk: number;
 
     @Column({ type: 'text', nullable: false })
     message: string;
@@ -34,10 +30,6 @@ export class TicketMessage extends BaseEntity {
     @ManyToOne(type => User, user => user.ticketMessage, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
-
-    @ManyToOne(type => Company, company => company.message, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'company_pk' })
-    company: Company;
 
     @ManyToOne('Ticket', (ticket: Ticket) => ticket.message, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'ticket_pk' })

@@ -1,21 +1,20 @@
 import { ConnectionOptions } from 'typeorm';
 
 // You can load you .env file here synchronously using dotenv package (not installed here),
-// import * as dotenv from 'dotenv';
-// import * as fs from 'fs';
-// const environment = process.env.NODE_ENV || 'development';
-// const data: any = dotenv.parse(fs.readFileSync(`${environment}.env`));
-// You can also make a singleton service that load and expose the .env file content.
-// ...
+import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+// const environment = process.env.NODE_ENV || '';
+// const env: any = dotenv.parse(fs.readFileSync(`.env${environment}`));
+const env: any = dotenv.parse(fs.readFileSync(`.env`));
 
 // Check typeORM documentation for more information.
 const config: ConnectionOptions = {
     type: 'postgres',
-    host: 'localhost',
+    host: env.DATABASE_HOST,
     port: 5432,
-    username: 'fjaka',
-    password: 'krXKK9DbD2P7HPFZvkaVXxYaLEuP7pcPj2bHjL5svBNXWV3bY579PpmkcQy9',
-    database: 'template',
+    username: env.DATABASE_USERNAME,
+    password: env.DATABASE_PASSWORD,
+    database: env.DATABASE_NAME,
     entities: [__dirname + '/**/*.entity{.ts,.js}'],
 
     // We are using migrations, synchronize should be set to false.
@@ -23,7 +22,7 @@ const config: ConnectionOptions = {
 
     // Run migrations automatically,
     // you can disable this if you prefer running migration manually.
-    migrationsRun: true,
+    migrationsRun: false,
     logging: true,
     logger: 'file',
 
