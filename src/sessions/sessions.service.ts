@@ -19,8 +19,7 @@ export class SessionsService {
     // }
     @UsePipes(ValidationPipe)
     async create(account: any): Promise<any> {
-        // don't remove other session
-        // this.removeByAccount(account.pk);
+        this.removeByAccount(account.pk);
 
         const obj: any = {
             token: account.access_token,
