@@ -11,11 +11,13 @@ export class AppController {
 
     @UseGuards(LocalAuthGuard)
     @Post('login')
-    login(@Request() req): any {
-        console.log('login');
-        const user = this.authService.login(req.user);
+    async login(@Response() res: any, @Request() req) {
+        const user = await this.authService.login(req.user);
         console.log(user);
-        return user;
+        if (user) {
+            return res.status(HttpStatus.OK).json({ status: 'success', user });
+        }
+        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
 
     @UseGuards(JwtAuthGuard)
