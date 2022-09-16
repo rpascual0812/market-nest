@@ -15,6 +15,7 @@ import { ValidationModule } from './validation/validation.module';
 import { LogsModule } from './logs/logs.module';
 import { GenderModule } from './gender/gender.module';
 import { ConfigModule } from '@nestjs/config';
+import { ProductsModule } from './products/products.module';
 
 @Module({
     imports: [
@@ -29,6 +30,7 @@ import { ConfigModule } from '@nestjs/config';
         LogsModule,
         GenderModule,
         ConfigModule.forRoot(),
+        ProductsModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],
