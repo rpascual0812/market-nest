@@ -16,6 +16,7 @@ import { LogsModule } from './logs/logs.module';
 import { GenderModule } from './gender/gender.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
+import { MeasurementsModule } from './measurements/measurements.module';
 
 @Module({
     imports: [
@@ -31,6 +32,7 @@ import { ProductsModule } from './products/products.module';
         GenderModule,
         ConfigModule.forRoot(),
         ProductsModule,
+        MeasurementsModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],

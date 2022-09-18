@@ -1,3 +1,4 @@
+import { Measurement } from 'src/measurements/entities/measurement.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double } from 'typeorm';
 
@@ -22,8 +23,11 @@ export class Product {
     @Column({ type: 'int', nullable: false })
     quantity: number;
 
-    @Column({ type: 'text', nullable: false })
-    measurement: string;
+    // @Column({ type: 'text', nullable: false })
+    // measurement: string;
+
+    @Column({ name: 'measurement_pk', nullable: true })
+    measurement_pk: number;
 
     @Column({ type: 'int', nullable: false })
     price_from: number;
@@ -47,4 +51,8 @@ export class Product {
     @ManyToOne(type => User, user => user.ticket, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
+
+    @ManyToOne(type => Measurement, measurement => measurement.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'measurement_pk' })
+    measurement: Measurement;
 }
