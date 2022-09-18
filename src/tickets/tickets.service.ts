@@ -49,24 +49,24 @@ export class TicketsService {
                     log.model = 'ticket_messages';
                     log.model_pk = newTicketMessage.pk;
                     log.details = JSON.stringify({
-                        account_pk: user.pk,
+                        user_pk: user.pk,
                         uuid: uuid,
                         category: form.category,
                         subject: form.subject,
                         status: 'Pending'
                     });
-                    log.account_pk = user.pk;
+                    log.user_pk = user.pk;
                     await EntityManager.save(log);
 
                     const log2 = new Log();
                     log2.model = 'tickets';
                     log2.model_pk = newTicket.pk;
                     log2.details = JSON.stringify({
-                        account_pk: user.pk,
+                        user_pk: user.pk,
                         ticket_pk: newTicket.pk,
                         message: form.message
                     });
-                    log2.account_pk = user.pk;
+                    log2.user_pk = user.pk;
                     await EntityManager.save(log2);
 
                     return { status: true, uuid: newTicket.uuid };
@@ -126,7 +126,7 @@ export class TicketsService {
                         log.model = 'tickets';
                         log.model_pk = body.pk;
                         log.details = JSON.stringify(body);
-                        log.account_pk = user['pk'];
+                        log.user_pk = user['pk'];
                         await EntityManager.save(log);
                     }
 

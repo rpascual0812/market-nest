@@ -50,7 +50,7 @@ export class AppController {
         console.log(req.query.token);
         const account = await this.authService.resetToken(req.query.token);
         console.log(account);
-        const { password, active, verified, last_login, login_attempts, date_created, archived, ...others } = account;
+        const { password, active, verified, login_attempts, date_created, archived, ...others } = account;
 
         if (account) {
             return res.status(HttpStatus.OK).json({ status: 'success', data: others, server_time: DateTime.now() });
