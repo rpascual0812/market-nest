@@ -1,4 +1,5 @@
 import { Account } from 'src/accounts/entities/account.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'logs' })
@@ -15,8 +16,8 @@ export class Log extends BaseEntity {
     @Column({ type: 'jsonb', nullable: true })
     details: string;
 
-    @Column({ name: 'account_pk', nullable: false })
-    account_pk: number;
+    @Column({ name: 'user_pk', nullable: false })
+    user_pk: number;
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
@@ -28,7 +29,7 @@ export class Log extends BaseEntity {
      * Relationship
      */
 
-    @ManyToOne('Account', (account: Account) => account.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'account_pk' })
-    account: Account;
+    @ManyToOne('User', (user: User) => user.log, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_pk' })
+    user: User;
 }

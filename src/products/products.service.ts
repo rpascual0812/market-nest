@@ -37,19 +37,19 @@ export class ProductsService {
                     // LOGS
                     const log = new Log();
                     log.model = 'products';
-                    log.model_pk = product.pk;
+                    log.model_pk = newProduct.pk;
                     log.details = JSON.stringify({
                         user_pk: user.pk,
                         uuid: uuid,
                         type: form.type,
-                        name: form.subject,
+                        name: form.name,
                         quantity: form.quantity,
                         measurement: form.measurement,
                         price_from: form.price_from,
                         price_to: form.price_to,
                         currency: form.currency,
                     });
-                    log.account_pk = user.pk;
+                    log.user_pk = user.pk;
                     await EntityManager.save(log);
 
                     return { status: true, uuid: uuid };

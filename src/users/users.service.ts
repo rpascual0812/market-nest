@@ -48,7 +48,7 @@ export class UsersService {
                 .leftJoinAndSelect("users.account", "accounts")
                 .leftJoinAndSelect("users.gender", "genders")
                 .select('users')
-                .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified", "accounts.last_login", "accounts.date_created"])
+                .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified"])
                 .addSelect(['genders.pk', 'genders.name'])
                 .andWhere(new Brackets(qb => {
                     qb.where('users.first_name ILIKE :search', { search: `%${filters.search}%` })
@@ -77,7 +77,7 @@ export class UsersService {
             .createQueryBuilder('users')
             .leftJoinAndSelect("users.account", "accounts")
             .select('users')
-            .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified", "accounts.last_login", "accounts.date_created"])
+            .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified"])
             .where("accounts.pk = :pk", { pk: account.pk })
             .getOne()
             ;
@@ -106,7 +106,7 @@ export class UsersService {
             .createQueryBuilder('users')
             .leftJoinAndSelect("users.account", "accounts")
             .select('users')
-            .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified", "accounts.last_login", "accounts.date_created"])
+            .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified"])
             .orderBy('users.pk', 'DESC')
             .getOne()
             ;

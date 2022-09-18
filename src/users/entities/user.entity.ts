@@ -4,6 +4,7 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, 
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { TicketMessage } from 'src/tickets/entities/ticket-message.entity';
 import { Gender } from 'src/gender/entities/gender.entity';
+import { Log } from 'src/logs/entities/log.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -70,6 +71,10 @@ export class User extends BaseEntity {
     @OneToMany('TicketMessage', (ticketMessage: TicketMessage) => ticketMessage.user)
     @JoinColumn({ name: 'pk' })
     ticketMessage: Array<TicketMessage>;
+
+    @OneToMany('Log', (log: Log) => log.user)
+    @JoinColumn({ name: 'pk' })
+    log: Array<Ticket>;
 
     // @OneToMany('Department', (deparment: Department) => deparment.user)
     // @JoinColumn({ name: 'pk' })
