@@ -4,13 +4,14 @@ import { MeasurementsService } from './measurements.service';
 
 @Controller('measurements')
 export class MeasurementsController {
+
     constructor(private readonly measurementsService: MeasurementsService) { }
 
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any) {
-        const data = await this.measurementsService.findAll();
-        if (data) {
+        const data = this.measurementsService.findAll();
+        if (await data) {
             return data;
         }
 
