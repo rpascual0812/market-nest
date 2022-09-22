@@ -26,7 +26,7 @@ export class Product {
     // @Column({ type: 'text', nullable: false })
     // measurement: string;
 
-    @Column({ name: 'measurement_pk', nullable: true })
+    @Column({ name: 'measurement_pk', nullable: false })
     measurement_pk: number;
 
     @Column({ type: 'int', nullable: false })
