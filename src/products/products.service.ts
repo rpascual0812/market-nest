@@ -28,7 +28,7 @@ export class ProductsService {
                     product.type = form.type;
                     product.name = form.name;
                     product.quantity = form.quantity;
-                    product.measurement = form.measurement;
+                    product.measurement_pk = form.measurement;
                     product.price_from = form.price_from;
                     product.price_to = form.price_to;
                     product.currency = form.currency;
