@@ -1,3 +1,4 @@
+import { Country } from 'src/countries/entities/country.entity';
 import { Measurement } from 'src/measurements/entities/measurement.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double } from 'typeorm';
@@ -35,8 +36,8 @@ export class Product {
     @Column({ type: 'int', nullable: true })
     price_to: number;
 
-    @Column({ type: 'text', nullable: false })
-    currency: string;
+    @Column({ name: 'country_pk', nullable: false })
+    country_pk: number;
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
@@ -55,4 +56,8 @@ export class Product {
     @ManyToOne(type => Measurement, measurement => measurement.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'measurement_pk' })
     measurement: Measurement;
+
+    @ManyToOne('Country', (country: Country) => country.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'country_pk' })
+    country: Country;
 }
