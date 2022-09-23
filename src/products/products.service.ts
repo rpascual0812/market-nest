@@ -31,7 +31,7 @@ export class ProductsService {
                     product.measurement_pk = form.measurement;
                     product.price_from = form.price_from;
                     product.price_to = form.price_to;
-                    product.country_pk = form.country_pk;
+                    product.country_pk = 173;  //form.country_pk;
                     const newProduct = await EntityManager.save(product);
 
                     // LOGS
