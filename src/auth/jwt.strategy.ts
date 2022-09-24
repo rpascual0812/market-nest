@@ -19,6 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         const filter = {
             pk: payload.sub
         };
+
         const user = await this.usersService.find(filter);
 
         return {

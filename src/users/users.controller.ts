@@ -29,9 +29,12 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Get('profile')
     async find(@Request() req: any) {
-        const res = await this.usersService.find(req.user);
+        console.log(req.user);
+        // no need to fetch another as fetching is always happening in jwt.strategy
+        return req.user;
+        // const res = await this.usersService.find(req.user);
         // console.log(res);
-        return res;
+        // return res;
     }
 
     @UseGuards(JwtAuthGuard)

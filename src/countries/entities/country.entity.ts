@@ -1,5 +1,6 @@
 import { Product } from 'src/products/entities/product.entity';
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany } from 'typeorm';
 
 @Entity({ name: 'countries' })
 @Unique(['name', 'code'])
@@ -40,4 +41,8 @@ export class Country {
     @OneToMany('Product', (product: Product) => product.country)
     @JoinColumn({ name: 'pk' })
     product: Array<Product>;
+
+    @ManyToMany('Product', (user: User) => user.country)
+    @JoinColumn({ name: 'pk' })
+    user: Array<User>;
 }
