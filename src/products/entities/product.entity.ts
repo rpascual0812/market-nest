@@ -1,5 +1,6 @@
 import { Country } from 'src/countries/entities/country.entity';
 import { Measurement } from 'src/measurements/entities/measurement.entity';
+import { ProductImage } from 'src/product-images/entities/product-image.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double } from 'typeorm';
 
@@ -60,4 +61,8 @@ export class Product {
     @ManyToOne('Country', (country: Country) => country.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'country_pk' })
     country: Country;
+
+    @OneToMany('ProductImage', (product_image: ProductImage) => product_image.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'product_image_pk' })
+    product_image: ProductImage;
 }

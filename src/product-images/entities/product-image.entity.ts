@@ -1,10 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne } from 'typeorm';
-import { Account } from 'src/accounts/entities/account.entity';
+import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne } from 'typeorm';
 
-@Entity({ name: 'documents' })
+@Entity({ name: 'product_images' })
 @Unique(['filename'])
-export class Document {
+export class ProductImage {
     @PrimaryGeneratedColumn()
     pk: number;
 
@@ -26,11 +26,8 @@ export class Document {
     @Column({ type: 'numeric' })
     size: number;
 
-    @Column({ type: 'text', nullable: true })
-    table_name: string;
-
     @Column({ type: 'int', nullable: true })
-    table_id: number;
+    product_pk: number;
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
@@ -41,8 +38,11 @@ export class Document {
     /**
      * Relationship
      */
+    @ManyToOne(type => Product, product => product.product_image, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'product_pk' })
+    product: Product;
 
-    @ManyToOne(type => User, user => user.document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne(type => User, user => user.product_image, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
 }

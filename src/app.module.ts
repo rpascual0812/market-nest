@@ -18,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { CountriesModule } from './countries/countries.module';
+import { ProductImagesModule } from './product-images/product-images.module';
 
 @Module({
     imports: [
@@ -35,6 +36,7 @@ import { CountriesModule } from './countries/countries.module';
         ProductsModule,
         MeasurementsModule,
         CountriesModule,
+        ProductImagesModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],
