@@ -10,8 +10,10 @@ export class MeasurementsController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any) {
-        const data = this.measurementsService.findAll();
-        if (await data) {
+        console.log('measurements');
+        const data = await this.measurementsService.findAll();
+        console.log(data);
+        if (data) {
             return data;
         }
 
