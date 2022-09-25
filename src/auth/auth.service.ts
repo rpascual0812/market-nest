@@ -45,8 +45,8 @@ export class AuthService {
         return others;
     }
 
-    async logout(account: any) {
-        this.sessionsService.removeByAccount(account.pk);
+    async logout(user: any) {
+        this.sessionsService.removeByAccount(user.account.pk);
     }
 
     async forgotPassword(data: any) {
