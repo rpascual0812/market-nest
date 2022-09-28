@@ -22,8 +22,12 @@ export class AppController {
 
     @UseGuards(JwtAuthGuard)
     @Post('logout')
-    logout(@Request() req): any {
-        return this.authService.logout(req.user);
+    logout(@Response() res: any, @Request() req): any {
+        const result = this.authService.logout(req.user);
+        if (result) {
+            return res.status(HttpStatus.OK).json({ status: 'success' });
+        }
+        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
 
     // @UseGuards(JwtAuthGuard)

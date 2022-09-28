@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import { getRepository, Repository } from 'typeorm';
 import { Account } from 'src/accounts/entities/account.entity';
 import { DateTime } from "luxon";
+import { resolveObjectURL } from 'buffer';
 
 @Injectable()
 export class AuthService {
@@ -46,7 +47,7 @@ export class AuthService {
     }
 
     async logout(user: any) {
-        this.sessionsService.removeByAccount(user.account.pk);
+        return await this.sessionsService.removeByAccount(user.account.pk);
     }
 
     async forgotPassword(data: any) {
