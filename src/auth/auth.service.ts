@@ -89,12 +89,19 @@ export class AuthService {
         return await this.accountsService.findToken(token);
     }
 
-    async register(account: any): Promise<any> {
-        account.password = await this.accountsService.getHash(account.password);
-        const newAccount = await this.accountsService.create(account);
+    async register(data: any): Promise<any> {
+        data.password = await this.accountsService.getHash(data.password);
+        console.log(data);
 
+        const account = {
+            username: data.email,
+            password: data.password
+        }
+
+        const newAccount = await this.accountsService.create(account);
+        console.log(newAccount);
         if (newAccount) {
-            const newUser = await this.usersService.create(account, newAccount.pk);
+            const newUser = await this.usersService.create(data, newAccount.pk);
         }
 
         return newAccount;
