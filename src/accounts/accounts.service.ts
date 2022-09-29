@@ -22,7 +22,7 @@ export class AccountsService {
     // }
     create(account: any): Promise<any | undefined> {
         const obj: any = {
-            username: account.email,
+            username: account.username,
             password: account.password
         }
 

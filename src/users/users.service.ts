@@ -26,16 +26,17 @@ export class UsersService {
     // create(createUserDto: CreateUserDto) {
     //     return 'This action adds a new user';
     // }
-    create(user, account_id) {
+    create(user, account_pk) {
         const obj: any = {
             uuid: uuidv4(),
             last_name: user.last_name,
             first_name: user.first_name,
             middle_name: user.middle_name,
-            birthdate: user.year + '-' + user.month + '-' + user.day,
+            birthdate: user.birthday,
             mobile_number: user.mobile,
             email_address: user.email,
-            account: account_id
+            account_pk: account_pk,
+            country_pk: 173
         }
 
         const newUser = this.userRepository.create(obj);

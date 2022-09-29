@@ -23,7 +23,7 @@ export class User extends BaseEntity {
     @Column({ type: 'text', nullable: false })
     first_name: string;
 
-    @Column({ type: 'text', nullable: false })
+    @Column({ type: 'text', nullable: true })
     middle_name: string;
 
     @Column({ name: 'gender_pk', nullable: true })
