@@ -2,8 +2,9 @@ import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 export const imageFileFilter = (req: any, file: any, callback: any) => {
-    // if (!file.mimetype.match(/\.(jpg|jpeg|png|gif)$/)) {
+    // if (!mimetype.match(/\.(jpg|jpeg|png)$/)) {
     if (!file.mimetype.match(/image.*/)) {
+        // if (!file.mimetype.match('image.*')) {
         return callback(new Error('Only image files are allowed!'), false);
     }
     callback(null, true);

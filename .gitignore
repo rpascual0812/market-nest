@@ -35,4 +35,5 @@ lerna-debug.log*
 
 # Manually Added
 
+/assets/images/*
 /assets/images/uploads/
