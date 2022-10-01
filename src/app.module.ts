@@ -19,6 +19,7 @@ import { ProductsModule } from './products/products.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { CountriesModule } from './countries/countries.module';
 import { ProductImagesModule } from './product-images/product-images.module';
+import { SlidersModule } from './sliders/sliders.module';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { ProductImagesModule } from './product-images/product-images.module';
         MeasurementsModule,
         CountriesModule,
         ProductImagesModule,
+        SlidersModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],

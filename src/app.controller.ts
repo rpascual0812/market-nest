@@ -66,8 +66,8 @@ export class AppController {
     }
 
     @Post('register')
-
     async register(@Response() res: any, @Request() req, @Body() body): Promise<any> {
+        console.log(body);
         const newAccount = await this.authService.register(body);
         if (newAccount) {
             return res.status(HttpStatus.OK).json({ status: 'success' });
