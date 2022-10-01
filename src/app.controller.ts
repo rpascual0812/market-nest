@@ -1,9 +1,12 @@
-import { Body, Controller, Get, Post, Request, Response, UseGuards, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, Response, UseGuards, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { AuthenticatedGuard } from './auth/authenticated.guard';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { DateTime } from "luxon";
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { editFileName, imageFileFilter } from './utilities/upload.utils';
 
 @Controller()
 export class AppController {
@@ -63,12 +66,34 @@ export class AppController {
     }
 
     @Post('register')
+
     async register(@Response() res: any, @Request() req, @Body() body): Promise<any> {
         const newAccount = await this.authService.register(body);
         if (newAccount) {
             return res.status(HttpStatus.OK).json({ status: 'success' });
         }
         return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
+    }
+
+    @Post('upload')
+    @UseInterceptors(
+        FileInterceptor('image', {
+            storage: diskStorage({
+                destination: './assets/images',
+                filename: editFileName,
+            }),
+            fileFilter: imageFileFilter,
+        }),
+    )
+    upload(@UploadedFile() file: any, @Request() req, @Response() res: any): string {
+        console.log('file', file);
+        if (file) {
+            return res.status(HttpStatus.OK).json(file.path);
+        }
+        else {
+            return res.status(HttpStatus.NOT_FOUND).json('');
+        }
+
     }
 
     @UseGuards(JwtAuthGuard)
@@ -79,6 +104,11 @@ export class AppController {
 
     @Get('assets/images/uploads/:customDir/:imageName')
     invoke(@Request() req, @Response() res) {
+        return res.sendFile(req.path, { root: './' });
+    }
+
+    @Get('assets/images/:imageName')
+    images(@Request() req, @Response() res) {
         return res.sendFile(req.path, { root: './' });
     }
 }
