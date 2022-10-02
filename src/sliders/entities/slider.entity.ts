@@ -1,4 +1,3 @@
-import { Document } from 'src/documents/entities/document.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, JoinTable } from 'typeorm';
 import { SliderDocument } from '../slider-documents/entities/slider-document.entity';

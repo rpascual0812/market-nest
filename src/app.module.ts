@@ -23,6 +23,11 @@ import { UserDocumentsModule } from './users/user-documents/user-documents.modul
 import { ProvincesModule } from './provinces/provinces.module';
 import { CitiesModule } from './cities/cities.module';
 import { AreasModule } from './areas/areas.module';
+import { RolesModule } from './roles/roles.module';
+import { PermissionsModule } from './permissions/permissions.module';
+import { ArticlesModule } from './articles/articles.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
     imports: [
@@ -45,6 +50,11 @@ import { AreasModule } from './areas/areas.module';
         ProvincesModule,
         CitiesModule,
         AreasModule,
+        RolesModule,
+        PermissionsModule,
+        ArticlesModule,
+        NotificationsModule,
+        ChatModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],
