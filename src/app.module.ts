@@ -18,7 +18,6 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { CountriesModule } from './countries/countries.module';
-import { ProductImagesModule } from './products/product-images/product-images.module';
 import { SlidersModule } from './sliders/sliders.module';
 import { UserDocumentsModule } from './users/user-documents/user-documents.module';
 
@@ -38,7 +37,6 @@ import { UserDocumentsModule } from './users/user-documents/user-documents.modul
         ProductsModule,
         MeasurementsModule,
         CountriesModule,
-        ProductImagesModule,
         SlidersModule,
         UserDocumentsModule,
     ],
