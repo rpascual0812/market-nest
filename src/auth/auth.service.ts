@@ -6,10 +6,11 @@ import { AccountsService } from 'src/accounts/accounts.service';
 import { EmailsService } from 'src/emails/emails.service';
 import { SessionsService } from 'src/sessions/sessions.service';
 import { UsersService } from 'src/users/users.service';
-import { getRepository, Repository } from 'typeorm';
+import { getConnection, getRepository, Repository } from 'typeorm';
 import { Account } from 'src/accounts/entities/account.entity';
 import { DateTime } from "luxon";
 import { resolveObjectURL } from 'buffer';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -90,20 +91,75 @@ export class AuthService {
     }
 
     async register(data: any): Promise<any> {
-        data.password = await this.accountsService.getHash(data.password);
-        console.log(data);
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
 
-        const account = {
-            username: data.email,
-            password: data.password
+        try {
+            data.password = await this.accountsService.getHash(data.password);
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    // create account                   
+                    const account = new Account();
+                    account.username = data.email;
+                    account.password = data.password;
+                    const newAccount = await EntityManager.save(account);
+
+                    /**
+                     first_name: 'Rafael',
+  last_name: 'Pascual',
+  birthday: '2022-10-02',
+  email: 'rpascual0812@gmail.com.au',
+  mobile: '9162052424',
+  password: '1Loveyou$$',
+  province: 'Item 1',
+  city: 'Item 1',
+  area: 'Item 1',
+  address_details: 'Pasig',
+  accept: 'false',
+  display_photo: '"assets/images/1664658307389.ca90df50-e372-4a3e-8f75-6e2a6b8d4016.7d576f43-f40b-4ffd-9e91-dbdad94d4acf.00d7b056-9ec7-4d5b-ba81-10201e5bd947.5e92b34355c108ef3.jpg"',
+  id_photo: '"assets/images/1664658309505.d958cf37-85f8-4e96-a1c1-be33be22a65a.0d703d1e-5de1-4aa3-b07c-c5ac03d4b09e.52090072-cdc2-40b8-957b-f210175bb453.c2d1926b2d8a9e0d.jpg"'
+                     */
+
+                    // create user
+                    const uuid = uuidv4();
+                    const user = new User();
+                    user.uuid = uuid;
+                    user.last_name = data.last_name;
+                    user.first_name = data.first_name;
+                    user.first_name = data.first_name;
+                    user.birthdate = data.birthday;
+                    user.mobile_number = data.mobile;
+                    user.email_address = data.email;
+                    user.country_pk = 173;
+                    await EntityManager.save(user);
+
+                    // create documents
+
+
+                    return { status: true, uuid: uuid };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
         }
 
-        const newAccount = await this.accountsService.create(account);
-        console.log(newAccount);
-        if (newAccount) {
-            const newUser = await this.usersService.create(data, newAccount.pk);
-        }
+        // data.password = await this.accountsService.getHash(data.password);
+        // console.log(data);
 
-        return newAccount;
+        // const account = {
+        //     username: data.email,
+        //     password: data.password
+        // }
+
+        // const newAccount = await this.accountsService.create(account);
+        // console.log(newAccount);
+        // if (newAccount) {
+        //     const newUser = await this.usersService.create(data, newAccount.pk);
+        // }
+
+        // return newAccount;
     }
 }

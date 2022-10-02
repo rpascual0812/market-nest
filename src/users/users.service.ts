@@ -7,6 +7,7 @@ import { User } from './entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Account } from 'src/accounts/entities/account.entity';
 import { Document } from 'src/documents/entities/document.entity';
+import { UserDocument } from './user-documents/entities/user-document.entity';
 
 // export type User = {
 //     id: number;
@@ -49,13 +50,26 @@ export class UsersService {
                 .createQueryBuilder('users')
                 .leftJoinAndSelect("users.account", "accounts")
                 .leftJoinAndSelect("users.gender", "genders")
+                .leftJoinAndSelect("users.user_document", "user_documents")
                 .select('users')
                 .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified"])
                 .addSelect(['genders.pk', 'genders.name'])
-                .andWhere(new Brackets(qb => {
-                    qb.where('users.first_name ILIKE :search', { search: `%${filters.search}%` })
-                        .orWhere('users.last_name ILIKE :search', { search: `%${filters.search}%` });
-                }))
+                // .addSelect(['user_documents'])
+                .leftJoinAndMapMany(
+                    'users.user_document',
+                    UserDocument,
+                    'users.pk=user_documents.user_pk',
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'documents',
+                    'user_documents.document_pk=documents.pk',
+                )
+                // .andWhere(new Brackets(qb => {
+                //     qb.where('users.first_name ILIKE :search', { search: `%${filters.search}%` })
+                //         .orWhere('users.last_name ILIKE :search', { search: `%${filters.search}%` });
+                // }))
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
@@ -67,6 +81,7 @@ export class UsersService {
                 total: users[1]
             }
         } catch (error) {
+            console.log(error);
             // SAVE ERROR
             return {
                 status: false

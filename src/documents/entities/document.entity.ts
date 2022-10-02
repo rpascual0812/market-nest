@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, ManyToMany, OneToOne } from 'typeorm';
 import { Account } from 'src/accounts/entities/account.entity';
 import { User } from 'src/users/entities/user.entity';
+import { UserDocument } from 'src/users/user-documents/entities/user-document.entity';
 
 @Entity({ name: 'documents' })
 @Unique(['filename'])
@@ -45,4 +46,7 @@ export class Document {
     @ManyToOne(type => User, user => user.document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
+
+    @OneToOne(type => UserDocument, user_document => user_document.document, { cascade: true })
+    user_document: UserDocument;
 }
