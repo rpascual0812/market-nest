@@ -2,6 +2,9 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, 
 import { Account } from 'src/accounts/entities/account.entity';
 import { User } from 'src/users/entities/user.entity';
 import { UserDocument } from 'src/users/user-documents/entities/user-document.entity';
+import { ProductDocument } from 'src/products/product-documents/entities/product-document.entity';
+import { Slider } from 'src/sliders/entities/slider.entity';
+import { SliderDocument } from 'src/sliders/slider-documents/entities/slider-document.entity';
 
 @Entity({ name: 'documents' })
 @Unique(['filename'])
@@ -49,4 +52,11 @@ export class Document {
 
     @OneToOne(type => UserDocument, user_document => user_document.document, { cascade: true })
     user_document: UserDocument;
+
+    @OneToOne(type => ProductDocument, product_document => product_document.document, { cascade: true })
+    product_document: ProductDocument;
+
+    @OneToOne(type => SliderDocument, slider_document => slider_document.document, { cascade: true })
+    slider_document: SliderDocument;
+
 }
