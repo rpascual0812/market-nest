@@ -10,6 +10,13 @@ import { UserDocument } from '../user-documents/entities/user-document.entity';
 import { ProductDocument } from 'src/products/product-documents/entities/product-document.entity';
 import { UserAddress } from '../user-addresses/entities/user-address.entity';
 import { Provinces } from 'src/provinces/entities/province.entity';
+import { Role } from 'src/roles/entities/role.entity';
+import { Permission } from 'src/permissions/entities/permission.entity';
+import { Article } from 'src/articles/entities/article.entity';
+import { Notification } from 'src/notifications/entities/notification.entity';
+import { Chat } from 'src/chat/entities/chat.entity';
+import { ChatParticipant } from 'src/chat/entities/chat-participants.entity';
+import { ChatMessage } from 'src/chat/entities/chat-messages.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -42,10 +49,13 @@ export class User extends BaseEntity {
     email_address: string;
 
     @Column({ type: 'text', nullable: true })
-    photo: string;
+    about: string;
 
     @Column({ name: 'account_pk', nullable: false })
     account_pk: number;
+
+    @Column({ name: 'role_pk', nullable: false })
+    role_pk: number;
 
     @Column({ name: 'country_pk', nullable: false })
     country_pk: number;
@@ -63,7 +73,11 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'account_pk' })
     account: Account;
 
-    @OneToOne('Gender', (gender: Gender) => gender.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne(type => Role, role => role.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'role_pk' })
+    role: Role;
+
+    @ManyToOne('Gender', (gender: Gender) => gender.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'gender_pk' })
     gender: Gender;
 
@@ -81,9 +95,9 @@ export class User extends BaseEntity {
 
     @OneToMany('Log', (log: Log) => log.user)
     @JoinColumn({ name: 'pk' })
-    log: Array<Ticket>;
+    log: Array<Log>;
 
-    @ManyToMany('Country', (country: Country) => country.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne('Country', (country: Country) => country.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'country_pk' })
     country: Country;
 
@@ -103,7 +117,27 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'product_document_pk' })
     product_document: ProductDocument;
 
-    // @OneToMany('Department', (deparment: Department) => deparment.user)
-    // @JoinColumn({ name: 'pk' })
-    // deparment: Array<Department>;
+    @OneToMany('Permission', (permission: Permission) => permission.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'permission_pk' })
+    permission: Permission;
+
+    @OneToMany('Article', (article: Article) => article.user)
+    @JoinColumn({ name: 'pk' })
+    article: Array<Article>;
+
+    @OneToMany('Notification', (notification: Notification) => notification.user)
+    @JoinColumn({ name: 'pk' })
+    notification: Array<Notification>;
+
+    @OneToMany('Chat', (chat: Chat) => chat.user)
+    @JoinColumn({ name: 'pk' })
+    chat: Array<Chat>;
+
+    @OneToMany('ChatParticipant', (chat_participant: ChatParticipant) => chat_participant.user)
+    @JoinColumn({ name: 'pk' })
+    chat_participant: Array<ChatParticipant>;
+
+    @OneToMany('ChatMessage', (chat_message: ChatMessage) => chat_message.user)
+    @JoinColumn({ name: 'pk' })
+    chat_message: Array<ChatMessage>;
 }

@@ -111,12 +111,16 @@ export class UsersService {
     }
 
     async uploadPhoto(user: any, file: any) {
-        return await getRepository(User)
-            .createQueryBuilder('users')
-            .update()
-            .set({ photo: file.path })
-            .where("account_pk = :pk", { pk: user.pk })
-            .execute();
+        return {
+            affected: 1
+        };
+        // change to add row to documents table
+        // return await getRepository(User)
+        //     .createQueryBuilder('users')
+        //     .update()
+        //     .set({ photo: file.path })
+        //     .where("account_pk = :pk", { pk: user.pk })
+        //     .execute();
     }
 
     async findLast(user: any) {
