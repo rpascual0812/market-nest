@@ -8,6 +8,8 @@ import { Log } from 'src/logs/entities/log.entity';
 import { Country } from 'src/countries/entities/country.entity';
 import { UserDocument } from '../user-documents/entities/user-document.entity';
 import { ProductDocument } from 'src/products/product-documents/entities/product-document.entity';
+import { UserAddress } from '../user-addresses/entities/user-address.entity';
+import { Provinces } from 'src/provinces/entities/province.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -84,6 +86,14 @@ export class User extends BaseEntity {
     @ManyToMany('Country', (country: Country) => country.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'country_pk' })
     country: Country;
+
+    @OneToMany('UserAddress', (user_address: UserAddress) => user_address.user)
+    @JoinColumn({ name: 'pk' })
+    user_address: Array<UserAddress>;
+
+    @OneToMany('Provinces', (provinces: Provinces) => provinces.user)
+    @JoinColumn({ name: 'pk' })
+    provinces: Array<Provinces>;
 
     @OneToMany('UserDocument', (user_document: UserDocument) => user_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_document_pk' })
