@@ -50,7 +50,7 @@ export class UsersService {
                 .createQueryBuilder('users')
                 .leftJoinAndSelect("users.account", "accounts")
                 .leftJoinAndSelect("users.gender", "genders")
-                .leftJoinAndSelect("users.user_document", "user_documents")
+                // .leftJoinAndSelect("users.user_document", "user_documents")
                 .select('users')
                 .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified"])
                 .addSelect(['genders.pk', 'genders.name'])
@@ -58,7 +58,8 @@ export class UsersService {
                 .leftJoinAndMapMany(
                     'users.user_document',
                     UserDocument,
-                    'users.pk=user_documents.user_pk',
+                    'user_documents',
+                    'users.pk=user_documents.user_pk'
                 )
                 .leftJoinAndMapOne(
                     'user_documents.document',
