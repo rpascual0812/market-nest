@@ -20,6 +20,9 @@ import { MeasurementsModule } from './measurements/measurements.module';
 import { CountriesModule } from './countries/countries.module';
 import { SlidersModule } from './sliders/sliders.module';
 import { UserDocumentsModule } from './users/user-documents/user-documents.module';
+import { ProvincesModule } from './provinces/provinces.module';
+import { CitiesModule } from './cities/cities.module';
+import { AreasModule } from './areas/areas.module';
 
 @Module({
     imports: [
@@ -39,6 +42,9 @@ import { UserDocumentsModule } from './users/user-documents/user-documents.modul
         CountriesModule,
         SlidersModule,
         UserDocumentsModule,
+        ProvincesModule,
+        CitiesModule,
+        AreasModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],

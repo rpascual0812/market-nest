@@ -1,4 +1,5 @@
 import { Product } from 'src/products/entities/product.entity';
+import { Provinces } from 'src/provinces/entities/province.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany } from 'typeorm';
 
@@ -45,4 +46,8 @@ export class Country {
     @ManyToMany('Product', (user: User) => user.country)
     @JoinColumn({ name: 'pk' })
     user: Array<User>;
+
+    @OneToMany('Provinces', (provinces: Provinces) => provinces.country)
+    @JoinColumn({ name: 'pk' })
+    provinces: Array<Provinces>;
 }
