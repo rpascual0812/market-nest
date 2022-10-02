@@ -6,7 +6,8 @@ import { TicketMessage } from 'src/tickets/entities/ticket-message.entity';
 import { Gender } from 'src/gender/entities/gender.entity';
 import { Log } from 'src/logs/entities/log.entity';
 import { Country } from 'src/countries/entities/country.entity';
-import { ProductImage } from 'src/product-images/entities/product-image.entity';
+import { ProductImage } from 'src/products/product-images/entities/product-image.entity';
+import { UserDocument } from '../user-documents/entities/user-document.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -56,14 +57,13 @@ export class User extends BaseEntity {
     /**
      * Relationship
      */
+    @OneToOne(type => Account, account => account.user, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'account_pk' })
+    account: Account;
 
     @OneToOne('Gender', (gender: Gender) => gender.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'gender_pk' })
     gender: Gender;
-
-    @OneToOne(type => Account, account => account.user, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'account_pk' })
-    account: Account;
 
     @OneToMany('Document', (document: Document) => document.user)
     @JoinColumn({ name: 'pk' })
@@ -88,6 +88,10 @@ export class User extends BaseEntity {
     @OneToMany('ProductImage', (product_image: ProductImage) => product_image.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_image_pk' })
     product_image: ProductImage;
+
+    @OneToMany('UserDocument', (user_document: UserDocument) => user_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_document_pk' })
+    user_document: UserDocument;
 
     // @OneToMany('Department', (deparment: Department) => deparment.user)
     // @JoinColumn({ name: 'pk' })

@@ -18,8 +18,9 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { CountriesModule } from './countries/countries.module';
-import { ProductImagesModule } from './product-images/product-images.module';
+import { ProductImagesModule } from './products/product-images/product-images.module';
 import { SlidersModule } from './sliders/sliders.module';
+import { UserDocumentsModule } from './users/user-documents/user-documents.module';
 
 @Module({
     imports: [
@@ -39,6 +40,7 @@ import { SlidersModule } from './sliders/sliders.module';
         CountriesModule,
         ProductImagesModule,
         SlidersModule,
+        UserDocumentsModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],

@@ -68,11 +68,11 @@ export class AppController {
     @Post('register')
     async register(@Response() res: any, @Request() req, @Body() body): Promise<any> {
         console.log(body);
-        const newAccount = await this.authService.register(body);
-        if (newAccount) {
-            return res.status(HttpStatus.OK).json({ status: 'success' });
-        }
-        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
+        // const newAccount = await this.authService.register(body);
+        // if (newAccount) {
+        //     return res.status(HttpStatus.OK).json({ status: 'success' });
+        // }
+        // return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
 
     @Post('upload')
@@ -93,7 +93,6 @@ export class AppController {
         else {
             return res.status(HttpStatus.NOT_FOUND).json('');
         }
-
     }
 
     @UseGuards(JwtAuthGuard)

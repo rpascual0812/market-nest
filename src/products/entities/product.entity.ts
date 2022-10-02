@@ -1,6 +1,6 @@
 import { Country } from 'src/countries/entities/country.entity';
 import { Measurement } from 'src/measurements/entities/measurement.entity';
-import { ProductImage } from 'src/product-images/entities/product-image.entity';
+import { ProductImage } from 'src/products/product-images/entities/product-image.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double } from 'typeorm';
 
