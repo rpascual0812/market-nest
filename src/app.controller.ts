@@ -7,10 +7,14 @@ import { DateTime } from "luxon";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from './utilities/upload.utils';
+import { DocumentsService } from './documents/documents.service';
 
 @Controller()
 export class AppController {
-    constructor(private readonly authService: AuthService) { }
+    constructor(
+        private readonly authService: AuthService,
+        private readonly documentsService: DocumentsService,
+    ) { }
 
     @UseGuards(LocalAuthGuard)
     @Post('login')
@@ -68,11 +72,11 @@ export class AppController {
     @Post('register')
     async register(@Response() res: any, @Request() req, @Body() body): Promise<any> {
         console.log(body);
-        // const newAccount = await this.authService.register(body);
-        // if (newAccount) {
-        //     return res.status(HttpStatus.OK).json({ status: 'success' });
-        // }
-        // return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
+        const newAccount = await this.authService.register(body);
+        if (newAccount) {
+            return res.status(HttpStatus.OK).json({ status: 'success' });
+        }
+        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
 
     @Post('upload')
@@ -85,14 +89,19 @@ export class AppController {
             fileFilter: imageFileFilter,
         }),
     )
-    upload(@UploadedFile() file: any, @Request() req, @Response() res: any): string {
-        console.log('file', file);
-        if (file) {
-            return res.status(HttpStatus.OK).json(file.path);
+    async upload(@UploadedFile() file: any, @Request() req, @Response() res: any): Promise<string> {
+        const document = await this.documentsService.create(file);
+        if (document) {
+            console.log(document);
+            return res.status(HttpStatus.OK).json({ status: 'success', document });
         }
-        else {
-            return res.status(HttpStatus.NOT_FOUND).json('');
-        }
+        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
+        // if (file) {
+        //     return res.status(HttpStatus.OK).json(file.path);
+        // }
+        // else {
+        //     return res.status(HttpStatus.NOT_FOUND).json('');
+        // }
     }
 
     @UseGuards(JwtAuthGuard)

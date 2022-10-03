@@ -9,7 +9,7 @@ import { Country } from 'src/countries/entities/country.entity';
 import { UserDocument } from '../user-documents/entities/user-document.entity';
 import { ProductDocument } from 'src/products/product-documents/entities/product-document.entity';
 import { UserAddress } from '../user-addresses/entities/user-address.entity';
-import { Provinces } from 'src/provinces/entities/province.entity';
+import { Province } from 'src/provinces/entities/province.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { Permission } from 'src/permissions/entities/permission.entity';
 import { Article } from 'src/articles/entities/article.entity';
@@ -17,6 +17,8 @@ import { Notification } from 'src/notifications/entities/notification.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
 import { ChatParticipant } from 'src/chat/entities/chat-participants.entity';
 import { ChatMessage } from 'src/chat/entities/chat-messages.entity';
+import { City } from 'src/cities/entities/city.entity';
+import { Area } from 'src/areas/entities/area.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -81,9 +83,9 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'gender_pk' })
     gender: Gender;
 
-    @OneToMany('Document', (document: Document) => document.user)
-    @JoinColumn({ name: 'pk' })
-    document: Array<Document>;
+    // @OneToMany('Document', (document: Document) => document.user)
+    // @JoinColumn({ name: 'pk' })
+    // document: Array<Document>;
 
     @OneToMany('Ticket', (ticket: Ticket) => ticket.user)
     @JoinColumn({ name: 'pk' })
@@ -101,13 +103,23 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'country_pk' })
     country: Country;
 
+    @OneToMany('Province', (province: Province) => province.user)
+    @JoinColumn({ name: 'pk' })
+    province: Array<Province>;
+
+    @OneToMany('City', (city: City) => city.user)
+    @JoinColumn({ name: 'pk' })
+    city: Array<City>;
+
+    @OneToMany('Area', (area: Area) => area.user)
+    @JoinColumn({ name: 'pk' })
+    area: Array<Area>;
+
     @OneToMany('UserAddress', (user_address: UserAddress) => user_address.user)
     @JoinColumn({ name: 'pk' })
     user_address: Array<UserAddress>;
 
-    @OneToMany('Provinces', (provinces: Provinces) => provinces.user)
-    @JoinColumn({ name: 'pk' })
-    provinces: Array<Provinces>;
+
 
     @OneToMany('UserDocument', (user_document: UserDocument) => user_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_document_pk' })
