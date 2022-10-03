@@ -30,7 +30,7 @@ export class DocumentsController {
         }),
     )
     async uploadedFile(@UploadedFile() file: Express.Multer.File, @Request() req) {
-        return await this.documentsService.create(req.user, file);
+        return await this.documentsService.create(file);
     }
 
     @UseGuards(JwtAuthGuard)

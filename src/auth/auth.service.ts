@@ -11,6 +11,8 @@ import { Account } from 'src/accounts/entities/account.entity';
 import { DateTime } from "luxon";
 import { resolveObjectURL } from 'buffer';
 import { User } from 'src/users/entities/user.entity';
+import { UserDocument } from 'src/users/user-documents/entities/user-document.entity';
+import { UserAddress } from 'src/users/user-addresses/entities/user-address.entity';
 
 @Injectable()
 export class AuthService {
@@ -105,9 +107,10 @@ export class AuthService {
                     const newAccount = await EntityManager.save(account);
 
                     /**
-                     first_name: 'Rafael',
+                    {
+  first_name: 'Rafael',
   last_name: 'Pascual',
-  birthday: '2022-10-02',
+  birthday: '2022-10-03',
   email: 'rpascual0812@gmail.com.au',
   mobile: '9162052424',
   password: '1Loveyou$$',
@@ -116,9 +119,10 @@ export class AuthService {
   area: 'Item 1',
   address_details: 'Pasig',
   accept: 'false',
-  display_photo: '"assets/images/1664658307389.ca90df50-e372-4a3e-8f75-6e2a6b8d4016.7d576f43-f40b-4ffd-9e91-dbdad94d4acf.00d7b056-9ec7-4d5b-ba81-10201e5bd947.5e92b34355c108ef3.jpg"',
-  id_photo: '"assets/images/1664658309505.d958cf37-85f8-4e96-a1c1-be33be22a65a.0d703d1e-5de1-4aa3-b07c-c5ac03d4b09e.52090072-cdc2-40b8-957b-f210175bb453.c2d1926b2d8a9e0d.jpg"'
-                     */
+  display_photo: '14',
+  id_photo: '15'
+}
+                    */
 
                     // create user
                     const uuid = uuidv4();
@@ -130,11 +134,32 @@ export class AuthService {
                     user.birthdate = data.birthday;
                     user.mobile_number = data.mobile;
                     user.email_address = data.email;
+                    user.role_pk = 1;
                     user.country_pk = 173;
-                    await EntityManager.save(user);
+                    user.account_pk = newAccount.pk;
+                    const newUser = await EntityManager.save(user);
+
+                    const address = new UserAddress;
+                    address.type = 'home';
+                    address.province_pk = 3;
+                    address.city_pk = 2;
+                    address.area_pk = 1;
+                    address.address = data.address_details;
+                    address.user_pk = newUser.pk;
+                    await EntityManager.save(address);
 
                     // create documents
+                    const display_photo = new UserDocument();
+                    display_photo.user_pk = newUser.pk;
+                    display_photo.type = 'profile_photo';
+                    display_photo.document_pk = data.display_photo;
+                    await EntityManager.save(display_photo);
 
+                    const id_photo = new UserDocument();
+                    id_photo.user_pk = newUser.pk;
+                    id_photo.type = 'id_photo';
+                    id_photo.document_pk = data.id_photo;
+                    await EntityManager.save(id_photo);
 
                     return { status: true, uuid: uuid };
                 }

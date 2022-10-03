@@ -12,8 +12,8 @@ export class Document {
     @PrimaryGeneratedColumn()
     pk: number;
 
-    @Column({ name: 'user_pk', nullable: false })
-    user_pk: number;
+    // @Column({ name: 'user_pk', nullable: false })
+    // user_pk: number;
 
     @Column({ type: 'text', nullable: false })
     original_name: string;
@@ -30,11 +30,11 @@ export class Document {
     @Column({ type: 'numeric' })
     size: number;
 
-    @Column({ type: 'text', nullable: true })
-    table_name: string;
+    // @Column({ type: 'text', nullable: true })
+    // table_name: string;
 
-    @Column({ type: 'int', nullable: true })
-    table_id: number;
+    // @Column({ type: 'int', nullable: true })
+    // table_id: number;
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
@@ -46,9 +46,9 @@ export class Document {
      * Relationship
      */
 
-    @ManyToOne(type => User, user => user.document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'user_pk' })
-    user: User;
+    // @ManyToOne(type => User, user => user.document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    // @JoinColumn({ name: 'user_pk' })
+    // user: User;
 
     @OneToOne(type => UserDocument, user_document => user_document.document, { cascade: true })
     user_document: UserDocument;

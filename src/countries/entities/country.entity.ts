@@ -1,5 +1,7 @@
+import { Area } from 'src/areas/entities/area.entity';
+import { City } from 'src/cities/entities/city.entity';
 import { Product } from 'src/products/entities/product.entity';
-import { Provinces } from 'src/provinces/entities/province.entity';
+import { Province } from 'src/provinces/entities/province.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany } from 'typeorm';
 
@@ -47,7 +49,15 @@ export class Country {
     @JoinColumn({ name: 'pk' })
     user: Array<User>;
 
-    @OneToMany('Provinces', (provinces: Provinces) => provinces.country)
+    @OneToMany('Province', (province: Province) => province.country)
     @JoinColumn({ name: 'pk' })
-    provinces: Array<Provinces>;
+    province: Array<Province>;
+
+    @OneToMany('City', (city: City) => city.country)
+    @JoinColumn({ name: 'pk' })
+    city: Array<City>;
+
+    @OneToMany('Area', (area: Area) => area.country)
+    @JoinColumn({ name: 'pk' })
+    area: Array<Area>;
 }

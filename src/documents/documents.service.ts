@@ -13,14 +13,13 @@ export class DocumentsService {
         private documentRepository: Repository<Document>,
     ) { }
 
-    create(user: any, file: any) {
+    create(file: any) {
         const obj = {
             original_name: file.originalname,
             filename: file.filename,
-            path: file.destination,
+            path: file.path,
             mime_type: file.mimetype,
             size: file.size,
-            account: user.pk
         }
         const newDocument = this.documentRepository.create(obj);
         return this.documentRepository.save(newDocument);
