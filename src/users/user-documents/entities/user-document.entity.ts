@@ -3,7 +3,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity({ name: 'user_documents' })
-@Unique(['type', 'document_pk'])
+@Unique(['type', 'document_pk', 'user_pk'])
 export class UserDocument {
     @PrimaryGeneratedColumn()
     pk: number;
