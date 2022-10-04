@@ -124,8 +124,6 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'pk' })
     user_permission: Array<UserPermission>;
 
-
-
     @OneToMany('UserDocument', (user_document: UserDocument) => user_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_document_pk' })
     user_document: UserDocument;
