@@ -1,3 +1,4 @@
+import { UserPermission } from 'src/users/entities/user-permission.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
 
@@ -34,4 +35,8 @@ export class Permission extends BaseEntity {
     @ManyToOne('User', (user: User) => user.permission, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
+
+    @OneToMany('UserPermission', (user_permission: UserPermission) => user_permission.permission)
+    @JoinColumn({ name: 'pk' })
+    user_permission: Array<UserPermission>;
 }
