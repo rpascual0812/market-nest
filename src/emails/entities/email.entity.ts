@@ -8,13 +8,9 @@ export class Email {
     @PrimaryGeneratedColumn()
     pk: number;
 
-    @ManyToOne(() => Account)
-    @JoinColumn({ name: 'account_pk' })
-    account: Account;
-
-    @ManyToOne(() => User)
-    @JoinColumn({ name: 'user_pk' })
-    user: User;
+    // @ManyToOne(() => Account)
+    // @JoinColumn({ name: 'account_pk' })
+    // account: Account;
 
     @Column({ type: 'text', nullable: false })
     uuid: string;
@@ -43,6 +39,9 @@ export class Email {
     @Column({ type: 'text', nullable: false })
     body: string;
 
+    @Column({ name: 'user_pk', nullable: false })
+    user_pk: number;
+
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
 
@@ -51,4 +50,12 @@ export class Email {
 
     @Column({ default: false })
     archived: boolean;
+
+    /**
+     * Relationship
+     */
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'user_pk' })
+    user: User;
 }

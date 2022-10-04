@@ -13,6 +13,7 @@ import { resolveObjectURL } from 'buffer';
 import { User } from 'src/users/entities/user.entity';
 import { UserDocument } from 'src/users/user-documents/entities/user-document.entity';
 import { UserAddress } from 'src/users/user-addresses/entities/user-address.entity';
+import { Email } from 'src/emails/entities/email.entity';
 
 @Injectable()
 export class AuthService {
@@ -106,24 +107,6 @@ export class AuthService {
                     account.password = data.password;
                     const newAccount = await EntityManager.save(account);
 
-                    /**
-                    {
-  first_name: 'Rafael',
-  last_name: 'Pascual',
-  birthday: '2022-10-03',
-  email: 'rpascual0812@gmail.com.au',
-  mobile: '9162052424',
-  password: '1Loveyou$$',
-  province: 'Item 1',
-  city: 'Item 1',
-  area: 'Item 1',
-  address_details: 'Pasig',
-  accept: 'false',
-  display_photo: '14',
-  id_photo: '15'
-}
-                    */
-
                     // create user
                     const uuid = uuidv4();
                     const user = new User();
@@ -160,6 +143,18 @@ export class AuthService {
                     id_photo.type = 'id_photo';
                     id_photo.document_pk = data.id_photo;
                     await EntityManager.save(id_photo);
+
+                    // save registration email
+                    const email = new Email;
+                    email.uuid = uuidv4();
+                    email.user_pk = newUser.pk;
+                    email.from = process.env.SEND_FROM;
+                    email.from_name = process.env.SENDER;
+                    email.to = data.email;
+                    email.to_name = newUser.first_name + ' ' + newUser.last_name;
+                    email.subject = 'Get Started with Samdhana Community Market';
+                    email.body = '<h1>Welcome to Samdhana Community Market</h1>'; // MODIFY: must be a template from the database
+                    await EntityManager.save(email);
 
                     return { status: true, uuid: uuid };
                 }
