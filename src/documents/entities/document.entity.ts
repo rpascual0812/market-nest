@@ -4,7 +4,7 @@ import { User } from 'src/users/entities/user.entity';
 import { UserDocument } from 'src/users/user-documents/entities/user-document.entity';
 import { ProductDocument } from 'src/products/product-documents/entities/product-document.entity';
 import { Slider } from 'src/sliders/entities/slider.entity';
-import { SliderDocument } from 'src/sliders/slider-documents/entities/slider-document.entity';
+import { SliderDocument } from 'src/sliders/entities/slider-document.entity';
 
 @Entity({ name: 'documents' })
 @Unique(['filename'])

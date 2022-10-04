@@ -1,26 +1,50 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSliderDto } from './dto/create-slider.dto';
-import { UpdateSliderDto } from './dto/update-slider.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Document } from 'src/documents/entities/document.entity';
+import { getRepository, Repository } from 'typeorm';
+import { SliderDocument } from './entities/slider-document.entity';
+import { Slider } from './entities/slider.entity';
 
 @Injectable()
 export class SlidersService {
-  create(createSliderDto: CreateSliderDto) {
-    return 'This action adds a new slider';
-  }
+    constructor(
+        @InjectRepository(Slider)
+        private sliderRepository: Repository<Slider>,
+    ) { }
 
-  findAll() {
-    return `This action returns all sliders`;
-  }
+    async findAll(data: any, filters: any) {
+        try {
+            const sliders = await getRepository(Slider)
+                .createQueryBuilder('sliders')
+                .select('sliders')
+                .leftJoinAndMapMany(
+                    'sliders.slider_document',
+                    SliderDocument,
+                    'slider_documents',
+                    'sliders.pk=slider_documents.slider_pk'
+                )
+                .leftJoinAndMapOne(
+                    'slider_documents.document',
+                    Document,
+                    'documents',
+                    'slider_documents.document_pk=documents.pk',
+                )
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
 
-  findOne(id: number) {
-    return `This action returns a #${id} slider`;
-  }
-
-  update(id: number, updateSliderDto: UpdateSliderDto) {
-    return `This action updates a #${id} slider`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} slider`;
-  }
+            return {
+                status: true,
+                data: sliders[0],
+                total: sliders[1]
+            }
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
 }
