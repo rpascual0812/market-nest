@@ -19,6 +19,7 @@ import { ChatParticipant } from 'src/chat/entities/chat-participants.entity';
 import { ChatMessage } from 'src/chat/entities/chat-messages.entity';
 import { City } from 'src/cities/entities/city.entity';
 import { Area } from 'src/areas/entities/area.entity';
+import { UserPermission } from './user-permission.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -118,6 +119,10 @@ export class User extends BaseEntity {
     @OneToMany('UserAddress', (user_address: UserAddress) => user_address.user)
     @JoinColumn({ name: 'pk' })
     user_address: Array<UserAddress>;
+
+    @OneToMany('UserPermission', (user_permission: UserPermission) => user_permission.user)
+    @JoinColumn({ name: 'pk' })
+    user_permission: Array<UserPermission>;
 
 
 
