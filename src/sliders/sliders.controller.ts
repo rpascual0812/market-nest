@@ -6,10 +6,9 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class SlidersController {
     constructor(private readonly slidersService: SlidersService) { }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any) {
-        // console.log('sliders');
         const data = await this.slidersService.findAll(req.user, req.query);
         // console.log('sliders', data);
         if (data) {
