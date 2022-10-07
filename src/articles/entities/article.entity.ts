@@ -1,5 +1,6 @@
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, JoinTable } from 'typeorm';
+import { ArticleDocument } from './article-document.entity';
 
 @Entity({ name: 'articles' })
 @Unique(['title', 'user_pk'])
@@ -29,4 +30,8 @@ export class Article {
     @ManyToOne(type => User, user => user.product_document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
+
+    @OneToMany('ArticleDocument', (article_document: ArticleDocument) => article_document.article, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'article_document_pk' })
+    article_document: ArticleDocument;
 }

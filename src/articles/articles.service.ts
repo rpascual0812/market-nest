@@ -1,26 +1,50 @@
 import { Injectable } from '@nestjs/common';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Document } from 'src/documents/entities/document.entity';
+import { getRepository, Repository } from 'typeorm';
+import { ArticleDocument } from './entities/article-document.entity';
+import { Article } from './entities/article.entity';
 
 @Injectable()
 export class ArticlesService {
-  create(createArticleDto: CreateArticleDto) {
-    return 'This action adds a new article';
-  }
+    constructor(
+        @InjectRepository(Article)
+        private articleRepository: Repository<Article>,
+    ) { }
 
-  findAll() {
-    return `This action returns all articles`;
-  }
+    async findAll(data: any, filters: any) {
+        try {
+            const articles = await getRepository(Article)
+                .createQueryBuilder('articles')
+                .select('articles')
+                .leftJoinAndMapMany(
+                    'articles.article_document',
+                    ArticleDocument,
+                    'article_documents',
+                    'articles.pk=article_documents.article_pk'
+                )
+                .leftJoinAndMapOne(
+                    'article_documents.document',
+                    Document,
+                    'documents',
+                    'article_documents.document_pk=documents.pk',
+                )
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
 
-  findOne(id: number) {
-    return `This action returns a #${id} article`;
-  }
-
-  update(id: number, updateArticleDto: UpdateArticleDto) {
-    return `This action updates a #${id} article`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} article`;
-  }
+            return {
+                status: true,
+                data: articles[0],
+                total: articles[1]
+            }
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
 }
