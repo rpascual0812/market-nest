@@ -7,7 +7,7 @@ import { User } from './entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Account } from 'src/accounts/entities/account.entity';
 import { Document } from 'src/documents/entities/document.entity';
-import { UserDocument } from './user-documents/entities/user-document.entity';
+import { UserDocument } from './entities/user-document.entity';
 
 // export type User = {
 //     id: number;

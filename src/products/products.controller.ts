@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Response, UseGuards, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Response, UseGuards, HttpStatus, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -12,5 +12,15 @@ export class ProductsController {
         console.log(body);
         const product = await this.productsService.create(body, req.user);
         return res.status(product.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(product);
+    }
+
+    @Get()
+    async findAll(@Request() req: any) {
+        const data = await this.productsService.findAll(req.user, req.query);
+        if (data) {
+            return data;
+        }
+
+        throw new InternalServerErrorException();
     }
 }
