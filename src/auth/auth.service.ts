@@ -11,7 +11,7 @@ import { Account } from 'src/accounts/entities/account.entity';
 import { DateTime } from "luxon";
 import { resolveObjectURL } from 'buffer';
 import { User } from 'src/users/entities/user.entity';
-import { UserDocument } from 'src/users/user-documents/entities/user-document.entity';
+import { UserDocument } from 'src/users/entities/user-document.entity';
 import { UserAddress } from 'src/users/user-addresses/entities/user-address.entity';
 import { Email } from 'src/emails/entities/email.entity';
 
