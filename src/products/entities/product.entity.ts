@@ -25,16 +25,16 @@ export class Product {
     @Column({ type: 'text', nullable: false })
     description: string;
 
-    @Column({ type: 'int', nullable: false })
+    @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
     quantity: number;
 
     @Column({ name: 'measurement_pk', nullable: false })
     measurement_pk: number;
 
-    @Column({ type: 'int', nullable: false })
+    @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
     price_from: number;
 
-    @Column({ type: 'int', nullable: true })
+    @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
     price_to: number;
 
     @Column({ name: 'country_pk', nullable: false })
