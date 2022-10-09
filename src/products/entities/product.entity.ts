@@ -2,7 +2,7 @@ import { Country } from 'src/countries/entities/country.entity';
 import { Measurement } from 'src/measurements/entities/measurement.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double } from 'typeorm';
-import { ProductDocument } from '../product-documents/entities/product-document.entity';
+import { ProductDocument } from './product-document.entity';
 
 @Entity({ name: 'products' })
 @Unique(['uuid'])
@@ -21,6 +21,9 @@ export class Product {
 
     @Column({ type: 'text', nullable: false })
     name: string;
+
+    @Column({ type: 'text', nullable: false })
+    description: string;
 
     @Column({ type: 'int', nullable: false })
     quantity: number;

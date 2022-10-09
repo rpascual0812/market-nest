@@ -3,7 +3,7 @@ import { UserDocumentsService } from './user-documents.service';
 import { UserDocumentsController } from './user-documents.controller';
 import { DatabaseModule } from 'src/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserDocument } from './entities/user-document.entity';
+import { UserDocument } from '../entities/user-document.entity';
 
 @Module({
     imports: [
