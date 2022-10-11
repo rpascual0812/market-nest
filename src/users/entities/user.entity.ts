@@ -8,7 +8,7 @@ import { Log } from 'src/logs/entities/log.entity';
 import { Country } from 'src/countries/entities/country.entity';
 import { UserDocument } from './user-document.entity';
 import { ProductDocument } from 'src/products/entities/product-document.entity';
-import { UserAddress } from '../user-addresses/entities/user-address.entity';
+import { UserAddress } from './user-address.entity';
 import { Province } from 'src/provinces/entities/province.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { Permission } from 'src/permissions/entities/permission.entity';
@@ -20,6 +20,11 @@ import { ChatMessage } from 'src/chat/entities/chat-messages.entity';
 import { City } from 'src/cities/entities/city.entity';
 import { Area } from 'src/areas/entities/area.entity';
 import { UserPermission } from './user-permission.entity';
+import { UserCart } from './user-cart.entity';
+import { ProductRating } from 'src/products/entities/product-ratings.entity';
+import { UserRating } from './user-rating.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import { Status } from 'src/statuses/entities/status.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -155,4 +160,28 @@ export class User extends BaseEntity {
     @OneToMany('ChatMessage', (chat_message: ChatMessage) => chat_message.user)
     @JoinColumn({ name: 'pk' })
     chat_message: Array<ChatMessage>;
+
+    @OneToMany('UserCart', (user_cart: UserCart) => user_cart.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_cart_pk' })
+    user_cart: UserCart;
+
+    @OneToMany('ProductRating', (product_rating: ProductRating) => product_rating.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'product_rating_pk' })
+    product_rating: ProductRating;
+
+    @OneToMany('UserRating', (user_rating: UserRating) => user_rating.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_rating_pk' })
+    user_rating: UserRating;
+
+    @OneToMany('UserRating', (user_rating: UserRating) => user_rating.created_by, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_rating_pk' })
+    created_by: UserRating;
+
+    @OneToMany('Order', (order: Order) => order.user_pk, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'order_pk' })
+    order: Order;
+
+    @OneToMany('Status', (status: Status) => status.user_pk, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'status_pk' })
+    status: Status;
 }

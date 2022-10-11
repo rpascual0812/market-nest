@@ -1,8 +1,11 @@
 import { Country } from 'src/countries/entities/country.entity';
 import { Measurement } from 'src/measurements/entities/measurement.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import { UserCart } from 'src/users/entities/user-cart.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double, ManyToMany } from 'typeorm';
 import { ProductDocument } from './product-document.entity';
+import { ProductRating } from './product-ratings.entity';
 
 @Entity({ name: 'products' })
 @Unique(['uuid'])
@@ -65,4 +68,16 @@ export class Product {
     @OneToMany('ProductDocument', (product_document: ProductDocument) => product_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_document_pk' })
     product_document: ProductDocument;
+
+    @OneToMany('UserCart', (user_cart: UserCart) => user_cart.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_cart_pk' })
+    user_cart: UserCart;
+
+    @OneToMany('ProductRating', (product_rating: ProductRating) => product_rating.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'product_rating_pk' })
+    product_rating: ProductRating;
+
+    @OneToMany('Order', (order: Order) => order.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'order_pk' })
+    order: Order;
 }

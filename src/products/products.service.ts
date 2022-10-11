@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ProductDocument } from './entities/product-document.entity';
 import { Document } from 'src/documents/entities/document.entity';
 import { UserDocument } from 'src/users/entities/user-document.entity';
-import { UserAddress } from 'src/users/user-addresses/entities/user-address.entity';
+import { UserAddress } from 'src/users/entities/user-address.entity';
 import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
