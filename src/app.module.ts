@@ -19,7 +19,6 @@ import { ProductsModule } from './products/products.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { CountriesModule } from './countries/countries.module';
 import { SlidersModule } from './sliders/sliders.module';
-import { UserDocumentsModule } from './users/user-documents/user-documents.module';
 import { ProvincesModule } from './provinces/provinces.module';
 import { CitiesModule } from './cities/cities.module';
 import { AreasModule } from './areas/areas.module';
@@ -28,6 +27,8 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { ArticlesModule } from './articles/articles.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ChatModule } from './chat/chat.module';
+import { OrdersModule } from './orders/orders.module';
+import { StatusesModule } from './statuses/statuses.module';
 
 @Module({
     imports: [
@@ -46,7 +47,6 @@ import { ChatModule } from './chat/chat.module';
         MeasurementsModule,
         CountriesModule,
         SlidersModule,
-        UserDocumentsModule,
         ProvincesModule,
         CitiesModule,
         AreasModule,
@@ -55,6 +55,8 @@ import { ChatModule } from './chat/chat.module';
         ArticlesModule,
         NotificationsModule,
         ChatModule,
+        OrdersModule,
+        StatusesModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],
