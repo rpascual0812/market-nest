@@ -67,15 +67,15 @@ export class Product {
 
     @OneToMany('ProductDocument', (product_document: ProductDocument) => product_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_document_pk' })
-    product_document: ProductDocument;
+    product_document: ProductDocument[];
 
     @OneToMany('UserCart', (user_cart: UserCart) => user_cart.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_cart_pk' })
-    user_cart: UserCart;
+    user_cart: UserCart[];
 
     @OneToMany('ProductRating', (product_rating: ProductRating) => product_rating.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_rating_pk' })
-    product_rating: ProductRating;
+    product_rating: ProductRating[];
 
     @OneToMany('Order', (order: Order) => order.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'order_pk' })

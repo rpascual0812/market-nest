@@ -21,6 +21,9 @@ export class ProductDocument {
     @Column({ name: 'document_pk', nullable: false })
     document_pk: number;
 
+    @Column({ type: 'bool', default: false })
+    default: boolean;
+
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
 

@@ -10,6 +10,7 @@ import { Document } from 'src/documents/entities/document.entity';
 import { UserDocument } from 'src/users/entities/user-document.entity';
 import { UserAddress } from 'src/users/entities/user-address.entity';
 import { User } from 'src/users/entities/user.entity';
+import { ProductRating } from './entities/product-ratings.entity';
 
 @Injectable()
 export class ProductsService {
@@ -80,7 +81,7 @@ export class ProductsService {
                 .leftJoinAndSelect("products.country", "countries")
 
                 // user documents
-                .leftJoinAndMapMany(
+                .leftJoinAndMapOne(
                     'products.user_document',
                     UserDocument,
                     'user_documents',
@@ -106,10 +107,34 @@ export class ProductsService {
                     'product_doc',
                     'product_documents.document_pk=product_doc.pk',
                 )
+
+                // product ratings
+                .leftJoinAndMapMany(
+                    'products.product_rating',
+                    ProductRating,
+                    'product_ratings',
+                    'products.pk=product_ratings.product_pk'
+                )
+
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
                 ;
+
+            products[0].forEach((product) => {
+                let total = 0,
+                    ratings = 0;
+
+                product.product_rating.forEach((rating) => {
+                    total++;
+                    ratings += parseFloat(rating.rating.toString());
+                });
+
+                let rating = ratings / total;
+                product['total_rating'] = rating ? parseFloat(rating.toString()).toFixed(2) : '0.00';
+
+                product['rating_count'] = product.product_rating.length;
+            });
 
             return {
                 status: true,

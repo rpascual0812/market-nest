@@ -10,6 +10,9 @@ export class UserAddress {
     @Column({ type: 'text', nullable: false })
     type: string;
 
+    @Column({ type: 'bool', default: false })
+    default: boolean;
+
     @Column({ name: 'province_pk', nullable: false })
     province_pk: number;
 
