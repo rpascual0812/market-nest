@@ -1,3 +1,4 @@
+import { Category } from 'src/categories/entities/category.entity';
 import { Country } from 'src/countries/entities/country.entity';
 import { Measurement } from 'src/measurements/entities/measurement.entity';
 import { Order } from 'src/orders/entities/order.entity';
@@ -34,6 +35,9 @@ export class Product {
     @Column({ name: 'measurement_pk', nullable: false })
     measurement_pk: number;
 
+    @Column({ name: 'category_pk', nullable: false })
+    category_pk: number;
+
     @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
     price_from: number;
 
@@ -60,6 +64,10 @@ export class Product {
     @ManyToOne(type => Measurement, measurement => measurement.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'measurement_pk' })
     measurement: Measurement;
+
+    @ManyToOne(type => Category, category => category.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'category_pk' })
+    category: Category;
 
     @ManyToOne('Country', (country: Country) => country.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'country_pk' })

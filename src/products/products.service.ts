@@ -70,6 +70,48 @@ export class ProductsService {
     }
 
     async findAll(data: any, filters: any) {
+        console.log('filters', filters);
+        /*
+        'Best Seller',
+            'Newest',
+            'Highest Price',
+            'Lowest Price',
+            'Average Rating',
+            'Vegetables',
+            'Fruits',
+            'Seeds',
+            'Herbs',
+            */
+        let orderByColumn,
+            orderByDirection;
+        if (filters.hasOwnProperty('orderBy')) {
+            switch (filters.orderBy) {
+                case 'Best Seller':
+                    orderByColumn = 'products.price_from';
+                    orderByDirection = 'DESC';
+                    break;
+                case 'Newest':
+                    orderByColumn = 'products.date_created';
+                    orderByDirection = 'DESC';
+                    break;
+                case 'Highest Price':
+                    orderByColumn = 'products.price_from';
+                    orderByDirection = 'DESC';
+                    break;
+                case 'Lowest Price':
+                    orderByColumn = 'products.price_from';
+                    orderByDirection = 'ASC';
+                    break;
+                case 'Lowest Price':
+                    orderByColumn = 'products.price_from';
+                    orderByDirection = 'ASC';
+                    break;
+                default:
+                    orderByColumn = 'products.date_created';
+                    orderByDirection = 'DESC';
+            }
+        }
+
         try {
             const products = await getRepository(Product)
                 .createQueryBuilder('products')
@@ -79,6 +121,7 @@ export class ProductsService {
 
                 .leftJoinAndSelect("products.measurement", "measurements")
                 .leftJoinAndSelect("products.country", "countries")
+                .leftJoinAndSelect("products.category", "product_categories")
 
                 // user documents
                 .leftJoinAndMapOne(
@@ -115,7 +158,8 @@ export class ProductsService {
                     'product_ratings',
                     'products.pk=product_ratings.product_pk'
                 )
-
+                .orderBy(orderByColumn, orderByDirection)
+                // .addOrderBy('products.date_created', 'DESC')
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()

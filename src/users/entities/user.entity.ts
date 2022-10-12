@@ -25,6 +25,7 @@ import { ProductRating } from 'src/products/entities/product-ratings.entity';
 import { UserRating } from './user-rating.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Status } from 'src/statuses/entities/status.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -136,6 +137,10 @@ export class User extends BaseEntity {
     @OneToMany('ProductDocument', (product_document: ProductDocument) => product_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_document_pk' })
     product_document: ProductDocument;
+
+    @OneToMany('Category', (category: Category) => category.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'category_pk' })
+    category: Category;
 
     @OneToMany('Permission', (permission: Permission) => permission.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'permission_pk' })

@@ -9,7 +9,6 @@ export class ProductsController {
     @UseGuards(JwtAuthGuard)
     @Post()
     async create(@Body() body: any, @Request() req: any, @Response() res: any) {
-        console.log(body);
         const product = await this.productsService.create(body, req.user);
         return res.status(product.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(product);
     }

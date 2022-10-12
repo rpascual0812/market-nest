@@ -29,6 +29,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { ChatModule } from './chat/chat.module';
 import { OrdersModule } from './orders/orders.module';
 import { StatusesModule } from './statuses/statuses.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
     imports: [
@@ -57,6 +58,7 @@ import { StatusesModule } from './statuses/statuses.module';
         ChatModule,
         OrdersModule,
         StatusesModule,
+        CategoriesModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],
