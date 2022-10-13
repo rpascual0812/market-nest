@@ -26,6 +26,7 @@ import { UserRating } from './user-rating.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { UserFollow } from './user-follow.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -189,4 +190,12 @@ export class User extends BaseEntity {
     @OneToMany('Status', (status: Status) => status.user_pk, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'status_pk' })
     status: Status;
+
+    @OneToMany('UserFollow', (user_follow: UserFollow) => user_follow.following, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_following_pk' })
+    following: UserFollow;
+
+    @OneToMany('UserFollow', (user_follow: UserFollow) => user_follow.follower, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_follower_pk' })
+    follower: UserFollow;
 }
