@@ -10,7 +10,7 @@ export class SlidersController {
     @Get()
     async findAll(@Request() req: any) {
         const data = await this.slidersService.findAll(req.user, req.query);
-        // console.log('sliders', data);
+        console.log('sliders', data);
         if (data) {
             return data;
         }

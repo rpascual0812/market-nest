@@ -13,6 +13,7 @@ export class SlidersService {
     ) { }
 
     async findAll(data: any, filters: any) {
+        console.log(filters);
         try {
             const sliders = await getRepository(Slider)
                 .createQueryBuilder('sliders')
