@@ -11,6 +11,9 @@ export class UserRating {
     @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
     rating: number;
 
+    @Column({ type: 'text', nullable: true })
+    message: String;
+
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 

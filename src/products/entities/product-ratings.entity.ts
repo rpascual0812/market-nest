@@ -17,6 +17,9 @@ export class ProductRating {
     @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
     rating: number;
 
+    @Column({ type: 'text', nullable: true })
+    message: String;
+
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
 
