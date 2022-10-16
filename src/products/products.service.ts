@@ -69,6 +69,20 @@ export class ProductsService {
         }
     }
 
+    async findOne(data: any) {
+        try {
+            return await Product.findOne({
+                pk: data.pk
+            });
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
     async findAll(data: any, filters: any) {
         console.log('filters', filters);
         /*
@@ -210,6 +224,28 @@ export class ProductsService {
                 )
                 // .where("product_documents.product_pk = :pk", { pk })
                 .where("product_documents.product_pk IN (:...pk)", { pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async getUserAddresses(pks: any, filters: any) {
+        try {
+            return await getRepository(UserAddress)
+                .createQueryBuilder('user_addresses')
+                .select('user_addresses')
+                .leftJoinAndSelect("user_addresses.province", "provinces")
+                .leftJoinAndSelect("user_addresses.city", "cities")
+                .leftJoinAndSelect("user_addresses.area", "areas")
+                .where("user_addresses.user_pk IN (:...user_pk)", { user_pk: pks })
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()

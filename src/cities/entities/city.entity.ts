@@ -1,6 +1,7 @@
 import { Area } from 'src/areas/entities/area.entity';
 import { Country } from 'src/countries/entities/country.entity';
 import { Province } from 'src/provinces/entities/province.entity';
+import { UserAddress } from 'src/users/entities/user-address.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany } from 'typeorm';
 
@@ -28,6 +29,10 @@ export class City {
     /**
      * Relationship
      */
+    @OneToMany('UserAddress', (user_address: UserAddress) => user_address.city)
+    @JoinColumn({ name: 'pk' })
+    user_address: Array<UserAddress>;
+
     @ManyToOne(type => Country, country => country.city, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'country_pk' })
     country: Country;
