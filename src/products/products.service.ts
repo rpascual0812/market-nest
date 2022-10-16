@@ -113,7 +113,7 @@ export class ProductsService {
         }
 
         try {
-            const products = await getRepository(Product)
+            return await getRepository(Product)
                 .createQueryBuilder('products')
                 .leftJoinAndSelect("products.user", "users")
                 .select('products')
@@ -138,59 +138,189 @@ export class ProductsService {
                 )
 
                 // product documents
-                .leftJoinAndMapMany(
-                    'products.product_document',
-                    ProductDocument,
-                    'product_documents',
-                    'products.pk=product_documents.product_pk'
-                )
-                .leftJoinAndMapOne(
-                    'product_documents.document',
-                    Document,
-                    'product_doc',
-                    'product_documents.document_pk=product_doc.pk',
-                )
+                // .leftJoinAndMapMany(
+                //     'products.product_document',
+                //     ProductDocument, 
+                //     'product_documents',
+                //     'products.pk=product_documents.product_pk',
+                // )
+                // .leftJoinAndMapOne(
+                //     'product_documents.document',
+                //     Document,
+                //     'product_doc',
+                //     'product_documents.document_pk=product_doc.pk',
+                // )
 
                 // product ratings
-                .leftJoinAndMapMany(
-                    'products.product_rating',
-                    ProductRating,
-                    'product_ratings',
-                    'products.pk=product_ratings.product_pk'
-                )
+                // .leftJoinAndMapMany(
+                //     'products.product_rating',
+                //     ProductRating,
+                //     'product_ratings',
+                //     'products.pk=product_ratings.product_pk'
+                // )
+                // .where("products.pk = :pk", { pk: 10 })
                 .orderBy(orderByColumn, orderByDirection)
                 // .addOrderBy('products.date_created', 'DESC')
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
                 ;
+            // put this in controller
+            // products[0].forEach(async (product) => {
+            //     let total = 0,
+            //         ratings = 0;
 
-            products[0].forEach((product) => {
-                let total = 0,
-                    ratings = 0;
+            //     product.product_rating.forEach((rating) => {
+            //         total++;
+            //         ratings += parseFloat(rating.rating.toString());
+            //     });
 
-                product.product_rating.forEach((rating) => {
-                    total++;
-                    ratings += parseFloat(rating.rating.toString());
-                });
+            //     let rating = ratings / total;
+            //     product['total_rating'] = rating ? parseFloat(rating.toString()).toFixed(2) : '0.00';
 
-                let rating = ratings / total;
-                product['total_rating'] = rating ? parseFloat(rating.toString()).toFixed(2) : '0.00';
+            //     product['rating_count'] = product.product_rating.length;
 
-                product['rating_count'] = product.product_rating.length;
-            });
+            //     // product['product_documents'] = await this.getProductDocuments(product['pk'], filters);
+            // });
 
-            return {
-                status: true,
-                data: products[0],
-                total: products[1]
-            }
+            // return await {
+            //     status: true,
+            //     data: products[0],
+            //     total: products[1]
+            // }
         } catch (error) {
             console.log(error);
             // SAVE ERROR
             return {
                 status: false
             }
+        }
+    }
+
+    async getProductDocuments(pks: any, filters: any) {
+        try {
+            return await getRepository(ProductDocument)
+                .createQueryBuilder('product_documents')
+                .select('product_documents')
+                .leftJoinAndMapOne(
+                    'product_documents.document',
+                    Document,
+                    'product_doc',
+                    'product_documents.document_pk=product_doc.pk',
+                )
+                // .where("product_documents.product_pk = :pk", { pk })
+                .where("product_documents.product_pk IN (:...pk)", { pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async getProductRatings(pks: any, filters: any) {
+        try {
+            return await getRepository(ProductRating)
+                .createQueryBuilder('product_ratings')
+                .select('product_ratings')
+                .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+                .leftJoinAndSelect("product_ratings.user", "users")
+                .leftJoinAndSelect("users.user_document", "user_documents")
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                .where("product_ratings.product_pk IN (:...pk)", { pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async getProductTotalRatings(pks: any) {
+        try {
+            return await getRepository(ProductRating)
+                .createQueryBuilder('product_ratings')
+                .select('product_pk')
+                .addSelect('sum(rating) as total')
+                .addSelect('count(pk) as count')
+                .where("product_ratings.product_pk IN (:...pk)", { pk: pks })
+                .groupBy('product_pk')
+                .getRawAndEntities()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async findOneRatingPerUser(data: any, filters: any) {
+        try {
+            return await ProductRating.findOne({
+                user_pk: parseInt(filters.pk),
+                product_pk: parseInt(data.product_pk)
+            });
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async createRating(body: any, user: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const existing = await EntityManager.findOne(ProductRating, { 'user_pk': user.pk, 'product_pk': body.product_pk });
+                    // await EntityManager.remove(existing);
+                    if (existing) {
+                        const fields = { 'rating': body.rating, 'message': body.message, anonymous: body.anonymous == 'true' ? true : false };
+                        const filters = { 'user_pk': user.pk, 'product_pk': body.product_pk };
+                        const res = await EntityManager.update(ProductRating, filters, fields);
+                        if (res.affected > 0) {
+                            return await EntityManager.findOne(ProductRating, { 'user_pk': user.pk, 'product_pk': body.product_pk });
+                        }
+                        return null;
+                    }
+                    else {
+                        const data = new ProductRating();
+                        data.user_pk = user.pk;
+                        data.product_pk = body.product_pk;
+                        data.rating = body.rating;
+                        data.message = body.message;
+                        data.anonymous = body.anonymous;
+                        return await EntityManager.save(data);
+                    }
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            await queryRunner.release();
+            // console.log('finally...');
         }
     }
 }

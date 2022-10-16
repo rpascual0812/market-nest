@@ -20,7 +20,7 @@ export class AppController {
     @Post('login')
     async login(@Response() res: any, @Request() req) {
         const user = await this.authService.login(req.user);
-        console.log(user);
+        // console.log(user);
         if (user) {
             return res.status(HttpStatus.OK).json({ status: 'success', user });
         }
