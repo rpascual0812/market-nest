@@ -18,8 +18,10 @@ export class ProductsController {
         const products = await this.productsService.findAll(req.user, req.query);
         if (products) {
             const pks = products[0].map(({ pk }) => pk);
+            const user_pks = products[0].map(({ user_pk }) => user_pk);
 
             const documents = await this.productsService.getProductDocuments(pks, req.query);
+            const addresses = await this.productsService.getUserAddresses(user_pks, req.query);
             const ratings = await this.productsService.getProductRatings(pks, req.query);
             const totalRatings = await this.productsService.getProductTotalRatings(pks);
 
@@ -63,6 +65,18 @@ export class ProductsController {
                         }
                     });
                 }
+
+                if (!product.hasOwnProperty('user_addresses')) {
+                    product['user_addresses'] = [];
+                }
+                // Append user addresses
+                if (addresses) {
+                    addresses[0].forEach(address => {
+                        if (product.user_pk == address.user_pk) {
+                            product['user_addresses'].push(address);
+                        }
+                    });
+                }
             });
 
             return {
@@ -85,6 +99,64 @@ export class ProductsController {
 
 
         // throw new InternalServerErrorException();
+    }
+
+    @Get(':pk')
+    async findOne(@Request() req: any, @Response() res: any) {
+        console.log('params', req.params);
+        const product = await this.productsService.findOne(req.params);
+        if (product) {
+            console.log(product['pk']);
+            const documents = await this.productsService.getProductDocuments([product['pk']], req.query);
+            const addresses = await this.productsService.getUserAddresses([product['user_pk']], req.query);
+            const ratings = await this.productsService.getProductRatings([product['pk']], req.query);
+            const totalRatings = await this.productsService.getProductTotalRatings([product['pk']]);
+
+            product['product_documents'] = [];
+            // Append product documents
+            if (documents) {
+                documents[0].forEach(document => {
+                    if (product['pk'] == document.product_pk) {
+                        product['product_documents'].push(document);
+                    }
+                });
+            }
+
+            product['product_ratings'] = [];
+            // Append product ratings
+            if (ratings) {
+                ratings[0].forEach(rating => {
+                    if (product['pk'] == rating.product_pk) {
+                        product['product_ratings'].push(rating);
+                    }
+                });
+            }
+
+            product['product_rating_total'] = 0;
+            product['product_rating_count'] = 0;
+            // Append product rating total
+            if (totalRatings['raw']) {
+                totalRatings['raw'].forEach(rating => {
+                    if (product['pk'] == rating.product_pk) {
+                        product['product_rating_count'] = rating.count;
+                        product['product_rating_total'] = rating.total / rating.count;
+                    }
+                });
+            }
+
+            product['user_addresses'] = [];
+            // Append user addresses
+            if (addresses) {
+                addresses[0].forEach(address => {
+                    if (product['user_pk'] == address.user_pk) {
+                        product['user_addresses'].push(address);
+                    }
+                });
+            }
+
+            return res.status(HttpStatus.OK).json({ status: 'success', data: product });
+        }
+        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
 
     @UseGuards(JwtAuthGuard)
