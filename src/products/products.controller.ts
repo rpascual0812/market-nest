@@ -160,9 +160,9 @@ export class ProductsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('rating')
+    @Get(':product_pk/rating')
     async findOneRatingPerUser(@Request() req: any, @Response() res: any) {
-        const data = await this.productsService.findOneRatingPerUser(req.query, req.user);
+        const data = await this.productsService.findOneRatingPerUser(req.params, req.user);
         if (data) {
             return res.status(HttpStatus.OK).json({ status: 'success', data: data });
         }
@@ -170,7 +170,7 @@ export class ProductsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post('rating')
+    @Post('ratings')
     async createRating(@Body() body: any, @Request() req: any, @Response() res: any) {
         const data = await this.productsService.createRating(body, req.user);
         if (data) {
