@@ -43,4 +43,4 @@ PreconditionFailedException
 
 
 
-pg_dump --username=postgres --encoding=ISO88591 database -f database.sql
+pg_dump -U postgres -W -F p -h localhost -f community_market-221018.sql community_market
