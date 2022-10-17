@@ -1,6 +1,7 @@
 import { City } from 'src/cities/entities/city.entity';
 import { Country } from 'src/countries/entities/country.entity';
 import { Province } from 'src/provinces/entities/province.entity';
+import { SellerAddress } from 'src/sellers/entities/seller-address.entity';
 import { UserAddress } from 'src/users/entities/user-address.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany } from 'typeorm';
@@ -35,6 +36,10 @@ export class Area {
     @OneToMany('UserAddress', (user_address: UserAddress) => user_address.area)
     @JoinColumn({ name: 'pk' })
     user_address: Array<UserAddress>;
+
+    @OneToMany('SellerAddress', (seller_address: SellerAddress) => seller_address.area)
+    @JoinColumn({ name: 'pk' })
+    seller_address: Array<SellerAddress>;
 
     @ManyToOne(type => Country, country => country.area, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'country_pk' })
