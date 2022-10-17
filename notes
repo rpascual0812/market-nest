@@ -40,3 +40,7 @@ BadGatewayException
 ServiceUnavailableException
 GatewayTimeoutException
 PreconditionFailedException
+
+
+
+pg_dump --username=postgres --encoding=ISO88591 database -f database.sql
