@@ -71,9 +71,32 @@ export class ProductsService {
 
     async findOne(data: any) {
         try {
-            return await Product.findOne({
-                pk: data.pk
-            });
+            return await getRepository(Product)
+                .createQueryBuilder('products')
+                .leftJoinAndSelect("products.user", "users")
+                .select('products')
+                .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+
+                .leftJoinAndSelect("products.measurement", "measurements")
+                .leftJoinAndSelect("products.country", "countries")
+                .leftJoinAndSelect("products.category", "product_categories")
+
+                // user documents
+                .leftJoinAndMapOne(
+                    'products.user_document',
+                    UserDocument,
+                    'user_documents',
+                    'products.user_pk=user_documents.user_pk'
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                .where('products.pk = :pk', { pk: data.pk })
+                .getOneOrFail()
+                ;
         } catch (error) {
             console.log(error);
             // SAVE ERROR
@@ -308,6 +331,7 @@ export class ProductsService {
     }
 
     async findOneRatingPerUser(data: any, filters: any) {
+        console.log(data);
         try {
             return await ProductRating.findOne({
                 user_pk: parseInt(filters.pk),
@@ -325,7 +349,6 @@ export class ProductsService {
     async createRating(body: any, user: any) {
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
-
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
@@ -344,7 +367,7 @@ export class ProductsService {
                         const data = new ProductRating();
                         data.user_pk = user.pk;
                         data.product_pk = body.product_pk;
-                        data.rating = body.rating;
+                        data.rating = parseFloat(body.rating);
                         data.message = body.message;
                         data.anonymous = body.anonymous;
                         return await EntityManager.save(data);
