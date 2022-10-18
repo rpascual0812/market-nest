@@ -18,10 +18,10 @@ export class ProductsController {
         const products = await this.productsService.findAll(req.user, req.query);
         if (products) {
             const pks = products[0].map(({ pk }) => pk);
-            const user_pks = products[0].map(({ user_pk }) => user_pk);
+            // const seller_pks = products[0].map(({ product }) => product.user.seller.pk);
 
             const documents = await this.productsService.getProductDocuments(pks, req.query);
-            const addresses = await this.productsService.getUserAddresses(user_pks, req.query);
+            // const addresses = await this.productsService.getSellerAddresses(seller_pks, req.query);
             const ratings = await this.productsService.getProductRatings(pks, req.query);
             const totalRatings = await this.productsService.getProductTotalRatings(pks);
 
@@ -66,17 +66,17 @@ export class ProductsController {
                     });
                 }
 
-                if (!product.hasOwnProperty('user_addresses')) {
-                    product['user_addresses'] = [];
-                }
-                // Append user addresses
-                if (addresses) {
-                    addresses[0].forEach(address => {
-                        if (product.user_pk == address.user_pk) {
-                            product['user_addresses'].push(address);
-                        }
-                    });
-                }
+                // if (!product.hasOwnProperty('user_addresses')) {
+                //     product['user_addresses'] = [];
+                // }
+                // // Append user addresses
+                // if (addresses) {
+                //     addresses[0].forEach(address => {
+                //         if (product.user_pk == address.user_pk) {
+                //             product['user_addresses'].push(address);
+                //         }
+                //     });
+                // }
             });
 
             return {
@@ -103,12 +103,12 @@ export class ProductsController {
 
     @Get(':pk')
     async findOne(@Request() req: any, @Response() res: any) {
-        console.log('params', req.params);
         const product = await this.productsService.findOne(req.params);
         if (product) {
-            console.log(product['pk']);
+            // console.log(product['pk'], product['user']['seller']['pk']);
             const documents = await this.productsService.getProductDocuments([product['pk']], req.query);
-            const addresses = await this.productsService.getUserAddresses([product['user_pk']], req.query);
+            const userAddresses = await this.productsService.getUserAddresses([product['user_pk']], req.query);
+            const sellerAddresses = await this.productsService.getSellerAddresses([product['user']['seller']['pk']], req.query);
             const ratings = await this.productsService.getProductRatings([product['pk']], req.query);
             const totalRatings = await this.productsService.getProductTotalRatings([product['pk']]);
 
@@ -146,10 +146,20 @@ export class ProductsController {
 
             product['user_addresses'] = [];
             // Append user addresses
-            if (addresses) {
-                addresses[0].forEach(address => {
+            if (userAddresses) {
+                userAddresses[0].forEach(address => {
                     if (product['user_pk'] == address.user_pk) {
                         product['user_addresses'].push(address);
+                    }
+                });
+            }
+
+            product['seller_addresses'] = [];
+            // Append user addresses
+            if (sellerAddresses) {
+                sellerAddresses[0].forEach(address => {
+                    if (product['user']['seller']['pk'] == address.seller_pk) {
+                        product['seller_addresses'].push(address);
                     }
                 });
             }

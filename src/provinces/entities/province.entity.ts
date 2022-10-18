@@ -2,7 +2,7 @@ import { Area } from 'src/areas/entities/area.entity';
 import { City } from 'src/cities/entities/city.entity';
 import { Country } from 'src/countries/entities/country.entity';
 import { Product } from 'src/products/entities/product.entity';
-import { SellerAddress } from 'src/sellers/entities/seller-address.entity';
+import { SellerAddress } from 'src/seller/entities/seller-address.entity';
 import { UserAddress } from 'src/users/entities/user-address.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany } from 'typeorm';

@@ -24,11 +24,11 @@ export class Seller {
      * Relationship
      */
 
-    @OneToOne(type => User, user => user.seller, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @OneToOne(type => User, user => user.seller, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
 
-    @OneToOne(type => SellerAddress, seller_address => seller_address.seller, { eager: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @OneToMany(type => SellerAddress, seller_address => seller_address.seller, { eager: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'seller_address_pk' })
     @JoinTable()
     seller_address: SellerAddress[];
