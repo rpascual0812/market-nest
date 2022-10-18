@@ -5,6 +5,7 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, 
 import { Seller } from './seller.entity';
 
 @Entity({ name: 'seller_addresses' })
+@Unique(['seller_pk', 'type'])
 export class SellerAddress {
     @PrimaryGeneratedColumn()
     pk: number;

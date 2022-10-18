@@ -11,6 +11,7 @@ import { UserDocument } from 'src/users/entities/user-document.entity';
 import { UserAddress } from 'src/users/entities/user-address.entity';
 import { User } from 'src/users/entities/user.entity';
 import { ProductRating } from './entities/product-ratings.entity';
+import { SellerAddress } from 'src/seller/entities/seller-address.entity';
 
 @Injectable()
 export class ProductsService {
@@ -73,8 +74,9 @@ export class ProductsService {
         try {
             return await getRepository(Product)
                 .createQueryBuilder('products')
-                .leftJoinAndSelect("products.user", "users")
                 .select('products')
+                .leftJoinAndSelect("products.user", "users")
+                .leftJoinAndSelect("users.seller", "sellers")
                 .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
 
                 .leftJoinAndSelect("products.measurement", "measurements")
@@ -269,6 +271,28 @@ export class ProductsService {
                 .leftJoinAndSelect("user_addresses.city", "cities")
                 .leftJoinAndSelect("user_addresses.area", "areas")
                 .where("user_addresses.user_pk IN (:...user_pk)", { user_pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async getSellerAddresses(pks: any, filters: any) {
+        try {
+            return await getRepository(SellerAddress)
+                .createQueryBuilder('seller_addresses')
+                .select('seller_addresses')
+                .leftJoinAndSelect("seller_addresses.province", "provinces")
+                .leftJoinAndSelect("seller_addresses.city", "cities")
+                .leftJoinAndSelect("seller_addresses.area", "areas")
+                .where("seller_addresses.seller_pk IN (:...seller_pk)", { seller_pk: pks })
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()

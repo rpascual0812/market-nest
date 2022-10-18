@@ -30,7 +30,8 @@ import { ChatModule } from './chat/chat.module';
 import { OrdersModule } from './orders/orders.module';
 import { StatusesModule } from './statuses/statuses.module';
 import { CategoriesModule } from './categories/categories.module';
-import { SellersModule } from './sellers/sellers.module';
+// import { SellersModule } from './sellers/sellers.module';
+import { SellerModule } from './seller/seller.module';
 
 @Module({
     imports: [
@@ -60,7 +61,8 @@ import { SellersModule } from './sellers/sellers.module';
         OrdersModule,
         StatusesModule,
         CategoriesModule,
-        SellersModule,
+        SellerModule,
+        // SellersModule,
     ],
     controllers: [AppController],
     providers: [AppService, CheckService, CronEmailService, GarbageCollectorService],

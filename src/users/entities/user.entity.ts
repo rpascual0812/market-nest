@@ -27,7 +27,7 @@ import { Order } from 'src/orders/entities/order.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { UserFollow } from './user-follow.entity';
-import { Seller } from 'src/sellers/entities/seller.entity';
+import { Seller } from 'src/seller/entities/seller.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -71,6 +71,9 @@ export class User extends BaseEntity {
     @Column({ name: 'country_pk', nullable: false })
     country_pk: number;
 
+    @Column({ default: false })
+    is_seller: boolean;
+
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
 
@@ -83,6 +86,12 @@ export class User extends BaseEntity {
     @OneToOne(type => Account, account => account.user, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'account_pk' })
     account: Account;
+
+    @OneToOne(type => Seller, seller => seller.user, { cascade: true })
+    seller: Seller;
+
+
+
 
     @ManyToOne(type => Role, role => role.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'role_pk' })
@@ -181,7 +190,7 @@ export class User extends BaseEntity {
     user_rating: UserRating;
 
     @OneToMany('UserRating', (user_rating: UserRating) => user_rating.created_by, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'user_rating_pk' })
+    @JoinColumn({ name: 'created_by_rating_pk' })
     created_by: UserRating;
 
     @OneToMany('Order', (order: Order) => order.user_pk, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
@@ -199,8 +208,4 @@ export class User extends BaseEntity {
     @OneToMany('UserFollow', (user_follow: UserFollow) => user_follow.follower, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_follower_pk' })
     follower: UserFollow;
-
-    @OneToOne('Seller', (seller: Seller) => seller.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'pk' })
-    seller: Seller;
 }
