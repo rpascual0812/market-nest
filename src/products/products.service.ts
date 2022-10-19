@@ -84,7 +84,7 @@ export class ProductsService {
                 .leftJoinAndSelect("products.category", "product_categories")
 
                 // user documents
-                .leftJoinAndMapOne(
+                .leftJoinAndMapMany(
                     'products.user_document',
                     UserDocument,
                     'user_documents',
@@ -167,7 +167,7 @@ export class ProductsService {
                 .leftJoinAndSelect("products.category", "product_categories")
 
                 // user documents
-                .leftJoinAndMapOne(
+                .leftJoinAndMapMany(
                     'products.user_document',
                     UserDocument,
                     'user_documents',
