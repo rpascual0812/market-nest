@@ -109,7 +109,6 @@ export class ProductsService {
     }
 
     async findAll(data: any, filters: any) {
-        console.log('filters', filters);
         /*
         'Best Seller',
             'Newest',
@@ -121,6 +120,8 @@ export class ProductsService {
             'Seeds',
             'Herbs',
             */
+
+
         let orderByColumn,
             orderByDirection;
         if (filters.hasOwnProperty('orderBy')) {
@@ -154,6 +155,9 @@ export class ProductsService {
         try {
             return await getRepository(Product)
                 .createQueryBuilder('products')
+                .where('products.archived=false')
+                .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:type)" : '1=1', { type: filters.type })
+                // .if(filters.hasOwnProperty('type'), query => query.andWhere(`products.type = :type`, { type: filters.type }))
                 .leftJoinAndSelect("products.user", "users")
                 .select('products')
                 .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
@@ -176,57 +180,11 @@ export class ProductsService {
                     'user_documents.document_pk=user_doc.pk',
                 )
 
-                // product documents
-                // .leftJoinAndMapMany(
-                //     'products.product_document',
-                //     ProductDocument, 
-                //     'product_documents',
-                //     'products.pk=product_documents.product_pk',
-                // )
-                // .leftJoinAndMapOne(
-                //     'product_documents.document',
-                //     Document,
-                //     'product_doc',
-                //     'product_documents.document_pk=product_doc.pk',
-                // )
-
-                // product ratings
-                // .leftJoinAndMapMany(
-                //     'products.product_rating',
-                //     ProductRating,
-                //     'product_ratings',
-                //     'products.pk=product_ratings.product_pk'
-                // )
-                // .where("products.pk = :pk", { pk: 10 })
                 .orderBy(orderByColumn, orderByDirection)
-                // .addOrderBy('products.date_created', 'DESC')
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
                 ;
-            // put this in controller
-            // products[0].forEach(async (product) => {
-            //     let total = 0,
-            //         ratings = 0;
-
-            //     product.product_rating.forEach((rating) => {
-            //         total++;
-            //         ratings += parseFloat(rating.rating.toString());
-            //     });
-
-            //     let rating = ratings / total;
-            //     product['total_rating'] = rating ? parseFloat(rating.toString()).toFixed(2) : '0.00';
-
-            //     product['rating_count'] = product.product_rating.length;
-
-            //     // product['product_documents'] = await this.getProductDocuments(product['pk'], filters);
-            // });
-
-            // return await {
-            //     status: true,
-            //     data: products[0],
-            //     total: products[1]
-            // }
         } catch (error) {
             console.log(error);
             // SAVE ERROR
