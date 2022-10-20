@@ -16,12 +16,14 @@ export class ProductsController {
     @Get()
     async findAll(@Request() req: any) {
         const products = await this.productsService.findAll(req.user, req.query);
-        if (products) {
+        if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
+            const user_pks = products[0].map(({ user_pk }) => user_pk);
             const seller_pks = products[0].map(({ product }) => product && product.user ? product.user.seller.pk : null);
 
             const documents = await this.productsService.getProductDocuments(pks, req.query);
-            const userAddresses = await this.productsService.getUserAddresses(pks, req.query);
+            const userAddresses = await this.productsService.getUserAddresses(user_pks, req.query);
+
             const sellerAddresses = await this.productsService.getSellerAddresses(seller_pks, req.query);
             // const addresses = await this.productsService.getSellerAddresses(seller_pks, req.query);
             const ratings = await this.productsService.getProductRatings(pks, req.query);
@@ -72,7 +74,7 @@ export class ProductsController {
                     product['user_addresses'] = [];
                 }
                 // Append user addresses
-                if (userAddresses) {
+                if (userAddresses[0]) {
                     userAddresses[0].forEach(address => {
                         if (product.user_pk == address.user_pk) {
                             product['user_addresses'].push(address);
@@ -108,6 +110,11 @@ export class ProductsController {
             // });
         }
         else {
+            return {
+                status: false,
+                data: [],
+                total: 0
+            }
         }
         // console.log('products', newProducts);
 

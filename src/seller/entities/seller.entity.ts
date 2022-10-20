@@ -14,6 +14,12 @@ export class Seller {
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 
+    @Column({ type: 'text', nullable: false })
+    mobile_number: string;
+
+    @Column({ type: 'text', nullable: false })
+    about: string;
+
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
 
