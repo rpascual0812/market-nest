@@ -153,13 +153,20 @@ export class ProductsService {
         }
 
         try {
+            let months = filters.hasOwnProperty('months') ? JSON.parse(filters.months) : [];
+            const monthsArr = months.map((month) => month.name);
             return await getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
                 .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:type)" : '1=1', { type: filters.type })
+                .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_created) = :year" : '1=1', { year: filters.year })
+                .andWhere(filters.hasOwnProperty('months') ? "TO_CHAR(products.date_created, 'Month') in (:...months)" : '1=1', { months: monthsArr })
                 // .if(filters.hasOwnProperty('type'), query => query.andWhere(`products.type = :type`, { type: filters.type }))
                 .leftJoinAndSelect("products.user", "users")
                 .select('products')
+                .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+
+                .leftJoinAndSelect("users.seller", "sellers")
                 .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
 
                 .leftJoinAndSelect("products.measurement", "measurements")
