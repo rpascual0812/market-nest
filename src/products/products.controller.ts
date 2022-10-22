@@ -1,10 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Response, UseGuards, HttpStatus, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('products')
 export class ProductsController {
-    constructor(private readonly productsService: ProductsService) { }
+    constructor(
+        private readonly productsService: ProductsService,
+        private readonly usersService: UsersService
+    ) { }
 
     @UseGuards(JwtAuthGuard)
     @Post()
@@ -22,9 +26,9 @@ export class ProductsController {
             const seller_pks = products[0].map(({ product }) => product && product.user ? product.user.seller.pk : null);
 
             const documents = await this.productsService.getProductDocuments(pks, req.query);
-            const userAddresses = await this.productsService.getUserAddresses(user_pks, req.query);
+            const userAddresses = await this.usersService.getUserAddresses(user_pks, req.query);
 
-            const sellerAddresses = await this.productsService.getSellerAddresses(seller_pks, req.query);
+            const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
             // const addresses = await this.productsService.getSellerAddresses(seller_pks, req.query);
             const ratings = await this.productsService.getProductRatings(pks, req.query);
             const totalRatings = await this.productsService.getProductTotalRatings(pks);
@@ -128,8 +132,8 @@ export class ProductsController {
         if (product) {
             // console.log(product['pk'], product['user']['seller']['pk']);
             const documents = await this.productsService.getProductDocuments([product['pk']], req.query);
-            const userAddresses = await this.productsService.getUserAddresses([product['user_pk']], req.query);
-            const sellerAddresses = product['user'] ? await this.productsService.getSellerAddresses([product['user']['seller']['pk']], req.query) : [];
+            const userAddresses = await this.usersService.getUserAddresses([product['user_pk']], req.query);
+            const sellerAddresses = product['user'] ? await this.usersService.getSellerAddresses([product['user']['seller']['pk']], req.query) : [];
             const ratings = await this.productsService.getProductRatings([product['pk']], req.query);
             const totalRatings = await this.productsService.getProductTotalRatings([product['pk']]);
 

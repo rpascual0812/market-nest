@@ -3,16 +3,16 @@ import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity({ name: 'user_follow' })
-@Unique(['following', 'follower'])
+@Unique(['user_pk', 'created_by'])
 export class UserFollow {
     @PrimaryGeneratedColumn()
     pk: number;
 
-    @Column({ name: 'following', nullable: false })
-    following: number;
+    @Column({ name: 'user_pk', nullable: false })
+    user_pk: number;
 
-    @Column({ name: 'follower', nullable: false })
-    follower: number;
+    @Column({ name: 'created_by', nullable: false })
+    created_by: number;
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
@@ -21,11 +21,12 @@ export class UserFollow {
      * Relationship
      */
 
-    @ManyToOne(type => User, user => user.following, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'following' })
-    userFollowing: User;
+    @ManyToOne(type => User, user => user.user_follow, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_pk' })
+    user: User;
 
-    @ManyToOne(type => User, user => user.follower, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'follower' })
-    userFollower: User;
+    @ManyToOne(type => User, user => user.created_by, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'created_by' })
+    createdBy: User;
+
 }

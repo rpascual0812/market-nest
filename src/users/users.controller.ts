@@ -15,6 +15,61 @@ export class UsersController {
     //     return this.usersService.create(createUserDto);
     // }
 
+    @Get(':pk')
+    async findOne(@Request() req: any) {
+        const user = await this.usersService.findOne(req.params);
+        const userAddresses = await this.usersService.getUserAddresses([user['pk']], req.query);
+        const sellerAddresses = user ? await this.usersService.getSellerAddresses([user['seller']['pk']], req.query) : [];
+        const userFollowing = await this.usersService.getUserFollowing([user['pk']], req.query);
+        const userFollower = await this.usersService.getUserFollower([user['pk']], req.query);
+
+        user['user_addresses'] = [];
+        // Append user addresses
+        if (userAddresses) {
+            userAddresses[0].forEach(address => {
+                if (user['pk'] == address.user_pk) {
+                    user['user_addresses'].push(address);
+                }
+            });
+        }
+
+        user['seller_addresses'] = [];
+        // Append user addresses
+        if (sellerAddresses[0]) {
+            sellerAddresses[0].forEach(address => {
+                if (user['seller']['pk'] == address.seller_pk) {
+                    user['seller_addresses'].push(address);
+                }
+            });
+        }
+
+        user['following_count'] = userFollowing ? userFollowing[1] : 0;
+        user['following'] = [];
+        if (userFollowing) {
+            userFollowing[0].forEach(following => {
+                if (user['pk'] == following.created_by) {
+                    user['following'].push(following);
+                }
+            });
+        }
+
+        user['follower_count'] = userFollower ? userFollower[1] : 0;
+        user['follower'] = [];
+        if (userFollower) {
+            userFollower[0].forEach(follower => {
+                if (user['pk'] == follower.user_pk) {
+                    user['follower'].push(follower);
+                }
+            });
+        }
+
+        if (user) {
+            return user;
+        }
+
+        throw new InternalServerErrorException();
+    }
+
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any) {
