@@ -6,6 +6,8 @@ import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { Account } from './entities/account.entity';
 import * as bcrypt from 'bcrypt';
+import { UserDocument } from 'src/users/entities/user-document.entity';
+import { Document } from 'src/documents/entities/document.entity';
 
 @Injectable()
 export class AccountsService {
@@ -35,7 +37,29 @@ export class AccountsService {
     }
 
     findOne(pk: number) {
-        return this.accountRepository.findOne({ where: { pk } });
+        // return this.accountRepository.findOne({ where: { pk } });
+        return getRepository(Account)
+            .createQueryBuilder('accounts')
+            .select(['accounts.username', 'accounts.verified'])
+            .leftJoinAndSelect("accounts.user", "users")
+            .leftJoinAndSelect("users.seller", "sellers")
+            .leftJoinAndSelect("users.gender", "genders")
+            // user documents
+            .leftJoinAndMapMany(
+                'users.user_document',
+                UserDocument,
+                'user_documents',
+                'users.pk=user_documents.user_pk'
+            )
+            .leftJoinAndMapOne(
+                'user_documents.document',
+                Document,
+                'documents',
+                'user_documents.document_pk=documents.pk',
+            )
+            .where("accounts.pk = :pk", { pk })
+            .getOne()
+            ;
     }
 
     async findToken(token: string) {
