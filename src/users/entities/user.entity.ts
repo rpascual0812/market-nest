@@ -201,11 +201,14 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'status_pk' })
     status: Status;
 
-    @OneToMany('UserFollow', (user_follow: UserFollow) => user_follow.following, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'user_following_pk' })
-    following: UserFollow;
+    @OneToMany('UserFollow', (user_follow: UserFollow) => user_follow.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'user_follow_pk' })
+    user_follow: UserFollow;
 
-    @OneToMany('UserFollow', (user_follow: UserFollow) => user_follow.follower, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'user_follower_pk' })
-    follower: UserFollow;
+    @OneToMany('UserFollow', (user_rating: UserFollow) => user_rating.created_by, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'created_by_follow_pk' })
+    user_follow_created_by: UserFollow;
+
+
+
 }

@@ -8,6 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { Account } from 'src/accounts/entities/account.entity';
 import { Document } from 'src/documents/entities/document.entity';
 import { UserDocument } from './entities/user-document.entity';
+import { UserAddress } from './entities/user-address.entity';
+import { SellerAddress } from 'src/seller/entities/seller-address.entity';
+import { UserFollow } from './entities/user-follow.entity';
 
 // export type User = {
 //     id: number;
@@ -90,6 +93,30 @@ export class UsersService {
         }
     }
 
+    async findOne(data: any) {
+        return await getRepository(User)
+            .createQueryBuilder('users')
+            .select('users')
+            .leftJoinAndSelect("users.seller", "sellers")
+            .leftJoinAndSelect("users.gender", "genders")
+            // user documents
+            .leftJoinAndMapMany(
+                'users.user_document',
+                UserDocument,
+                'user_documents',
+                'users.pk=user_documents.user_pk'
+            )
+            .leftJoinAndMapOne(
+                'user_documents.document',
+                Document,
+                'documents',
+                'user_documents.document_pk=documents.pk',
+            )
+            .where("users.pk = :pk", { pk: data.pk })
+            .getOne()
+            ;
+    }
+
     async find(account: any) {
         return await getRepository(User)
             .createQueryBuilder('users')
@@ -134,18 +161,125 @@ export class UsersService {
             ;
     }
 
+    async getUserAddresses(pks: any, filters: any) {
+        try {
+            return await getRepository(UserAddress)
+                .createQueryBuilder('user_addresses')
+                .select('user_addresses')
+                .leftJoinAndSelect("user_addresses.province", "provinces")
+                .leftJoinAndSelect("user_addresses.city", "cities")
+                .leftJoinAndSelect("user_addresses.area", "areas")
+                .where("user_addresses.user_pk IN (:...user_pk)", { user_pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
 
+    async getSellerAddresses(pks: any, filters: any) {
+        try {
+            return await getRepository(SellerAddress)
+                .createQueryBuilder('seller_addresses')
+                .select('seller_addresses')
+                .leftJoinAndSelect("seller_addresses.province", "provinces")
+                .leftJoinAndSelect("seller_addresses.city", "cities")
+                .leftJoinAndSelect("seller_addresses.area", "areas")
+                .where("seller_addresses.seller_pk IN (:...seller_pk)", { seller_pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
 
-    // async findOne(id: number): Promise<User | undefined> {
-    //     return `This action returns a #${id} account`;
-    //     // return this.users.find(user => user.id === id);
+    async getUserFollowing(pks: any, filters: any) {
+        try {
+            return await getRepository(UserFollow)
+                .createQueryBuilder('user_follow')
+                .select('user_follow')
+                .leftJoinAndSelect("user_follow.user", "users")
+                .leftJoinAndSelect("users.user_document", "user_documents")
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'documents',
+                    'user_documents.document_pk=documents.pk',
+                )
+                .where("user_follow.created_by IN (:...pk)", { pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async getUserFollower(pks: any, filters: any) {
+        try {
+            return await getRepository(UserFollow)
+                .createQueryBuilder('user_follow')
+                .select('user_follow')
+                .leftJoinAndSelect("user_follow.createdBy", "users")
+                .leftJoinAndSelect("users.user_document", "user_documents")
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'documents',
+                    'user_documents.document_pk=documents.pk',
+                )
+                .where("user_follow.user_pk IN (:...pk)", { pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    // async getUserFollowing(pks: any) {
+    //     try {
+    //         return await getRepository(UserFollow)
+    //             .createQueryBuilder('user_follow')
+    //             .select('product_pk')
+    //             .addSelect('sum(rating) as total')
+    //             .addSelect('count(pk) as count')
+    //             .where("product_ratings.product_pk IN (:...pk)", { pk: pks })
+    //             .groupBy('product_pk')
+    //             .getRawAndEntities()
+    //             ;
+    //     } catch (error) {
+    //         console.log(error);
+    //         // SAVE ERROR
+    //         return {
+    //             status: false
+    //         }
+    //     }
     // }
 
-    // update(id: number, updateUserDto: UpdateUserDto) {
-    //     return `This action updates a #${id} user`;
-    // }
 
-    // remove(id: number) {
-    //     return `This action removes a #${id} user`;
-    // }
 }

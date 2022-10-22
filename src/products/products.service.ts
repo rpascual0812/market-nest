@@ -77,7 +77,7 @@ export class ProductsService {
                 .select('products')
                 .leftJoinAndSelect("products.user", "users")
                 .leftJoinAndSelect("users.seller", "sellers")
-                .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+                .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
 
                 .leftJoinAndSelect("products.measurement", "measurements")
                 .leftJoinAndSelect("products.country", "countries")
@@ -164,7 +164,7 @@ export class ProductsService {
                 // .if(filters.hasOwnProperty('type'), query => query.andWhere(`products.type = :type`, { type: filters.type }))
                 .leftJoinAndSelect("products.user", "users")
                 .select('products')
-                .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+                .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
 
                 .leftJoinAndSelect("users.seller", "sellers")
                 .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
@@ -214,50 +214,6 @@ export class ProductsService {
                 )
                 // .where("product_documents.product_pk = :pk", { pk })
                 .where("product_documents.product_pk IN (:...pk)", { pk: pks })
-                .skip(filters.skip)
-                .take(filters.take)
-                .getManyAndCount()
-                ;
-        } catch (error) {
-            console.log(error);
-            // SAVE ERROR
-            return {
-                status: false
-            }
-        }
-    }
-
-    async getUserAddresses(pks: any, filters: any) {
-        try {
-            return await getRepository(UserAddress)
-                .createQueryBuilder('user_addresses')
-                .select('user_addresses')
-                .leftJoinAndSelect("user_addresses.province", "provinces")
-                .leftJoinAndSelect("user_addresses.city", "cities")
-                .leftJoinAndSelect("user_addresses.area", "areas")
-                .where("user_addresses.user_pk IN (:...user_pk)", { user_pk: pks })
-                .skip(filters.skip)
-                .take(filters.take)
-                .getManyAndCount()
-                ;
-        } catch (error) {
-            console.log(error);
-            // SAVE ERROR
-            return {
-                status: false
-            }
-        }
-    }
-
-    async getSellerAddresses(pks: any, filters: any) {
-        try {
-            return await getRepository(SellerAddress)
-                .createQueryBuilder('seller_addresses')
-                .select('seller_addresses')
-                .leftJoinAndSelect("seller_addresses.province", "provinces")
-                .leftJoinAndSelect("seller_addresses.city", "cities")
-                .leftJoinAndSelect("seller_addresses.area", "areas")
-                .where("seller_addresses.seller_pk IN (:...seller_pk)", { seller_pk: pks })
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()

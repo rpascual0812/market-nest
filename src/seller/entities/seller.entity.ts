@@ -17,7 +17,7 @@ export class Seller {
     @Column({ type: 'text', nullable: false })
     mobile_number: string;
 
-    @Column({ type: 'text', nullable: false })
+    @Column({ type: 'text', nullable: true })
     about: string;
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
