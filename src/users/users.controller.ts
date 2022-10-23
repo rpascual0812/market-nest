@@ -19,7 +19,6 @@ export class UsersController {
 
     @Get(':pk')
     async findOne(@Request() req: any) {
-        console.log(req.query);
         const user = await this.usersService.findOne(req.params);
         const userAddresses = await this.usersService.getUserAddresses([user['pk']], req.query);
         const sellerAddresses = user && user['seller'] ? await this.usersService.getSellerAddresses([user['seller']['pk']], req.query) : [];
