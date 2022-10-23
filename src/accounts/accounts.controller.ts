@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, InternalServerErrorException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UsersService } from 'src/users/users.service';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 
 @Controller('accounts')
 export class AccountsController {
-    constructor(private readonly accountsService: AccountsService) { }
+    constructor(private readonly accountsService: AccountsService, private readonly usersService: UsersService) { }
 
     @Post()
     create(@Body() createAccountDto: CreateAccountDto) {
@@ -20,8 +21,60 @@ export class AccountsController {
 
     @UseGuards(JwtAuthGuard)
     @Get(':pk')
-    findOne(@Param('pk') pk: number) {
-        return this.accountsService.findOne(pk);
+    async findOne(@Param('pk') pk: number, @Request() req: any) {
+        const account = await this.accountsService.findOne(pk);
+        const userAddresses = await this.usersService.getUserAddresses([account['user']['pk']], req.query);
+        const sellerAddresses = account && account['user']['seller'] ? await this.usersService.getSellerAddresses([account['user']['seller']['pk']], req.query) : [];
+        const userFollowing = await this.usersService.getUserFollowing([account['user']['pk']], req.query);
+        const userFollower = await this.usersService.getUserFollower([account['user']['pk']], req.query);
+        console.log(userAddresses);
+
+        account['user']['user_addresses'] = [];
+        // Append user addresses
+        if (userAddresses) {
+            userAddresses[0].forEach(address => {
+                if (account['user']['pk'] == address.user_pk) {
+                    account['user']['user_addresses'].push(address);
+                }
+            });
+        }
+
+        account['user']['seller_addresses'] = [];
+        if (sellerAddresses[0]) {
+            sellerAddresses[0].forEach(address => {
+                if (account['user']['seller']['pk'] == address.seller_pk) {
+                    account['user']['seller_addresses'].push(address);
+                }
+            });
+        }
+
+        account['user']['following_count'] = userFollowing ? userFollowing[1] : 0;
+        account['user']['following'] = [];
+        if (userFollowing) {
+            userFollowing[0].forEach(following => {
+                if (account['user']['pk'] == following.created_by) {
+                    account['user']['following'].push(following);
+                }
+            });
+        }
+
+        account['user']['follower_count'] = userFollower ? userFollower[1] : 0;
+        account['user']['follower'] = [];
+        if (userFollower) {
+            userFollower[0].forEach(follower => {
+                if (account['user']['pk'] == follower.user_pk) {
+                    account['user']['follower'].push(follower);
+                }
+            });
+        }
+
+        console.log(account['user']);
+        if (account) {
+            return account;
+        }
+
+        throw new InternalServerErrorException();
+
     }
 
     @Patch(':id')
