@@ -11,6 +11,7 @@ import { UserDocument } from './entities/user-document.entity';
 import { UserAddress } from './entities/user-address.entity';
 import { SellerAddress } from 'src/seller/entities/seller-address.entity';
 import { UserFollow } from './entities/user-follow.entity';
+import { Log } from 'src/logs/entities/log.entity';
 
 // export type User = {
 //     id: number;
@@ -218,7 +219,7 @@ export class UsersService {
                     'documents',
                     'user_documents.document_pk=documents.pk',
                 )
-                .where("user_follow.created_by IN (:...pk)", { pk: pks })
+                .where("user_follow.created_by IN (:...pks)", { pks })
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
@@ -246,7 +247,7 @@ export class UsersService {
                     'documents',
                     'user_documents.document_pk=documents.pk',
                 )
-                .where("user_follow.user_pk IN (:...pk)", { pk: pks })
+                .where("user_follow.user_pk IN (:...pks)", { pks })
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
@@ -258,6 +259,116 @@ export class UsersService {
             return {
                 status: false
             }
+        }
+    }
+
+    async followedByUser(createdBys: any, userPks: any) {
+        try {
+            return await getRepository(UserFollow)
+                .createQueryBuilder('user_follow')
+                .select('user_follow')
+                .leftJoinAndSelect("user_follow.user", "users")
+                .where("user_follow.created_by in (:...createdBys)", { createdBys })
+                .andWhere("user_follow.user_pk in (:...userPks)", { userPks })
+                .getMany()
+                ;
+
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    // async followings(params: any) {
+    //     try {
+    //         return await getRepository(UserFollow)
+    //             .createQueryBuilder('user_follow')
+    //             .select('user_follow')
+    //             .leftJoinAndSelect("user_follow.user", "users")
+    //             .where("user_follow.created_by = :pk", { pk: params.pk })
+    //             .getManyAndCount()
+    //             ;
+
+    //     } catch (error) {
+    //         console.log(error);
+    //         // SAVE ERROR
+    //         return {
+    //             status: false
+    //         }
+    //     }
+    // }
+
+    // async followers(params: any) {
+    //     try {
+    //         return await getRepository(UserFollow)
+    //             .createQueryBuilder('user_follow')
+    //             .select('user_follow')
+    //             .leftJoinAndSelect("user_follow.createdBy", "users")
+    //             .where("user_follow.user_pk = :pk", { pk: params.pk })
+    //             .getManyAndCount()
+    //             ;
+
+    //     } catch (error) {
+    //         console.log(error);
+    //         // SAVE ERROR
+    //         return {
+    //             status: false
+    //         }
+    //     }
+    // }
+
+    async follow(user: any, data: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const follow = new UserFollow();
+                    follow.user_pk = data.user_pk;
+                    follow.created_by = user.pk;
+                    const newFollow = await EntityManager.save(follow);
+
+                    // LOGS
+                    const uuid = uuidv4();
+                    const log = new Log();
+                    log.model = 'users';
+                    log.model_pk = newFollow.pk;
+                    log.details = JSON.stringify({
+                        user_pk: data.user_pk,
+                        created_by: user.pk
+                    });
+                    log.user_pk = user.pk;
+                    await EntityManager.save(log);
+
+                    return { status: true, pk: newFollow.pk };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
+    async unfollow(user: any, data: any) {
+        try {
+            return await getConnection()
+                .createQueryBuilder()
+                .delete()
+                .from(UserFollow)
+                .where("user_pk = :user_pk", { user_pk: data.user_pk })
+                .andWhere("created_by = :created_by", { created_by: user.pk })
+                .execute();
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
         }
     }
 
