@@ -4,11 +4,13 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from '../utilities/upload.utils';
+import e from 'express';
+import { AccountsService } from 'src/accounts/accounts.service';
 // import { response } from 'express';
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) { }
+    constructor(private readonly usersService: UsersService, private readonly accountsService: AccountsService) { }
 
     // @Post()
     // create(@Body() createUserDto: CreateUserDto) {
@@ -17,9 +19,10 @@ export class UsersController {
 
     @Get(':pk')
     async findOne(@Request() req: any) {
+        console.log(req.query);
         const user = await this.usersService.findOne(req.params);
         const userAddresses = await this.usersService.getUserAddresses([user['pk']], req.query);
-        const sellerAddresses = user ? await this.usersService.getSellerAddresses([user['seller']['pk']], req.query) : [];
+        const sellerAddresses = user && user['seller'] ? await this.usersService.getSellerAddresses([user['seller']['pk']], req.query) : [];
         const userFollowing = await this.usersService.getUserFollowing([user['pk']], req.query);
         const userFollower = await this.usersService.getUserFollower([user['pk']], req.query);
 
@@ -120,6 +123,113 @@ export class UsersController {
     async getLast(@Request() req: any) {
         console.log('getting last user', req.user);
         return await this.usersService.findLast(req.user);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('follow')
+    async follow(@Request() req: any, @Body() body: any) {
+        console.log(body);
+        if (body.follow == 'follow') {
+            return await this.usersService.follow(req.user, body);
+        }
+        else {
+            return await this.usersService.unfollow(req.user, body);
+        }
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('followedByUser')
+    async followedByUser(@Request() req: any, @Body() body: any) {
+        const followings = await this.usersService.followedByUser([req.user.pk], [body.user_pk]);
+
+        if (followings[1] > 0) {
+            return {
+                status: true,
+                data: followings[0],
+                total: followings[1]
+            }
+        }
+        else {
+            return {
+                status: false,
+                data: [],
+                total: 0
+            }
+        }
+    }
+
+    @Get(':pk/followings')
+    async fetchFollowings(@Request() req: any, @Body() body: any) {
+        const followings = await this.usersService.getUserFollowing([req.params.pk], body);
+        const account = await this.accountsService.findOne(req.query.account_pk);
+        const userPks = followings[0].map(({ user }) => user.pk);
+
+        let isAlsoFollowed: any = [];
+        if (account) {
+            isAlsoFollowed = await this.usersService.followedByUser([account.user.pk], userPks);
+        }
+
+        followings[0].forEach(following => {
+            following['isAlsoFollowed'] = {};
+            isAlsoFollowed.forEach(also => {
+                if (also.user_pk == following.user_pk) {
+                    following['isAlsoFollowed'] = also;
+                }
+            });
+        });
+
+        if (followings[1] > 0) {
+            return {
+                status: true,
+                data: followings[0],
+                total: followings[1]
+            }
+        }
+        else {
+            return {
+                status: false,
+                data: [],
+                total: 0
+            }
+        }
+
+        // console.log(account, followings);
+    }
+
+    @Get(':pk/followers')
+    async fetchFollowers(@Request() req: any, @Body() body: any) {
+        const followers = await this.usersService.getUserFollower([req.params.pk], body);
+        const account = await this.accountsService.findOne(req.query.account_pk);
+        const createdByPks = followers[0].map(({ createdBy }) => createdBy.pk);
+
+        let isAlsoFollowed: any = [];
+        if (account) {
+            isAlsoFollowed = await this.usersService.followedByUser(createdByPks, [account.user.pk]);
+        }
+
+        followers[0].forEach(follower => {
+            follower['isAlsoFollowed'] = {};
+            isAlsoFollowed.forEach(also => {
+                if (also.created_by == follower.created_by) {
+                    follower['isAlsoFollowed'] = also;
+                }
+            });
+        });
+
+        if (followers[1] > 0) {
+            return {
+                status: true,
+                data: followers[0],
+                total: followers[1]
+            }
+        }
+        else {
+            return {
+                status: false,
+                data: [],
+                total: 0
+            }
+        }
     }
 
     // @Get(':id')
