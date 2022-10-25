@@ -5,7 +5,7 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, 
 
 @Entity({ name: 'statuses' })
 @Unique(['name', 'type'])
-export class Status {
+export class Status extends BaseEntity {
     @PrimaryGeneratedColumn()
     pk: number;
 

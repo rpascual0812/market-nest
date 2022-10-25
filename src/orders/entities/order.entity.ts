@@ -2,11 +2,11 @@ import { Measurement } from 'src/measurements/entities/measurement.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double, ManyToMany, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'orders' })
 @Unique(['uuid'])
-export class Order {
+export class Order extends BaseEntity {
     @PrimaryGeneratedColumn()
     pk: number;
 
@@ -15,6 +15,9 @@ export class Order {
 
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
+
+    @Column({ name: 'seller_pk', nullable: false })
+    seller_pk: number;
 
     @Column({ type: 'text', nullable: false })
     product_pk: string;
@@ -44,6 +47,10 @@ export class Order {
     @ManyToOne(type => User, user => user.order, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
+
+    @ManyToOne(type => User, user => user.order_seller, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'seller_pk' })
+    seller: User;
 
     @ManyToOne(type => Product, product => product.order, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_pk' })
