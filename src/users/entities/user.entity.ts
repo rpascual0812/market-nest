@@ -197,6 +197,10 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'order_pk' })
     order: Order;
 
+    @OneToMany('Order', (order: Order) => order.seller, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'order_seller_pk' })
+    order_seller: Order;
+
     @OneToMany('Status', (status: Status) => status.user_pk, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'status_pk' })
     status: Status;
@@ -208,6 +212,8 @@ export class User extends BaseEntity {
     @OneToMany('UserFollow', (user_rating: UserFollow) => user_rating.created_by, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'created_by_follow_pk' })
     user_follow_created_by: UserFollow;
+
+
 
 
 

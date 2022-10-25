@@ -115,6 +115,11 @@ export class AppController {
         return res.sendFile(req.path, { root: './' });
     }
 
+    @Get('assets/images/uploads/:customDir/:subDir/:imageName')
+    product_images(@Request() req, @Response() res) {
+        return res.sendFile(req.path, { root: './' });
+    }
+
     @Get('assets/images/:imageName')
     images(@Request() req, @Response() res) {
         return res.sendFile(req.path, { root: './' });

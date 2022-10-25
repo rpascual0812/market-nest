@@ -155,13 +155,19 @@ export class ProductsService {
         try {
             let months = filters.hasOwnProperty('months') ? JSON.parse(filters.months) : [];
             const monthsArr = months.map((month) => month.name);
+
+            let type = [];
+            if (filters.hasOwnProperty('type') && filters.type) {
+                type = filters.type.split(',');
+            }
+
             return await getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
-                .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:type)" : '1=1', { type: filters.type })
                 .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_created) = :year" : '1=1', { year: filters.year })
                 .andWhere(filters.hasOwnProperty('months') ? "TO_CHAR(products.date_created, 'Month') in (:...months)" : '1=1', { months: monthsArr })
-                // .if(filters.hasOwnProperty('type'), query => query.andWhere(`products.type = :type`, { type: filters.type }))
+                .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
+                .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type })
                 .leftJoinAndSelect("products.user", "users")
                 .select('products')
                 .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
@@ -276,7 +282,6 @@ export class ProductsService {
     }
 
     async findOneRatingPerUser(data: any, filters: any) {
-        console.log(data);
         try {
             return await ProductRating.findOne({
                 user_pk: parseInt(filters.pk),
