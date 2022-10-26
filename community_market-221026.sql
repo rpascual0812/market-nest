@@ -1949,7 +1949,7 @@ COPY public.accounts (pk, username, password, active, verified, archived) FROM s
 --
 
 COPY public.areas (pk, name, country_pk, province_pk, city_pk, user_pk, archived) FROM stdin;
-1	Test	173	3	2	4	f
+1	Area 1	173	3	2	4	f
 \.
 
 
@@ -2016,7 +2016,7 @@ COPY public.chats (pk, uuid, title, last_message, user_pk, archived) FROM stdin;
 --
 
 COPY public.cities (pk, name, country_pk, province_pk, user_pk, archived) FROM stdin;
-2	Test	173	3	4	f
+2	Pasig	173	3	4	f
 \.
 
 
@@ -2302,7 +2302,6 @@ COPY public.documents (pk, original_name, filename, path, mime_type, size, date_
 21	a6fd5bad-2c51-4787-a65f-5fcac68091786113503417163353516.jpg	1664916894593.c5c9e0d7-0a0d-431f-9adc-d50bd3cc1425.48d70421-942b-4d73-a319-72d2b91b2c4e.362e1ec0-bb80-4720-81bb-0beecb9a4a33.df42da1dd10ef8b39.jpg	assets/images/1664916894593.c5c9e0d7-0a0d-431f-9adc-d50bd3cc1425.48d70421-942b-4d73-a319-72d2b91b2c4e.362e1ec0-bb80-4720-81bb-0beecb9a4a33.df42da1dd10ef8b39.jpg	image/jpg	63414	2022-10-05 04:54:54.65181+08	f
 22	image_picker4414279767664012814.jpg	1664916957504.6b203f95-bc6d-4daa-ae04-ad5e5617442b.a2fbaa31-ce8c-48b4-b188-a0b97197255b.b5c9f2ea-6588-497b-b529-1ebc9fe21717.c592a141c27efc57.jpg	assets/images/1664916957504.6b203f95-bc6d-4daa-ae04-ad5e5617442b.a2fbaa31-ce8c-48b4-b188-a0b97197255b.b5c9f2ea-6588-497b-b529-1ebc9fe21717.c592a141c27efc57.jpg	image/jpg	145361	2022-10-05 04:55:57.731414+08	f
 23	161fbb0c-746e-428e-aa0c-7cc16466d9656653953435792235650.jpg	1664916964091.cc769f64-0718-4262-b5a0-230245ed529e.1cafa757-6a8b-46f4-a5ca-0c9067e7c8fe.c71b5a88-d8fe-4d87-b85f-2802feca0120.15226e31051cd8fd8.jpg	assets/images/1664916964091.cc769f64-0718-4262-b5a0-230245ed529e.1cafa757-6a8b-46f4-a5ca-0c9067e7c8fe.c71b5a88-d8fe-4d87-b85f-2802feca0120.15226e31051cd8fd8.jpg	image/jpg	64254	2022-10-05 04:56:04.117895+08	f
-25	ce618669-1261-46cb-b6ec-5fce5b8b6a966685712579319686807.jpg	1664917712443.3d1414cf-a365-425c-afe7-d41493000c39.6d1beaf7-8130-4b74-9daa-c85e7aad33f7.b2d30382-101f-423e-8f48-b7383ac7a08c.f510ab3bcdac4e416.jpg	assets/images/1664917712443.3d1414cf-a365-425c-afe7-d41493000c39.6d1beaf7-8130-4b74-9daa-c85e7aad33f7.b2d30382-101f-423e-8f48-b7383ac7a08c.f510ab3bcdac4e416.jpg	image/jpg	62788	2022-10-05 05:08:32.450347+08	f
 28	big_3.png	big_3.png	assets/images/big_3.png	image/png	123456	2022-10-05 05:51:57.860931+08	f
 30	farmer.png	farmer.png	assets/images/farmer.png	image/png	1234	2022-10-05 06:15:22.42554+08	f
 32	big_1_.png	big_1_.png	assets/images/big_2.png	image/png	123456	2022-10-05 05:51:10.52282+08	f
@@ -2310,20 +2309,21 @@ COPY public.documents (pk, original_name, filename, path, mime_type, size, date_
 36	XeWg4Ny.jpg	XeWg4Ny.jpg	assets/images/XeWg4Ny.jpg	image/jpg	1234	2022-10-08 15:30:40.582553+08	f
 37	9VtNpc9.jpg	9VtNpc9.jpg	assets/images/9VtNpc9.jpg	image/jpg	1234	2022-10-08 15:30:40.589166+08	f
 38	1646470633439.419f6e81-60df-4cbd-aa92-7effa1c78fc4.bd439e59-7056-4cdc-9159-e9603a609ab5.3c8297ba-273c-4a00-8244-20a45e2f3e3f.1f7910f721867fb7b.png	1646470633439.419f6e81-60df-4cbd-aa92-7effa1c78fc4.bd439e59-7056-4cdc-9159-e9603a609ab5.3c8297ba-273c-4a00-8244-20a45e2f3e3f.1f7910f721867fb7b.png	assets/images/uploads/profile/1646470633439.419f6e81-60df-4cbd-aa92-7effa1c78fc4.bd439e59-7056-4cdc-9159-e9603a609ab5.3c8297ba-273c-4a00-8244-20a45e2f3e3f.1f7910f721867fb7b.png	image/png	1153466	2022-10-09 08:04:58.752882+08	f
-39	talong.jpg	talong.jpg	assets/images/uploads/documents/products/talong.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
-40	pechay.jpg	pechay.jpg	assets/images/uploads/documents/products/pechay.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
-41	peppers.jpg	peppers.jpg	assets/images/uploads/documents/products/peppers.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
-42	sayote.jpg	sayote.jpg	assets/images/uploads/documents/products/sayote.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
-44	upo.jpg	upo.jpg	assets/images/uploads/documents/products/upo.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
-45	sigarilyas.jpg	sigarilyas.jpg	assets/images/uploads/documents/products/sigarilyas.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
-46	chilis.jpeg	chilis.jpeg	assets/images/uploads/documents/products/chilis.jpeg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
-47	grapes.jpg	grapes.jpg	assets/images/uploads/documents/products/grapes.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
-48	mangoes.jpg	mangoes.jpg	assets/images/uploads/documents/products/mangoes.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
 24	morgan.jpg	morgan.jpg	assets/images/uploads/profile/morgan.jpg	image/jpg	31385	2022-10-05 05:08:25.074253+08	f
 49	gal.jpeg	gal.jpeg	assets/images/uploads/profile/gal.jpeg	image/jpg	31385	2022-10-05 05:08:25.074253+08	f
 26	top10.jpg	top10.jpg	assets/images/top10.jpg	image/jpg	123456	2022-10-05 05:51:10.52282+08	f
 27	vegetables1.jpg	vegetables1.jpg	assets/images/vegetables1.jpg	image/jpg	123456	2022-10-05 05:51:57.860931+08	f
 29	vegetables2.jpg	vegetables2.jpg	assets/images/vegetables2.jpg	image/jpg	123456	2022-10-05 05:51:57.860931+08	f
+39	talong.jpg	talong.jpg	assets/images/uploads/documents/talong.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+40	pechay.jpg	pechay.jpg	assets/images/uploads/documents/pechay.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+41	peppers.jpg	peppers.jpg	assets/images/uploads/documents/peppers.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+42	sayote.jpg	sayote.jpg	assets/images/uploads/documents/sayote.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+44	upo.jpg	upo.jpg	assets/images/uploads/documents/upo.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+45	sigarilyas.jpg	sigarilyas.jpg	assets/images/uploads/documents/sigarilyas.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+46	chilis.jpeg	chilis.jpeg	assets/images/uploads/documents/chilis.jpeg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+47	grapes.jpg	grapes.jpg	assets/images/uploads/documents/grapes.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+48	mangoes.jpg	mangoes.jpg	assets/images/uploads/documents/mangoes.jpg	image/jpg	1153466	2022-10-09 08:04:58.752882+08	f
+25	fruits.jpeg	fruits.jpeg	assets/images/fruits.jpeg	image/jpg	62788	2022-10-05 05:08:32.450347+08	f
 \.
 
 
@@ -2489,7 +2489,7 @@ COPY public.products (pk, uuid, user_pk, type, name, date_created, archived, mea
 --
 
 COPY public.provinces (pk, name, country_pk, active, user_pk, archived) FROM stdin;
-3	Test	173	t	4	f
+3	Rizal	173	t	4	f
 \.
 
 
@@ -2528,7 +2528,7 @@ COPY public.sellers (pk, uuid, user_pk, date_created, archived, mobile_number, a
 
 COPY public.sessions (pk, token, expiration, date_created, account_pk) FROM stdin;
 144	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZW1haWxAZ21haWwuY29tIiwic3ViIjoxMTMsImlhdCI6MTY2NjU2MDk4NiwiZXhwIjoxNjY2NjA0MTg2fQ.W976m4hhomIkFX3xKzX6ZtRcU_07csI-t5VC1wUxLBg	2022-10-24 17:36:26+08	2022-10-24 05:36:26.819225+08	113
-156	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZW1haWwwMUBnbWFpbC5jb20iLCJzdWIiOjEzNSwiaWF0IjoxNjY2NzM0ODg3LCJleHAiOjE2NjY3NzgwODd9.wP5eGwNBjlzwXOjfX1KZosNiq5XNm_yq_XApHtsgKU8	2022-10-26 17:54:47+08	2022-10-26 05:54:47.791191+08	135
+157	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZW1haWwwMUBnbWFpbC5jb20iLCJzdWIiOjEzNSwiaWF0IjoxNjY2NzgyNTc0LCJleHAiOjE2NjY4MjU3NzR9.uTba0DlcSSGLqeRmzhsMZ63QSZOufk8S3a_OcftH6KE	2022-10-27 07:09:34+08	2022-10-26 19:09:34.839462+08	135
 \.
 
 
@@ -2537,11 +2537,11 @@ COPY public.sessions (pk, token, expiration, date_created, account_pk) FROM stdi
 --
 
 COPY public.slider_documents (pk, user_pk, slider_pk, type, document_pk, date_created) FROM stdin;
-1	4	2	background	26	2022-10-05 06:13:43.287141+08
 2	4	2	icon	30	2022-10-05 06:15:46.314376+08
 5	4	4	background	28	2022-10-06 06:04:25.177759+08
 6	4	5	background	29	2022-10-06 06:04:25.177759+08
 3	4	3	background	27	2022-10-06 06:04:25.177759+08
+1	4	2	background	25	2022-10-05 06:13:43.287141+08
 \.
 
 
@@ -2599,12 +2599,12 @@ COPY public.typeorm_metadata (type, database, schema, "table", name, value) FROM
 --
 
 COPY public.user_addresses (pk, type, province_pk, city_pk, area_pk, address, user_pk, date_created, "default") FROM stdin;
-1	home	3	2	1	Pasig	11	2022-10-03 20:54:54.643943+08	t
-4	home	3	2	1	Pasig	14	2022-10-05 04:44:17.107276+08	t
-7	home	3	2	1	Pasig	17	2022-10-05 04:51:25.523334+08	t
-8	home	3	2	1	Pasig	18	2022-10-05 04:56:16.406206+08	t
-9	home	3	2	1	Pasig	19	2022-10-05 05:10:45.232267+08	t
-10	home	3	2	1	Pasig	4	2022-10-05 05:10:45.232267+08	t
+1	home	3	2	1	Palatiw	11	2022-10-03 20:54:54.643943+08	t
+4	home	3	2	1	Pinagbuhatan	14	2022-10-05 04:44:17.107276+08	t
+7	home	3	2	1	Kapasigan	17	2022-10-05 04:51:25.523334+08	t
+8	home	3	2	1	Buting	18	2022-10-05 04:56:16.406206+08	t
+9	home	3	2	1	Orambo	19	2022-10-05 05:10:45.232267+08	t
+10	home	3	2	1	San Nicholas	4	2022-10-05 05:10:45.232267+08	t
 \.
 
 
@@ -2883,7 +2883,7 @@ SELECT pg_catalog.setval('public.sellers_pk_seq', 2, true);
 -- Name: sessions_pk_seq; Type: SEQUENCE SET; Schema: public; Owner: samdhana
 --
 
-SELECT pg_catalog.setval('public.sessions_pk_seq', 156, true);
+SELECT pg_catalog.setval('public.sessions_pk_seq', 157, true);
 
 
 --
