@@ -13,7 +13,6 @@ export class SlidersService {
     ) { }
 
     async findAll(data: any, filters: any) {
-        console.log(filters);
         try {
             const sliders = await getRepository(Slider)
                 .createQueryBuilder('sliders')
@@ -32,6 +31,7 @@ export class SlidersService {
                 )
                 .skip(filters.skip)
                 .take(filters.take)
+                .orderBy('sliders.pk', 'ASC')
                 .getManyAndCount()
                 ;
 
