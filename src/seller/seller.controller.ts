@@ -1,34 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, Response, UseGuards, HttpStatus, UseInterceptors, UploadedFile, ConsoleLogger } from '@nestjs/common';
 import { SellerService } from './seller.service';
-import { CreateSellerDto } from './dto/create-seller.dto';
-import { UpdateSellerDto } from './dto/update-seller.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
-@Controller('seller')
+@Controller('sellers')
 export class SellerController {
-  constructor(private readonly sellerService: SellerService) {}
+    constructor(private readonly sellerService: SellerService) { }
 
-  @Post()
-  create(@Body() createSellerDto: CreateSellerDto) {
-    return this.sellerService.create(createSellerDto);
-  }
+    @UseGuards(JwtAuthGuard)
+    @Post()
+    async create(@Response() res: any, @Body() body: any, @Request() req) {
+        const seller = await this.sellerService.create(body, req.user);
+        // if (seller) {
+        //     return res.status(HttpStatus.OK).json({ status: 'success' });
+        // }
+        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
+    }
 
-  @Get()
-  findAll() {
-    return this.sellerService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.sellerService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sellerService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSellerDto: UpdateSellerDto) {
-    return this.sellerService.update(+id, updateSellerDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sellerService.remove(+id);
-  }
 }
