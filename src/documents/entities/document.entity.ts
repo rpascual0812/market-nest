@@ -5,6 +5,7 @@ import { UserDocument } from 'src/users/entities/user-document.entity';
 import { ProductDocument } from 'src/products/entities/product-document.entity';
 import { Slider } from 'src/sliders/entities/slider.entity';
 import { SliderDocument } from 'src/sliders/entities/slider-document.entity';
+import { SellerDocument } from 'src/seller/entities/seller-document.entity';
 
 @Entity({ name: 'documents' })
 @Unique(['filename'])
@@ -52,6 +53,9 @@ export class Document {
 
     @OneToOne(type => UserDocument, user_document => user_document.document, { cascade: true })
     user_document: UserDocument;
+
+    @OneToOne(type => SellerDocument, seller_document => seller_document.document, { cascade: true })
+    seller_document: SellerDocument;
 
     @OneToOne(type => ProductDocument, product_document => product_document.document, { cascade: true })
     product_document: ProductDocument;
