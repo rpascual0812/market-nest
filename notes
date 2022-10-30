@@ -44,4 +44,4 @@ PreconditionFailedException
 
 
 pg_dump -U postgres -W -F p -h localhost -f community_market-221018.sql community_market
-psql -U postgres -d community_market-221018 -f db/community_market-221018.sql
+psql -U postgres -d community_market221022 -f db/community_market-221022.sql

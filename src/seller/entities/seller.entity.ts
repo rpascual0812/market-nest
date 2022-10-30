@@ -1,6 +1,7 @@
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { SellerAddress } from './seller-address.entity';
+import { SellerDocument } from './seller-document.entity';
 
 @Entity({ name: 'sellers' })
 @Unique(['user_pk'])
@@ -38,4 +39,9 @@ export class Seller {
     @JoinColumn({ name: 'seller_address_pk' })
     @JoinTable()
     seller_address: SellerAddress[];
+
+    @OneToMany(type => SellerDocument, seller_document => seller_document.seller, { eager: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'seller_document_pk' })
+    @JoinTable()
+    seller_document: SellerDocument[];
 }
