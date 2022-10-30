@@ -27,7 +27,7 @@ export class AccountsController {
         const sellerAddresses = account && account['user']['seller'] ? await this.usersService.getSellerAddresses([account['user']['seller']['pk']], req.query) : [];
         const userFollowing = await this.usersService.getUserFollowing([account['user']['pk']], req.query);
         const userFollower = await this.usersService.getUserFollower([account['user']['pk']], req.query);
-        console.log(userAddresses);
+        // console.log(userAddresses);
 
         account['user']['user_addresses'] = [];
         // Append user addresses
@@ -68,7 +68,7 @@ export class AccountsController {
             });
         }
 
-        console.log(account['user']);
+        // console.log(account['user']);
         if (account) {
             return account;
         }
