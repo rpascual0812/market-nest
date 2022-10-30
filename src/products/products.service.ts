@@ -22,6 +22,7 @@ export class ProductsService {
 
     @UsePipes(ValidationPipe)
     async create(form: any, user: any) {
+        console.log('creating rpoduct', form);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -34,12 +35,26 @@ export class ProductsService {
                     product.uuid = uuid;
                     product.type = form.type;
                     product.name = form.name;
+                    product.description = form.description;
                     product.quantity = form.quantity;
                     product.measurement_pk = form.measurement;
+                    product.category_pk = 1;
                     product.price_from = form.price_from;
                     product.price_to = form.price_to;
                     product.country_pk = 173;  //form.country_pk;
                     const newProduct = await EntityManager.save(product);
+
+                    let documents = form.documents != '' ? form.documents.split(',') : [];
+
+                    //Documents
+                    documents.forEach(pk => {
+                        const document = new ProductDocument();
+                        document.type = 'slide';
+                        document.product_pk = newProduct.pk;
+                        document.document_pk = pk;
+                        document.user_pk = user.pk;
+                        EntityManager.save(document);
+                    });
 
                     // LOGS
                     const log = new Log();
@@ -168,6 +183,23 @@ export class ProductsService {
                 .andWhere(filters.hasOwnProperty('months') ? "TO_CHAR(products.date_created, 'Month') in (:...months)" : '1=1', { months: monthsArr })
                 .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
                 .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type })
+
+                // additional where for search
+                // All
+                .andWhere(
+                    filters.hasOwnProperty('filter') && filters.filter == 'All' &&
+                        filters.hasOwnProperty('keyword') ?
+                        "products.name ILIKE :keyword" :
+                        '1=1', { keyword: `%${filters.keyword}%` }
+                )
+                // Products
+                .andWhere(
+                    filters.hasOwnProperty('filter') && filters.filter == 'Products' &&
+                        filters.hasOwnProperty('keyword') ?
+                        "products.name ILIKE :keyword" :
+                        '1=1', { keyword: `%${filters.keyword}%` }
+                )
+
                 .leftJoinAndSelect("products.user", "users")
                 .select('products')
                 .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
