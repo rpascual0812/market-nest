@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AccountsModule } from 'src/accounts/accounts.module';
 import { EmailsModule } from 'src/emails/emails.module';
+import { SellerModule } from 'src/seller/seller.module';
 import { SessionsModule } from 'src/sessions/sessions.module';
 import { UsersModule } from 'src/users/users.module';
 import { AuthService } from './auth.service';
@@ -17,6 +18,7 @@ import { LocalStrategy } from './local.strategy';
         UsersModule,
         SessionsModule,
         EmailsModule,
+        SellerModule,
         PassportModule,
         JwtModule.register({
             secret: process.env.SECRET,

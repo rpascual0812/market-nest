@@ -14,6 +14,7 @@ import { User } from 'src/users/entities/user.entity';
 import { UserDocument } from 'src/users/entities/user-document.entity';
 import { UserAddress } from 'src/users/entities/user-address.entity';
 import { Email } from 'src/emails/entities/email.entity';
+import { SellerService } from 'src/seller/seller.service';
 
 @Injectable()
 export class AuthService {
@@ -41,6 +42,14 @@ export class AuthService {
         account.expiration = DateTime.now().plus({ seconds: Number.parseInt(process.env.EXPIRES) }).toFormat('y-LL-dd HH:mm:ss');
 
         this.sessionsService.create(account);
+
+        let user = await this.accountsService.findOne(account.pk);
+
+        // get seller
+        account.seller_pk = 0;
+        if (user && user.user && user.user.seller != null) {
+            account.seller_pk = user.user.seller.pk;
+        }
 
         // IMPROVE
         // websocket

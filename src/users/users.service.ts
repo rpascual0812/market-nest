@@ -121,8 +121,9 @@ export class UsersService {
     async find(account: any) {
         return await getRepository(User)
             .createQueryBuilder('users')
-            .leftJoinAndSelect("users.account", "accounts")
             .select('users')
+            .leftJoinAndSelect("users.account", "accounts")
+            .leftJoinAndSelect("users.seller", "sellers")
             .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified"])
             .where("accounts.pk = :pk", { pk: account.pk })
             .getOne()

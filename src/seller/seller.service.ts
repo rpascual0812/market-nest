@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Log } from 'src/logs/entities/log.entity';
-import { getConnection, Repository } from 'typeorm';
+import { getConnection, getRepository, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { SellerAddress } from './entities/seller-address.entity';
 import { SellerDocument } from './entities/seller-document.entity';
@@ -88,5 +88,23 @@ export class SellerService {
 
     findAll() {
         return `This action returns all seller`;
+    }
+
+    async findOne(filters: any) {
+        try {
+            return await getRepository(Seller)
+                .createQueryBuilder('sellers')
+                .select('sellers')
+                .where('sellers.archived = false')
+                .andWhere(filters.hasOwnProperty('user_pk') ? "sellers.user_pk = :user_pk" : '1=1', { user_pk: filters.user_pk })
+                .getOneOrFail()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
     }
 }
