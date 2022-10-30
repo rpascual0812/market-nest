@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Log } from 'src/logs/entities/log.entity';
 import { getConnection, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { SellerAddress } from './entities/seller-address.entity';
 import { SellerDocument } from './entities/seller-document.entity';
 import { Seller } from './entities/seller.entity';
 
@@ -29,6 +30,17 @@ export class SellerService {
                     seller.user_pk = user.pk;
                     seller.mobile_number = user.mobile_number;
                     const newSeller = await EntityManager.save(seller);
+
+                    //Address
+                    const address = new SellerAddress();
+                    address.type = 'home';
+                    address.default = true;
+                    address.province_pk = 3;
+                    address.city_pk = 2;
+                    address.area_pk = 1;
+                    address.address = data.address;
+                    address.seller_pk = newSeller.pk;
+                    EntityManager.save(address);
 
                     //Documents
                     documents.forEach(pk => {
@@ -61,7 +73,7 @@ export class SellerService {
                     log.user_pk = user.pk;
                     await EntityManager.save(log);
 
-                    return { status: true, data: newSeller };
+                    return newSeller;
                 }
             );
         } catch (err) {

@@ -11,7 +11,7 @@ export class SellerController {
     async create(@Response() res: any, @Body() body: any, @Request() req) {
         const seller = await this.sellerService.create(body, req.user);
         if (seller) {
-            return res.status(HttpStatus.OK).json({ status: 'success' });
+            return res.status(HttpStatus.OK).json({ status: 'success', data: seller });
         }
         return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }

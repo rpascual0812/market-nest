@@ -1,26 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProvinceDto } from './dto/create-province.dto';
-import { UpdateProvinceDto } from './dto/update-province.dto';
+import { getRepository } from 'typeorm';
+import { Province } from './entities/province.entity';
 
 @Injectable()
 export class ProvincesService {
-  create(createProvinceDto: CreateProvinceDto) {
-    return 'This action adds a new province';
-  }
 
-  findAll() {
-    return `This action returns all provinces`;
-  }
+    async findAll(filters: any) {
+        try {
+            const users = await getRepository(Province)
+                .createQueryBuilder('provinces')
+                .select(['pk', 'name'])
+                .leftJoinAndSelect("provinces.country", "countries")
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
 
-  findOne(id: number) {
-    return `This action returns a #${id} province`;
-  }
-
-  update(id: number, updateProvinceDto: UpdateProvinceDto) {
-    return `This action updates a #${id} province`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} province`;
-  }
+            return {
+                status: true,
+                data: users[0],
+                total: users[1]
+            }
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
 }

@@ -58,9 +58,9 @@ export class AppController {
 
     @Get('reset-token')
     async resetToken(@Response() res: any, @Request() req): Promise<any> {
-        console.log(req.query.token);
+        // console.log(req.query.token);
         const account = await this.authService.resetToken(req.query.token);
-        console.log(account);
+        // console.log(account);
         const { password, active, verified, login_attempts, date_created, archived, ...others } = account;
 
         if (account) {
@@ -91,7 +91,7 @@ export class AppController {
     async upload(@UploadedFile() file: any, @Request() req, @Response() res: any): Promise<string> {
         const document = await this.documentsService.create(file);
         if (document) {
-            console.log(document);
+            // console.log(document);
             return res.status(HttpStatus.OK).json({ status: 'success', document });
         }
         return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
