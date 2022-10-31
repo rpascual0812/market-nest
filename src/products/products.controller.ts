@@ -20,7 +20,6 @@ export class ProductsController {
     @Get()
     async findAll(@Request() req: any) {
         const products = await this.productsService.findAll(req.user, req.query);
-        console.log(products);
         if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
