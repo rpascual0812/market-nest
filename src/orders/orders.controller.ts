@@ -22,6 +22,45 @@ export class OrdersController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get('cart')
+    async cart(@Body() body: any, @Request() req: any,) {
+        const orders = await this.ordersService.findCartOrders(body, req.user);
+
+        if (orders[1] > 0) {
+            const product_pks = orders[0].map(({ product }) => product.pk);
+
+            const documents = await this.productsService.getProductDocuments(product_pks, req.query);
+
+            orders[0].forEach(order => {
+                if (!order.hasOwnProperty('product_documents')) {
+                    order['product_documents'] = [];
+                }
+                // Append product documents
+                if (documents) {
+                    documents[0].forEach(document => {
+                        if (order.product.pk == document.product_pk) {
+                            order['product_documents'].push(document);
+                        }
+                    });
+                }
+            });
+
+            return {
+                status: true,
+                data: orders[0],
+                total: orders[1]
+            }
+        }
+        else {
+            return {
+                status: false,
+                data: [],
+                total: 0
+            }
+        }
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get('sold')
     async sold(@Body() body: any, @Request() req: any,) {
         const orders = await this.ordersService.findSoldOrders(body, req.user);

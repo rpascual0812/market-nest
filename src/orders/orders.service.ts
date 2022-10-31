@@ -96,6 +96,28 @@ export class OrdersService {
         }
     }
 
+    async findCartOrders(filters: any, user: any) {
+        return await getRepository(Order)
+            .createQueryBuilder('orders')
+            .select('orders')
+            .leftJoinAndSelect("orders.user", "users")
+            .leftJoinAndSelect("orders.status", "statuses")
+            .leftJoinAndSelect("orders.product", "products")
+            .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+
+            .leftJoinAndSelect("products.measurement", "measurements")
+            .leftJoinAndSelect("products.country", "countries")
+            .leftJoinAndSelect("products.category", "product_categories")
+
+            .where('orders.archived=false')
+            .andWhere('orders.status_pk = :pk', { pk: '1' })
+
+            .skip(filters.skip)
+            .take(filters.take)
+            .getManyAndCount()
+            ;
+    }
+
     async findSoldOrders(filters: any, user: any) {
         return await getRepository(Order)
             .createQueryBuilder('orders')
