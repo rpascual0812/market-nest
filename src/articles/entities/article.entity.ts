@@ -14,6 +14,9 @@ export class Article {
     @Column({ type: 'text', nullable: false })
     description: string;
 
+    @Column({ type: 'text', nullable: false })
+    url: string;
+
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 

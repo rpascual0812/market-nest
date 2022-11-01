@@ -133,7 +133,7 @@ export class ProductsController {
             // console.log(product['pk'], product['user']['seller']['pk']);
             const documents = await this.productsService.getProductDocuments([product['pk']], req.query);
             const userAddresses = await this.usersService.getUserAddresses([product['user_pk']], req.query);
-            const sellerAddresses = product['user'] ? await this.usersService.getSellerAddresses([product['user']['seller']['pk']], req.query) : [];
+            const sellerAddresses = product['user'] && product['user']['seller'] ? await this.usersService.getSellerAddresses([product['user']['seller']['pk']], req.query) : [];
             const ratings = await this.productsService.getProductRatings([product['pk']], req.query);
             const totalRatings = await this.productsService.getProductTotalRatings([product['pk']]);
 

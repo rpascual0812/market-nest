@@ -19,8 +19,8 @@ export class Order extends BaseEntity {
     @Column({ name: 'seller_pk', nullable: false })
     seller_pk: number;
 
-    @Column({ type: 'text', nullable: false })
-    product_pk: string;
+    @Column({ name: 'product_pk', nullable: false })
+    product_pk: number;
 
     @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
     quantity: number;

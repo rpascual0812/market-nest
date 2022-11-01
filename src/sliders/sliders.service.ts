@@ -31,7 +31,7 @@ export class SlidersService {
                 )
                 .skip(filters.skip)
                 .take(filters.take)
-                .orderBy('sliders.pk', 'ASC')
+                .orderBy('sliders.order', 'ASC')
                 .addOrderBy('slider_documents.pk', 'ASC')
                 .getManyAndCount()
                 ;

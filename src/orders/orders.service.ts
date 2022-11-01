@@ -142,6 +142,7 @@ export class OrdersService {
     }
 
     async findBoughtOrders(filters: any, user: any) {
+        console.log(filters, user);
         return await getRepository(Order)
             .createQueryBuilder('orders')
             // .andWhere(filters.hasOwnProperty('year') ? "date_part('year', orders.date_created) = :year" : '1=1', { year: filters.year })

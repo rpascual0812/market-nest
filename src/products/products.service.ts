@@ -12,6 +12,8 @@ import { UserAddress } from 'src/users/entities/user-address.entity';
 import { User } from 'src/users/entities/user.entity';
 import { ProductRating } from './entities/product-ratings.entity';
 import { SellerAddress } from 'src/seller/entities/seller-address.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import { Status } from 'src/statuses/entities/status.entity';
 
 @Injectable()
 export class ProductsService {
@@ -29,10 +31,9 @@ export class ProductsService {
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    const uuid = uuidv4();
                     const product = new Product();
                     product.user_pk = user.pk;
-                    product.uuid = uuid;
+                    product.uuid = uuidv4();
                     product.type = form.type;
                     product.name = form.name;
                     product.description = form.description;
@@ -47,14 +48,34 @@ export class ProductsService {
                     let documents = form.documents != '' ? form.documents.split(',') : [];
 
                     //Documents
-                    documents.forEach(pk => {
+                    documents.forEach((pk, i) => {
                         const document = new ProductDocument();
                         document.type = 'slide';
                         document.product_pk = newProduct.pk;
                         document.document_pk = pk;
                         document.user_pk = user.pk;
+                        document.default = i == 0 ? true : false;
                         EntityManager.save(document);
                     });
+
+                    if (form.type == 'looking_for') {
+                        const status = await Status.findOne({
+                            where: {
+                                name: 'Pending'
+                            }
+                        });
+
+                        const order = new Order();
+                        order.uuid = uuidv4();
+                        order.user_pk = user.pk;
+                        order.product_pk = newProduct.pk;
+                        order.quantity = form.quantity;
+                        order.measurement_pk = form.measurement;
+                        order.price = 0;
+                        order.status_pk = status.pk;
+                        order.seller_pk = user.pk;
+                        EntityManager.save(order);
+                    }
 
                     // LOGS
                     const log = new Log();
@@ -62,7 +83,7 @@ export class ProductsService {
                     log.model_pk = newProduct.pk;
                     log.details = JSON.stringify({
                         user_pk: user.pk,
-                        uuid: uuid,
+                        uuid: uuidv4(),
                         type: form.type,
                         name: form.name,
                         quantity: form.quantity,
@@ -74,7 +95,7 @@ export class ProductsService {
                     log.user_pk = user.pk;
                     await EntityManager.save(log);
 
-                    return { status: true, uuid: uuid };
+                    return { status: true, data: newProduct };
                 }
             );
         } catch (err) {
@@ -124,19 +145,7 @@ export class ProductsService {
     }
 
     async findAll(data: any, filters: any) {
-        /*
-        'Best Seller',
-            'Newest',
-            'Highest Price',
-            'Lowest Price',
-            'Average Rating',
-            'Vegetables',
-            'Fruits',
-            'Seeds',
-            'Herbs',
-            */
-
-
+        console.log(data, filters);
         let orderByColumn,
             orderByDirection;
         if (filters.hasOwnProperty('orderBy')) {
@@ -183,6 +192,113 @@ export class ProductsService {
                 .andWhere(filters.hasOwnProperty('months') ? "TO_CHAR(products.date_created, 'Month') in (:...months)" : '1=1', { months: monthsArr })
                 .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
                 .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type })
+                .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
+
+                // additional where for search
+                // All
+                .andWhere(
+                    filters.hasOwnProperty('filter') && filters.filter == 'All' &&
+                        filters.hasOwnProperty('keyword') ?
+                        "products.name ILIKE :keyword" :
+                        '1=1', { keyword: `%${filters.keyword}%` }
+                )
+                // Products
+                .andWhere(
+                    filters.hasOwnProperty('filter') && filters.filter == 'Products' &&
+                        filters.hasOwnProperty('keyword') ?
+                        "products.name ILIKE :keyword" :
+                        '1=1', { keyword: `%${filters.keyword}%` }
+                )
+
+                .leftJoinAndSelect("products.user", "users")
+                .select('products')
+                .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+
+                .leftJoinAndSelect("users.seller", "sellers")
+                .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+
+                .leftJoinAndSelect("products.measurement", "measurements")
+                .leftJoinAndSelect("products.country", "countries")
+                .leftJoinAndSelect("products.category", "product_categories")
+
+                // user documents
+                .leftJoinAndMapMany(
+                    'products.user_document',
+                    UserDocument,
+                    'user_documents',
+                    'products.user_pk=user_documents.user_pk'
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+
+                .orderBy(orderByColumn, orderByDirection)
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async findSellerProducts(params: any, filters: any) {
+        console.log('seller products', params, filters);
+        let orderByColumn,
+            orderByDirection;
+        if (filters.hasOwnProperty('orderBy')) {
+            switch (filters.orderBy) {
+                case 'Best Seller':
+                    orderByColumn = 'products.price_from';
+                    orderByDirection = 'DESC';
+                    break;
+                case 'Newest':
+                    orderByColumn = 'products.date_created';
+                    orderByDirection = 'DESC';
+                    break;
+                case 'Highest Price':
+                    orderByColumn = 'products.price_from';
+                    orderByDirection = 'DESC';
+                    break;
+                case 'Lowest Price':
+                    orderByColumn = 'products.price_from';
+                    orderByDirection = 'ASC';
+                    break;
+                case 'Lowest Price':
+                    orderByColumn = 'products.price_from';
+                    orderByDirection = 'ASC';
+                    break;
+                default:
+                    orderByColumn = 'products.date_created';
+                    orderByDirection = 'DESC';
+            }
+        }
+
+        try {
+            let months = filters.hasOwnProperty('months') ? JSON.parse(filters.months) : [];
+            const monthsArr = months.map((month) => month.name);
+
+            let type = [];
+            if (filters.hasOwnProperty('type') && filters.type) {
+                type = filters.type.split(',');
+            }
+
+            return await getRepository(Product)
+                .createQueryBuilder('products')
+                .where('products.archived=false')
+                .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_created) = :year" : '1=1', { year: filters.year })
+                .andWhere(filters.hasOwnProperty('months') ? "TO_CHAR(products.date_created, 'Month') in (:...months)" : '1=1', { months: monthsArr })
+                .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
+                .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type })
+                .andWhere(filters.hasOwnProperty('user_pk') ? "products.user_pk = :user_pk" : '1=1', { user_pk: filters.user_pk })
+                .andWhere(params.hasOwnProperty('type') ? "products.type = :type" : '1=1', { type: params.type })
 
                 // additional where for search
                 // All

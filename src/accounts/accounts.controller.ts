@@ -27,6 +27,10 @@ export class AccountsController {
         const sellerAddresses = account && account['user']['seller'] ? await this.usersService.getSellerAddresses([account['user']['seller']['pk']], req.query) : [];
         const userFollowing = await this.usersService.getUserFollowing([account['user']['pk']], req.query);
         const userFollower = await this.usersService.getUserFollower([account['user']['pk']], req.query);
+
+        const ratings = await this.usersService.getUserRatings([account['user']['pk']], req.query);
+        const totalRatings = await this.usersService.getUserTotalRatings([account['user']['pk']]);
+        console.log(ratings, totalRatings);
         // console.log(userAddresses);
 
         account['user']['user_addresses'] = [];
@@ -64,6 +68,34 @@ export class AccountsController {
             userFollower[0].forEach(follower => {
                 if (account['user']['pk'] == follower.user_pk) {
                     account['user']['follower'].push(follower);
+                }
+            });
+        }
+
+        if (!account.hasOwnProperty('user_ratings')) {
+            account['user']['user_ratings'] = [];
+        }
+        // Append user ratings
+        if (ratings) {
+            ratings[0].forEach(rating => {
+                if (account.user.pk == rating.user_pk) {
+                    account['user']['user_ratings'].push(rating);
+                }
+            });
+        }
+
+        if (!account.hasOwnProperty('user_rating_total')) {
+            account['user']['user_rating_total'] = 0;
+        }
+        if (!account.hasOwnProperty('user_rating_count')) {
+            account['user']['user_rating_count'] = 0;
+        }
+        // Append user rating total
+        if (totalRatings['raw']) {
+            totalRatings['raw'].forEach(rating => {
+                if (account.user.pk == rating.user_pk) {
+                    account['user']['user_rating_count'] = rating.count;
+                    account['user']['user_rating_total'] = rating.total / rating.count;
                 }
             });
         }
