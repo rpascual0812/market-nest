@@ -17,7 +17,7 @@ export class ArticlesService {
             const articles = await getRepository(Article)
                 .createQueryBuilder('articles')
                 .select('articles')
-                .leftJoinAndMapMany(
+                .leftJoinAndMapOne(
                     'articles.article_document',
                     ArticleDocument,
                     'article_documents',

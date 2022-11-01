@@ -12,6 +12,7 @@ import { UserAddress } from './entities/user-address.entity';
 import { SellerAddress } from 'src/seller/entities/seller-address.entity';
 import { UserFollow } from './entities/user-follow.entity';
 import { Log } from 'src/logs/entities/log.entity';
+import { UserRating } from './entities/user-rating.entity';
 
 // export type User = {
 //     id: number;
@@ -43,7 +44,7 @@ export class UsersService {
             account_pk: account_pk,
             country_pk: 173
         }
-
+        console.log(obj);
         const newUser = this.userRepository.create(obj);
         return this.userRepository.save(newUser);
     }
@@ -274,6 +275,55 @@ export class UsersService {
                 .getMany()
                 ;
 
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async getUserRatings(pks: any, filters: any) {
+        try {
+            console.log(pks);
+            return await getRepository(UserRating)
+                .createQueryBuilder('user_ratings')
+                .select('user_ratings')
+                .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+                .leftJoinAndSelect("user_ratings.user", "users")
+                .leftJoinAndSelect("users.user_document", "user_documents")
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                .where("user_ratings.user_pk IN (:...pk)", { pk: pks })
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async getUserTotalRatings(pks: any) {
+        try {
+            return await getRepository(UserRating)
+                .createQueryBuilder('user_ratings')
+                .select('user_pk')
+                .addSelect('sum(rating) as total')
+                .addSelect('count(pk) as count')
+                .where("user_ratings.user_pk IN (:...pk)", { pk: pks })
+                .groupBy('user_pk')
+                .getRawAndEntities()
+                ;
         } catch (error) {
             console.log(error);
             // SAVE ERROR

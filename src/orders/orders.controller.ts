@@ -106,7 +106,7 @@ export class OrdersController {
 
         if (orders[1] > 0) {
             const product_pks = orders[0].map(({ product }) => product.pk);
-            const seller_pks = orders[0].map(({ seller }) => seller ? seller.seller.pk : null);
+            const seller_pks = orders[0].map(({ user }) => user ? user.pk : null);
 
             const documents = await this.productsService.getProductDocuments(product_pks, req.query);
             const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);

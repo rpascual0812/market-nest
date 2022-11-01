@@ -126,6 +126,7 @@ export class AuthService {
                     user.birthdate = data.birthday;
                     user.mobile_number = data.mobile;
                     user.email_address = data.email;
+                    user.about = data.about;
                     user.role_pk = 1;
                     user.country_pk = 173;
                     user.account_pk = newAccount.pk;

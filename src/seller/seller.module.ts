@@ -4,13 +4,15 @@ import { SellerController } from './seller.controller';
 import { DatabaseModule } from 'src/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Seller } from './entities/seller.entity';
+import { Product } from 'src/products/entities/product.entity';
+import { ProductsService } from 'src/products/products.service';
 
 @Module({
     imports: [
         DatabaseModule,
-        TypeOrmModule.forFeature([Seller]),
+        TypeOrmModule.forFeature([Seller, Product]),
     ],
     controllers: [SellerController],
-    providers: [SellerService]
+    providers: [SellerService, ProductsService]
 })
 export class SellerModule { }

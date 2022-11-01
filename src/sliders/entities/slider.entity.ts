@@ -20,6 +20,9 @@ export class Slider {
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 
+    @Column({ name: 'order', nullable: true })
+    order: number;
+
     @Column({ default: false })
     archived: boolean;
 
