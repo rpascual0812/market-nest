@@ -9,11 +9,12 @@ import { Session } from '../sessions/entities/session.entity';
 import { SessionsService } from 'src/sessions/sessions.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
+import { UserDocument } from 'src/users/entities/user-document.entity';
 
 @Module({
     imports: [
         DatabaseModule,
-        TypeOrmModule.forFeature([Account, Session, User]),
+        TypeOrmModule.forFeature([Account, Session, User, UserDocument]),
     ],
     providers: [AccountsService, SessionsService, UsersService],
     controllers: [AccountsController],
