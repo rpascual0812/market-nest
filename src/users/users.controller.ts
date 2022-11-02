@@ -16,6 +16,11 @@ export class UsersController {
     // create(@Body() createUserDto: CreateUserDto) {
     //     return this.usersService.create(createUserDto);
     // }
+    // @UseGuards(JwtAuthGuard)
+    @Post('update')
+    async update(@Request() req: any, @Body() body: any) {
+        return await this.usersService.update(body);
+    }
 
     @Get(':pk')
     async findOne(@Request() req: any) {

@@ -27,6 +27,8 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        @InjectRepository(UserDocument)
+        private userDocumentRepository: Repository<UserDocument>,
     ) { }
 
     // create(createUserDto: CreateUserDto) {
@@ -442,6 +444,42 @@ export class UsersService {
     //         }
     //     }
     // }
+
+    async update(data: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const user = await EntityManager.findOne(User, data.pk);
+                    user.first_name = data.first_name;
+                    user.last_name = data.last_name;
+                    user.birthdate = data.birthdate;
+                    user.email_address = data.email;
+                    user.mobile_number = data.mobile;
+                    user.about = data.about;
+                    const updatedUser = await EntityManager.save(user);
+
+                    let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
+                    displayPhoto.document_pk = data.display_photo;
+                    await EntityManager.save(displayPhoto);
+
+                    let idPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'id_photo' });
+                    idPhoto.document_pk = data.id_photo;
+                    await EntityManager.save(idPhoto);
+
+                    return { status: true, data: updatedUser };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+
+    }
 
 
 }
