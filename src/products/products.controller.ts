@@ -17,6 +17,13 @@ export class ProductsController {
         return res.status(product.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(product);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Post('/update')
+    async update(@Body() body: any, @Request() req: any, @Response() res: any) {
+        const product = await this.productsService.update(body, req.user);
+        return res.status(product.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(product);
+    }
+
     @Get()
     async findAll(@Request() req: any) {
         const products = await this.productsService.findAll(req.user, req.query);

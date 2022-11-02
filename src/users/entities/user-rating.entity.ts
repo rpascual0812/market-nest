@@ -14,6 +14,9 @@ export class UserRating {
     @Column({ type: 'text', nullable: true })
     message: String;
 
+    @Column({ default: false })
+    anonymous: boolean;
+
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 

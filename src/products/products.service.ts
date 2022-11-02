@@ -20,6 +20,8 @@ export class ProductsService {
     constructor(
         @InjectRepository(Product)
         private productRepository: Repository<Product>,
+        @InjectRepository(Product)
+        private productDocumentRepository: Repository<ProductDocument>,
     ) { }
 
     @UsePipes(ValidationPipe)
@@ -106,6 +108,67 @@ export class ProductsService {
         }
     }
 
+    @UsePipes(ValidationPipe)
+    async update(form: any, user: any) {
+        console.log('updating rpoduct', form);
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const product = await EntityManager.findOne(Product, form.pk);
+                    product.name = form.name;
+                    product.price_from = form.price;
+                    product.quantity = form.stock;
+                    product.description = form.description;
+                    product.measurement_pk = form.measurement;
+                    product.category_pk = form.category;
+                    const updatedProduct = await EntityManager.save(product);
+
+                    // document
+                    await getConnection()
+                        .createQueryBuilder()
+                        .delete()
+                        .from(ProductDocument)
+                        .where("product_pk = :product_pk", { product_pk: product.pk })
+                        .execute();
+
+                    let documents = form.documents != '' ? form.documents.split(',') : [];
+                    documents.forEach((pk, i) => {
+                        const document = new ProductDocument();
+                        document.type = 'slide';
+                        document.product_pk = product.pk;
+                        document.document_pk = pk;
+                        document.user_pk = product.user_pk;
+                        document.default = i == 0 ? true : false;
+                        EntityManager.save(document);
+                    });
+
+                    // LOGS
+                    const log = new Log();
+                    log.model = 'products';
+                    log.model_pk = product.pk;
+                    log.details = JSON.stringify({
+                        name: form.name,
+                        quantity: form.quantity,
+                        measurement: form.measurement,
+                        price: form.price_from,
+                    });
+                    log.user_pk = product.user_pk;
+                    await EntityManager.save(log);
+
+                    return { status: true, data: updatedProduct };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
     async findOne(data: any) {
         try {
             return await getRepository(Product)
@@ -170,6 +233,18 @@ export class ProductsService {
                     orderByColumn = 'products.price_from';
                     orderByDirection = 'ASC';
                     break;
+                case 'Sort by Name':
+                    orderByColumn = 'products.name';
+                    orderByDirection = 'ASC';
+                    break;
+                case 'Sort by Date':
+                    orderByColumn = 'products.date_created';
+                    orderByDirection = 'ASC';
+                    break;
+                case 'Sort by Category':
+                    orderByColumn = 'products.category_pk';
+                    orderByDirection = 'ASC';
+                    break;
                 default:
                     orderByColumn = 'products.date_created';
                     orderByDirection = 'DESC';
@@ -209,6 +284,8 @@ export class ProductsService {
                         "products.name ILIKE :keyword" :
                         '1=1', { keyword: `%${filters.keyword}%` }
                 )
+                // Producer
+
 
                 .leftJoinAndSelect("products.user", "users")
                 .select('products')
