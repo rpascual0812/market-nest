@@ -10,7 +10,7 @@ export class ProvincesService {
             const users = await getRepository(Province)
                 .createQueryBuilder('provinces')
                 .select('provinces')
-                .leftJoinAndSelect("provinces.country", "countries")
+                // .leftJoinAndSelect("provinces.country", "countries")
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
