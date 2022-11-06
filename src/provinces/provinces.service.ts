@@ -9,11 +9,10 @@ export class ProvincesService {
         try {
             const users = await getRepository(Province)
                 .createQueryBuilder('provinces')
-                .select(['provinces.pk', 'provinces.name'])
-                // .leftJoinAndSelect("provinces.country", "countries")
+                .select('provinces')
+                .leftJoinAndSelect("provinces.country", "countries")
                 .skip(filters.skip)
                 .take(filters.take)
-                .where('active=true')
                 .getManyAndCount()
                 ;
 
