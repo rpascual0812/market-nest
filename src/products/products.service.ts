@@ -110,7 +110,6 @@ export class ProductsService {
 
     @UsePipes(ValidationPipe)
     async update(form: any, user: any) {
-        console.log('updating rpoduct', form);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -263,6 +262,7 @@ export class ProductsService {
             return await getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
+                .andWhere(filters.hasOwnProperty('user_pk') ? "products.user_pk = :user_pk" : '1=1', { user_pk: filters.user_pk })
                 .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_created) = :year" : '1=1', { year: filters.year })
                 .andWhere(filters.hasOwnProperty('months') ? "TO_CHAR(products.date_created, 'Month') in (:...months)" : '1=1', { months: monthsArr })
                 .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
