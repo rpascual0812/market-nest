@@ -45,3 +45,17 @@ PreconditionFailedException
 
 pg_dump -U postgres -W -F p -h localhost -f community_market-221018.sql community_market
 psql -U postgres -d community_market221022 -f db/community_market-221022.sql
+
+
+
+
+market
+cd /home/rafael/Documents/Market && ./market
+
+
+cd market
+git pull origin master
+npm run typeorm schema:sync
+npm run typeorm migration:run
+npm run build
+pm2 restart main
