@@ -38,6 +38,7 @@ export class ProductsService {
                     product.uuid = uuidv4();
                     product.type = form.type;
                     product.name = form.name;
+                    product.date_available = form.date_available;
                     product.description = form.description;
                     product.quantity = form.quantity;
                     product.measurement_pk = form.measurement;
@@ -120,6 +121,7 @@ export class ProductsService {
                     product.name = form.name;
                     product.price_from = form.price;
                     product.quantity = form.stock;
+                    product.date_available = form.date_available;
                     product.description = form.description;
                     product.measurement_pk = form.measurement;
                     product.category_pk = form.category;

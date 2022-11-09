@@ -48,6 +48,9 @@ export class Product extends BaseEntity {
     country_pk: number;
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+    date_available: Date;
+
+    @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
 
     @Column({ default: false })
