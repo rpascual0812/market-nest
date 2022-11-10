@@ -178,6 +178,8 @@ export class ProductsService {
                 .leftJoinAndSelect("products.user", "users")
                 .leftJoinAndSelect("users.seller", "sellers")
                 .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+                .leftJoinAndSelect("users.account", "accounts")
+                .addSelect(['accounts.pk'])
 
                 .leftJoinAndSelect("products.measurement", "measurements")
                 .leftJoinAndSelect("products.country", "countries")
@@ -260,13 +262,13 @@ export class ProductsService {
             if (filters.hasOwnProperty('type') && filters.type) {
                 type = filters.type.split(',');
             }
-            // console.log(filters);
+            console.log(filters);
             return await getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
                 .andWhere(filters.hasOwnProperty('user_pk') ? "products.user_pk = :user_pk" : '1=1', { user_pk: filters.user_pk })
                 .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_created) = :year" : '1=1', { year: filters.year })
-                .andWhere(filters.hasOwnProperty('months') ? "TO_CHAR(products.date_created, 'Month') in (:...months)" : '1=1', { months: monthsArr })
+                .andWhere(filters.hasOwnProperty('months') ? "TRIM(TO_CHAR(products.date_created, 'Month')) in (:...months)" : '1=1', { months: monthsArr })
                 .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
                 .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type })
                 .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
@@ -295,6 +297,9 @@ export class ProductsService {
 
                 .leftJoinAndSelect("users.seller", "sellers")
                 .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+
+                .leftJoinAndSelect("users.account", "accounts")
+                .addSelect(['accounts.pk'])
 
                 .leftJoinAndSelect("products.measurement", "measurements")
                 .leftJoinAndSelect("products.country", "countries")

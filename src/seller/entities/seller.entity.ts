@@ -1,11 +1,11 @@
 import { User } from 'src/users/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable, BaseEntity } from 'typeorm';
 import { SellerAddress } from './seller-address.entity';
 import { SellerDocument } from './seller-document.entity';
 
 @Entity({ name: 'sellers' })
 @Unique(['user_pk'])
-export class Seller {
+export class Seller extends BaseEntity {
     @PrimaryGeneratedColumn()
     pk: number;
 
