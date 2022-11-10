@@ -260,7 +260,7 @@ export class ProductsService {
             if (filters.hasOwnProperty('type') && filters.type) {
                 type = filters.type.split(',');
             }
-
+            // console.log(filters);
             return await getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
@@ -450,6 +450,25 @@ export class ProductsService {
             return { status: false, code: err.code };
         } finally {
             await queryRunner.release();
+            // console.log('finally...');
+        }
+    }
+
+    async delete(pk: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    EntityManager.update(Product, { pk }, { archived: true });
+                    return { status: true, data: { pk } };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
             // console.log('finally...');
         }
     }
