@@ -27,6 +27,7 @@ export class ProductsController {
     @Get()
     async findAll(@Request() req: any) {
         const products = await this.productsService.findAll(req.user, req.query);
+        // console.log(products);
         if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
@@ -220,5 +221,12 @@ export class ProductsController {
         }
         return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
         // return res.status(product.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(product);
+    }
+
+    // @UseGuards(JwtAuthGuard)
+    @Delete(':pk')
+    async delete(@Body() body: any, @Request() req: any, @Response() res: any) {
+        const product = await this.productsService.delete(req.params.pk);
+        return res.status(product.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(product);
     }
 }
