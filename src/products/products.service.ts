@@ -64,7 +64,7 @@ export class ProductsService {
                     if (form.type == 'looking_for') {
                         const status = await Status.findOne({
                             where: {
-                                name: 'Pending'
+                                name: 'Awaiting Confirmation'
                             }
                         });
 
