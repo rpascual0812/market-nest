@@ -253,6 +253,10 @@ export class ProductsService {
                     orderByDirection = 'DESC';
             }
         }
+        else {
+            orderByColumn = 'products.date_created';
+            orderByDirection = 'DESC';
+        }
 
         try {
             let months = filters.hasOwnProperty('months') ? JSON.parse(filters.months) : [];
