@@ -42,7 +42,7 @@ export class ProductsService {
                     product.description = form.description;
                     product.quantity = form.quantity;
                     product.measurement_pk = form.measurement;
-                    product.category_pk = 1;
+                    product.category_pk = form.category;
                     product.price_from = form.price_from;
                     product.price_to = form.price_to;
                     product.country_pk = 173;  //form.country_pk;
