@@ -79,14 +79,14 @@ export class OrdersController {
             const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
 
             orders[0].forEach(order => {
-                if (!order.hasOwnProperty('product_documents')) {
-                    order['product_documents'] = [];
+                if (!order['product'].hasOwnProperty('product_documents')) {
+                    order['product']['product_documents'] = [];
                 }
                 // Append product documents
                 if (documents) {
                     documents[0].forEach(document => {
                         if (order.product.pk == document.product_pk) {
-                            order['product_documents'].push(document);
+                            order['product']['product_documents'].push(document);
                         }
                     });
                 }

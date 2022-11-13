@@ -36,7 +36,7 @@ export class OrdersService {
             const seller = await Seller.findOne({
                 user_pk: product.user_pk
             });
-            console.log(seller);
+            console.log(form, seller, user);
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
                     const existing = await getRepository(Order)

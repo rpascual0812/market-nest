@@ -16,7 +16,7 @@ export class Order extends BaseEntity {
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 
-    @Column({ name: 'seller_pk', nullable: false })
+    @Column({ name: 'seller_pk', nullable: true })
     seller_pk: number;
 
     @Column({ name: 'product_pk', nullable: false })
