@@ -64,7 +64,7 @@ export class ProductsService {
                     if (form.type == 'looking_for') {
                         const status = await Status.findOne({
                             where: {
-                                name: 'Awaiting Confirmation'
+                                name: form.status
                             }
                         });
 
@@ -211,7 +211,7 @@ export class ProductsService {
     }
 
     async findAll(data: any, filters: any) {
-        // console.log(data, filters);
+        console.log(data, filters);
         let orderByColumn,
             orderByDirection;
         if (filters.hasOwnProperty('orderBy')) {
@@ -262,15 +262,26 @@ export class ProductsService {
             let months = filters.hasOwnProperty('months') ? JSON.parse(filters.months) : [];
             const monthsArr = months.map((month) => month.name);
 
+            let user_pk = null;
+            if (filters.hasOwnProperty('user_pk')) {
+                user_pk = filters.user_pk
+            }
+            else if (filters.hasOwnProperty('account_pk')) {
+                const user = await User.findOne({
+                    account_pk: filters.account_pk
+                });
+                user_pk = user.pk;
+            }
+
             let type = [];
             if (filters.hasOwnProperty('type') && filters.type) {
                 type = filters.type.split(',');
             }
-            // console.log('find all products', filters);
+            console.log('type', type);
             return await getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
-                .andWhere(filters.hasOwnProperty('user_pk') ? "products.user_pk = :user_pk" : '1=1', { user_pk: filters.user_pk })
+                .andWhere(user_pk != null ? "products.user_pk = :user_pk" : '1=1', { user_pk: user_pk })
                 .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_available) = :year" : '1=1', { year: filters.year })
                 .andWhere(filters.hasOwnProperty('months') ? "TRIM(TO_CHAR(products.date_available, 'Month')) in (:...months)" : '1=1', { months: monthsArr })
                 .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
