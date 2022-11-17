@@ -7,7 +7,7 @@ import { City } from './entities/city.entity';
 @Injectable()
 export class CitiesService {
     async findAll(filters: any) {
-        console.log(filters);
+        // console.log(filters);
         try {
             const cities = await getRepository(City)
                 .createQueryBuilder('cities')
@@ -20,7 +20,7 @@ export class CitiesService {
                 .take(filters.take)
                 .getManyAndCount()
                 ;
-            console.log(cities);
+            // console.log(cities);
             return {
                 status: true,
                 data: cities[0],

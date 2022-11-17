@@ -115,7 +115,7 @@ export class TicketsService {
     async update(pk: number, user: object, body: any) {
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
-        console.log(body, user);
+        // console.log(body, user);
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {

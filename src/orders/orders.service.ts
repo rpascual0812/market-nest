@@ -36,7 +36,7 @@ export class OrdersService {
             const seller = await Seller.findOne({
                 user_pk: product.user_pk
             });
-            console.log(form, seller, user);
+            // console.log(form, seller, user);
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
                     const existing = await getRepository(Order)
@@ -60,7 +60,7 @@ export class OrdersService {
                             'status_pk': status.pk
                         };
                         const res = await EntityManager.update(Order, filters, fields);
-                        console.log(res);
+                        // console.log(res);
                         if (res.affected > 0) {
                             return await EntityManager.findOne(Order, { 'user_pk': user.pk, 'product_pk': form.product_pk });
                         }
@@ -109,7 +109,7 @@ export class OrdersService {
     }
 
     async update(body: any, user: any) {
-        console.log('update', body);
+        // console.log('update', body);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -224,7 +224,7 @@ export class OrdersService {
     }
 
     async findBoughtOrders(filters: any, user: any) {
-        console.log(filters, user);
+        // console.log(filters, user);
         return await getRepository(Order)
             .createQueryBuilder('orders')
             // .andWhere(filters.hasOwnProperty('year') ? "date_part('year', orders.date_created) = :year" : '1=1', { year: filters.year })

@@ -20,7 +20,7 @@ export class CategoriesController {
         //     pk: 0,
         //     name: 'All'
         // });
-        console.log(categories);
+        // console.log(categories);
         return {
             status: true,
             data: categories[0],

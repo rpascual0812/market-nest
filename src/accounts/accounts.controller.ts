@@ -30,7 +30,7 @@ export class AccountsController {
 
         const ratings = await this.usersService.getUserRatings([account['user']['pk']], req.query);
         const totalRatings = await this.usersService.getUserTotalRatings([account['user']['pk']]);
-        console.log(ratings, totalRatings);
+        // console.log(ratings, totalRatings);
         // console.log(userAddresses);
 
         account['user']['user_addresses'] = [];
