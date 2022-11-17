@@ -26,7 +26,7 @@ export class ProductsService {
 
     @UsePipes(ValidationPipe)
     async create(form: any, user: any) {
-        console.log('creating rpoduct', form);
+        // console.log('creating rpoduct', form);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -211,7 +211,7 @@ export class ProductsService {
     }
 
     async findAll(data: any, filters: any) {
-        console.log(data, filters);
+        console.log(filters);
         let orderByColumn,
             orderByDirection;
         if (filters.hasOwnProperty('orderBy')) {
@@ -277,7 +277,7 @@ export class ProductsService {
             if (filters.hasOwnProperty('type') && filters.type) {
                 type = filters.type.split(',');
             }
-            console.log('type', type);
+            // console.log('filters', filters);
             return await getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
@@ -361,8 +361,8 @@ export class ProductsService {
                 )
                 // .where("product_documents.product_pk = :pk", { pk })
                 .where("product_documents.product_pk IN (:...pk)", { pk: pks })
-                .skip(filters.skip)
-                .take(filters.take)
+                // .skip(filters.skip)
+                // .take(filters.take)
                 .getManyAndCount()
                 ;
         } catch (error) {

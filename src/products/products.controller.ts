@@ -27,13 +27,15 @@ export class ProductsController {
     @Get()
     async findAll(@Request() req: any) {
         const products = await this.productsService.findAll(req.user, req.query);
-        console.log(2, products);
+        // console.log(2, products);
+        // console.log('length', products[0].length);
         if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
             const seller_pks = products[0].map(({ product }) => product && product.user ? product.user.seller.pk : null);
 
             const documents = await this.productsService.getProductDocuments(pks, req.query);
+            // console.log('documents', documents);
             const userAddresses = await this.usersService.getUserAddresses(user_pks, req.query);
 
             const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
@@ -46,8 +48,10 @@ export class ProductsController {
                     product['product_documents'] = [];
                 }
                 // Append product documents
+
                 if (documents) {
                     documents[0].forEach(document => {
+                        // console.log(product.pk, document.product_pk);
                         if (product.pk == document.product_pk) {
                             product['product_documents'].push(document);
                         }
