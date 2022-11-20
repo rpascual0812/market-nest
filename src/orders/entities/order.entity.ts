@@ -1,5 +1,6 @@
 import { Measurement } from 'src/measurements/entities/measurement.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { Seller } from 'src/seller/entities/seller.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double, ManyToMany, BaseEntity } from 'typeorm';
@@ -48,9 +49,9 @@ export class Order extends BaseEntity {
     @JoinColumn({ name: 'user_pk' })
     user: User;
 
-    @ManyToOne(type => User, user => user.order_seller, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne(type => Seller, seller => seller.order, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'seller_pk' })
-    seller: User;
+    seller: Seller;
 
     @ManyToOne(type => Product, product => product.order, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_pk' })

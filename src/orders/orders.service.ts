@@ -71,7 +71,7 @@ export class OrdersService {
                         const order = new Order();
                         order.uuid = uuid;
                         order.user_pk = user.pk;
-                        order.seller_pk = seller.user_pk;
+                        order.seller_pk = seller.pk;
                         order.product_pk = form.product_pk;
                         order.quantity = form.quantity;
                         order.measurement_pk = form.measurement_pk;
@@ -141,7 +141,9 @@ export class OrdersService {
         return await getRepository(Order)
             .createQueryBuilder('orders')
             .select('orders')
-            .leftJoinAndSelect("orders.user", "users")
+            // .leftJoinAndSelect("orders.user", "users")
+            .leftJoinAndSelect("orders.seller", "sellers")
+            .leftJoinAndSelect("sellers.user", "users")
             .leftJoinAndSelect("orders.status", "statuses")
             .leftJoinAndSelect("orders.product", "products")
             .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
@@ -177,8 +179,10 @@ export class OrdersService {
         return await getRepository(Order)
             .createQueryBuilder('orders')
             .select('orders')
-            .leftJoinAndSelect("orders.seller", "users")
-            .leftJoinAndSelect("users.seller", "sellers")
+            .leftJoinAndSelect("orders.user", "users")
+            .leftJoinAndSelect("orders.seller", "sellers")
+            .leftJoinAndSelect("sellers.user", "users as seller_user")
+            // .leftJoinAndSelect("users.seller", "sellers")
             .leftJoinAndSelect("orders.status", "statuses")
             .leftJoinAndSelect("orders.product", "products")
             .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])

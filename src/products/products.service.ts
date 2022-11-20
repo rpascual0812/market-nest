@@ -211,7 +211,7 @@ export class ProductsService {
     }
 
     async findAll(data: any, filters: any) {
-        console.log(filters);
+        // console.log(1, filters);
         let orderByColumn,
             orderByDirection;
         if (filters.hasOwnProperty('orderBy')) {
@@ -273,11 +273,19 @@ export class ProductsService {
                 user_pk = user.pk;
             }
 
-            let type = [];
+            let types = [];
+            let isFutureCrop = false;
             if (filters.hasOwnProperty('type') && filters.type) {
-                type = filters.type.split(',');
+                types = filters.type.split(',');
+                types.forEach((type, i) => {
+                    if (type == 'future_crop') {
+                        isFutureCrop = true;
+                        types[i] = 'product';
+                    }
+                });
             }
-            // console.log('filters', filters);
+
+            // console.log('types', types, isFutureCrop);
             return await getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
@@ -285,8 +293,9 @@ export class ProductsService {
                 .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_available) = :year" : '1=1', { year: filters.year })
                 .andWhere(filters.hasOwnProperty('months') ? "TRIM(TO_CHAR(products.date_available, 'Month')) in (:...months)" : '1=1', { months: monthsArr })
                 .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
-                .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type })
+                .andWhere(filters.hasOwnProperty('types') ? "products.type IN (:...type)" : '1=1', { types })
                 .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
+                .andWhere(isFutureCrop ? "products.date_available > :date" : '1=1', { date: new Date() })
 
                 // additional where for search
                 // All
