@@ -5,13 +5,20 @@ import { Product } from 'src/products/entities/product.entity';
 import { SellerAddress } from 'src/seller/entities/seller-address.entity';
 import { UserAddress } from 'src/users/entities/user-address.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'provinces' })
-@Unique(['name', 'country_pk'])
+@Unique(['name', 'country_pk', 'psgc_code', 'region_code', 'province_code'])
 export class Province {
-    @PrimaryGeneratedColumn()
-    pk: number;
+    @Column({ type: 'bigint', nullable: true })
+    psgc_code: number;
+
+    @Column({ type: 'int', nullable: true })
+    region_code: number;
+
+    // @Column({ type: 'int', unique: true, nullable: true })
+    @PrimaryColumn()
+    province_code: number;
 
     @Column({ type: 'text', nullable: false })
     name: string;
@@ -48,12 +55,12 @@ export class Province {
     country: Country;
 
     @OneToMany('City', (city: City) => city.province)
-    @JoinColumn({ name: 'pk' })
-    city: Array<City>;
+    @JoinColumn({ name: 'province_code' })
+    city: City[];
 
     @OneToMany('Area', (area: Area) => area.province)
-    @JoinColumn({ name: 'pk' })
-    area: Array<Area>;
+    @JoinColumn({ name: 'province_code' })
+    area: Area[];
 
     @ManyToOne(type => User, user => user.province, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })

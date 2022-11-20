@@ -7,7 +7,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany } from 'typeorm';
 
 @Entity({ name: 'areas' })
-@Unique(['name', 'country_pk', 'province_pk', 'city_pk'])
+@Unique(['name', 'country_pk', 'province_code', 'city_code'])
 export class Area {
     @PrimaryGeneratedColumn()
     pk: number;
@@ -18,11 +18,11 @@ export class Area {
     @Column({ name: 'country_pk', nullable: false })
     country_pk: number;
 
-    @Column({ name: 'province_pk', nullable: false })
-    province_pk: number;
+    @Column({ name: 'province_code', nullable: true })
+    province_code: number;
 
-    @Column({ name: 'city_pk', nullable: false })
-    city_pk: number;
+    @Column({ name: 'city_code', nullable: true })
+    city_code: number;
 
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
@@ -46,11 +46,11 @@ export class Area {
     country: Country;
 
     @ManyToOne(type => Province, province => province.area, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'province_pk' })
+    @JoinColumn({ name: 'province_code' })
     province: Province;
 
     @ManyToOne(type => City, city => city.area, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'city_pk' })
+    @JoinColumn({ name: 'city_code' })
     city: City;
 
     @ManyToOne(type => User, user => user.area, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
