@@ -134,9 +134,9 @@ export class AuthService {
 
                     const address = new UserAddress;
                     address.type = 'home';
-                    address.province_pk = 3;
-                    address.city_pk = 2;
-                    address.area_pk = 1;
+                    address.province_pk = data.province;
+                    address.city_pk = data.city;
+                    address.area_pk = data.area;
                     address.address = data.address_details;
                     address.user_pk = newUser.pk;
                     await EntityManager.save(address);
