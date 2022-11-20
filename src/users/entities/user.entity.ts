@@ -197,9 +197,9 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'order_pk' })
     order: Order;
 
-    @OneToMany('Order', (order: Order) => order.seller, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'order_seller_pk' })
-    order_seller: Order;
+    // @OneToMany('Order', (order: Order) => order.seller, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    // @JoinColumn({ name: 'order_seller_pk' })
+    // order_seller: Order;
 
     @OneToMany('Status', (status: Status) => status.user_pk, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'status_pk' })

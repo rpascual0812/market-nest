@@ -44,6 +44,7 @@ export class SessionsService {
     }
 
     async removeByAccount(pk: number): Promise<any> {
+        // console.log('delete', pk);
         return await getConnection()
             .createQueryBuilder()
             .delete()

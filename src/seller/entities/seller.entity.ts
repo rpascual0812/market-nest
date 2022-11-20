@@ -1,3 +1,4 @@
+import { Order } from 'src/orders/entities/order.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable, BaseEntity } from 'typeorm';
 import { SellerAddress } from './seller-address.entity';
@@ -34,6 +35,10 @@ export class Seller extends BaseEntity {
     @OneToOne(type => User, user => user.seller, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
+
+    @OneToMany('Order', (order: Order) => order.seller, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'seller_pk' })
+    order: Order;
 
     @OneToMany(type => SellerAddress, seller_address => seller_address.seller, { eager: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'seller_address_pk' })

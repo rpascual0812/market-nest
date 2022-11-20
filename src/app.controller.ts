@@ -30,6 +30,7 @@ export class AppController {
     @UseGuards(JwtAuthGuard)
     @Post('logout')
     logout(@Response() res: any, @Request() req): any {
+        // console.log('logging out', req.user);
         const result = this.authService.logout(req.user);
         if (result) {
             return res.status(HttpStatus.OK).json({ status: 'success' });
