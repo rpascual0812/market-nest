@@ -16,8 +16,8 @@ export class Province {
     @Column({ type: 'int', nullable: true })
     region_code: number;
 
-    // @Column({ type: 'int', unique: true, nullable: true })
-    @PrimaryColumn()
+    @Column({ type: 'int', unique: true, nullable: true })
+    // @PrimaryColumn()
     province_code: number;
 
     @Column({ type: 'text', nullable: false })
