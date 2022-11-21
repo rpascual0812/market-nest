@@ -7,7 +7,7 @@ import { City } from './entities/city.entity';
 @Injectable()
 export class CitiesService {
     async findAll(filters: any) {
-        console.log(filters);
+        // console.log(filters);
         try {
             const cities = await getRepository(City)
                 .createQueryBuilder('cities')
@@ -16,6 +16,7 @@ export class CitiesService {
                 .leftJoinAndSelect("cities.province", "provinces")
                 .where('cities.archived=false')
                 .andWhere(filters.hasOwnProperty('province_code') && filters.province_code != '0' ? "cities.province_code = :province_code" : '1=1', { province_code: filters.province_code })
+                .orderBy('cities.name')
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()

@@ -14,6 +14,7 @@ export class AreasService {
                 .leftJoinAndSelect("areas.city", "cities")
                 .where('cities.archived=false')
                 .andWhere(filters.hasOwnProperty('city_code') && filters.city_code != '0' ? "areas.city_code = :city_code" : '1=1', { city_code: filters.city_code })
+                .orderBy('areas.name')
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()

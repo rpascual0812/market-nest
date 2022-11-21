@@ -35,9 +35,9 @@ export class SellerService {
                     const address = new SellerAddress();
                     address.type = 'home';
                     address.default = true;
-                    address.province_pk = 3;
-                    address.city_pk = 2;
-                    address.area_pk = 1;
+                    address.province_pk = data.province;
+                    address.city_pk = data.city;
+                    address.area_pk = data.area;
                     address.address = data.address;
                     address.seller_pk = newSeller.pk;
                     EntityManager.save(address);

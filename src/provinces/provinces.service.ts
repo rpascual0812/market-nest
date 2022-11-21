@@ -13,6 +13,7 @@ export class ProvincesService {
                 .leftJoinAndSelect("provinces.country", "countries")
                 .skip(filters.skip)
                 .take(filters.take)
+                .orderBy('provinces.name')
                 .getManyAndCount()
                 ;
 
