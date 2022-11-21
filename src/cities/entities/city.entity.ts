@@ -21,8 +21,8 @@ export class City {
     @Column({ name: 'province_code', nullable: true })
     province_code: number;
 
-    // @Column({ name: 'city_code', unique: true, nullable: true })
-    @PrimaryColumn()
+    @Column({ name: 'city_code', unique: true, nullable: true })
+    // @PrimaryColumn()
     city_code: number;
 
     @Column({ name: 'user_pk', nullable: false })
