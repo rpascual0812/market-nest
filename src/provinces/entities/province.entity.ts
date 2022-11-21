@@ -10,17 +10,14 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, 
 @Entity({ name: 'provinces' })
 @Unique(['name', 'country_pk', 'psgc_code', 'region_code', 'province_code'])
 export class Province {
-    @PrimaryGeneratedColumn()
-    pk: number;
-
     @Column({ type: 'bigint', nullable: true })
     psgc_code: number;
 
     @Column({ type: 'int', nullable: true })
     region_code: number;
 
-    @Column({ type: 'int', unique: true, nullable: true })
-    // @PrimaryColumn()
+    // @Column({ type: 'int', unique: true, nullable: true })
+    @PrimaryColumn()
     province_code: number;
 
     @Column({ type: 'text', nullable: false })
