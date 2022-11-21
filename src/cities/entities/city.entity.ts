@@ -9,8 +9,8 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, 
 @Entity({ name: 'cities' })
 @Unique(['name', 'country_pk', 'province_code'])
 export class City {
-    // @PrimaryGeneratedColumn()
-    // pk: number;
+    @PrimaryGeneratedColumn()
+    pk: number;
 
     @Column({ type: 'text', nullable: false })
     name: string;
