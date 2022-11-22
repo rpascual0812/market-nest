@@ -8,7 +8,7 @@ export class Chat extends BaseEntity {
     @PrimaryGeneratedColumn('increment', { type: 'bigint' })
     pk: number;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'text', nullable: false })
     uuid: string;
 
     @Column({ type: 'text', nullable: true })
@@ -17,8 +17,11 @@ export class Chat extends BaseEntity {
     @Column({ type: 'text', nullable: true })
     last_message: string;
 
-    @Column({ name: 'user_pk', nullable: false })
+    @Column({ name: 'last_message_user_pk', nullable: true })
     last_message_user_pk: number;
+
+    @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+    last_message_date: Date;
 
     @Column({ default: false })
     archived: boolean;
@@ -28,7 +31,7 @@ export class Chat extends BaseEntity {
      */
 
     @ManyToOne('User', (user: User) => user.notification, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'user_pk' })
+    @JoinColumn({ name: 'last_message_user_pk' })
     user: User;
 
     @OneToMany('ChatParticipant', (chat_participant: ChatParticipant) => chat_participant.chat)
