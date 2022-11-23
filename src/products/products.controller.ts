@@ -26,6 +26,7 @@ export class ProductsController {
 
     @Get()
     async findAll(@Request() req: any) {
+        // console.log(req.query, req.user);
         const products = await this.productsService.findAll(req.user, req.query);
         // console.log('products', products);
         // console.log('length', products[0].length);

@@ -43,11 +43,11 @@ export class UserAddress {
     user: User;
 
     @ManyToOne(type => Province, province => province.user_address, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'province_code' })
+    @JoinColumn({ name: 'province_pk' })
     province: Province;
 
     @ManyToOne(type => City, city => city.user_address, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'city_code' })
+    @JoinColumn({ name: 'city_pk' })
     city: City;
 
     @ManyToOne(type => Area, area => area.user_address, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })

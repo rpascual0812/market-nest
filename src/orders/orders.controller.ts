@@ -104,9 +104,11 @@ export class OrdersController {
         const orders = await this.ordersService.findOrders(req.query, req.user);
         if (orders[1] > 0) {
             const product_pks = orders[0].map(({ product }) => product.pk);
+            const user_pks = orders[0].map(({ user_pk }) => user_pk);
             const seller_pks = orders[0].map(({ seller_pk }) => seller_pk);
 
             const documents = await this.productsService.getProductDocuments(product_pks, req.query);
+            const userAddresses = await this.usersService.getUserAddresses(user_pks, req.query);
             const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
             // console.log(seller_pks, sellerAddresses);
             orders[0].forEach(order => {
@@ -122,6 +124,19 @@ export class OrdersController {
                     });
                 }
 
+                if (!order.hasOwnProperty('user_addresses')) {
+                    order['user_addresses'] = [];
+                }
+                // console.log(user_pks, userAddresses);
+                // Append user addresses
+                if (userAddresses) {
+                    userAddresses[0].forEach(address => {
+                        if (order.user_pk == address.user_pk) {
+                            order['user_addresses'].push(address);
+                        }
+                    });
+                }
+
                 if (!order.hasOwnProperty('seller_addresses')) {
                     order['seller_addresses'] = [];
                 }
@@ -131,7 +146,7 @@ export class OrdersController {
                         if (order.seller_pk == address.seller_pk) {
                             order['seller_addresses'].push(address);
                         }
-                    }); seller_pks
+                    });
                 }
             });
 

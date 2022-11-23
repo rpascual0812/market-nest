@@ -296,6 +296,7 @@ export class ProductsService {
                 .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
                 .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
                 .andWhere(isFutureCrop ? "products.date_available > :date" : '1=1', { date: new Date() })
+                .andWhere(!isFutureCrop ? "products.date_available <= :date" : '1=1', { date: new Date() })
 
                 // additional where for search
                 // All

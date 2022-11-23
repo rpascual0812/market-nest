@@ -34,11 +34,11 @@ export class Area {
      * Relationship
      */
     @OneToMany('UserAddress', (user_address: UserAddress) => user_address.area)
-    @JoinColumn({ name: 'pk' })
+    @JoinColumn({ name: 'area_code' })
     user_address: Array<UserAddress>;
 
     @OneToMany('SellerAddress', (seller_address: SellerAddress) => seller_address.area)
-    @JoinColumn({ name: 'pk' })
+    @JoinColumn({ name: 'area_code' })
     seller_address: Array<SellerAddress>;
 
     @ManyToOne(type => Country, country => country.area, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })

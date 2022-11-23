@@ -9,7 +9,7 @@ import { Document } from 'src/documents/entities/document.entity';
 @Injectable()
 export class ChatService {
     async findAll(filters: any, user: any) {
-        console.log(filters, user);
+        // console.log(filters, user);
         try {
             return await getRepository(Chat)
                 .createQueryBuilder('chats')

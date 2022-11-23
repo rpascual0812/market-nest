@@ -162,10 +162,12 @@ export class OrdersService {
     }
 
     async findOrders(filters: any, user: any) {
-        // console.log(filters);
+        // console.log(filters, user);
         let type = [];
+        let hasFutureCrops = false;
         if (filters.hasOwnProperty('type') && filters.type) {
             type = filters.type.split(',');
+            hasFutureCrops = type.includes("future_crops") ? true : false;
         }
 
         let status_pk = null;
@@ -197,6 +199,7 @@ export class OrdersService {
             .andWhere(filters.hasOwnProperty('status') && status ? "orders.status_pk = :status_pk" : '1=1', { status_pk: status_pk })
             .andWhere(filters.hasOwnProperty('user_pk') && !filters.hasOwnProperty('seller') ? "orders.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
             .andWhere(filters.hasOwnProperty('seller') ? "products.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
+            .andWhere(!hasFutureCrops ? "products.date_available <= :date" : '1=1', { date: new Date() })
 
             .skip(filters.skip)
             .take(filters.take)
