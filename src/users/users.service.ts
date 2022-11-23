@@ -46,7 +46,7 @@ export class UsersService {
             account_pk: account_pk,
             country_pk: 173
         }
-        console.log(obj);
+        // console.log(obj);
         const newUser = this.userRepository.create(obj);
         return this.userRepository.save(newUser);
     }
@@ -288,7 +288,7 @@ export class UsersService {
 
     async getUserRatings(pks: any, filters: any) {
         try {
-            console.log(pks);
+            // console.log(pks);
             return await getRepository(UserRating)
                 .createQueryBuilder('user_ratings')
                 .select('user_ratings')
@@ -462,12 +462,32 @@ export class UsersService {
                     const updatedUser = await EntityManager.save(user);
 
                     let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
-                    displayPhoto.document_pk = data.display_photo;
-                    await EntityManager.save(displayPhoto);
+                    if (displayPhoto) {
+                        displayPhoto.document_pk = data.display_photo;
+                        await EntityManager.save(displayPhoto);
+                    }
+                    else {
+                        const document = new UserDocument();
+                        document.user_pk = data.pk;
+                        document.type = 'profile_photo';
+                        document.document_pk = data.display_photo;
+                        await EntityManager.save(document);
+                    }
+
 
                     let idPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'id_photo' });
-                    idPhoto.document_pk = data.id_photo;
-                    await EntityManager.save(idPhoto);
+                    if (idPhoto) {
+                        idPhoto.document_pk = data.id_photo;
+                        await EntityManager.save(idPhoto);
+                    }
+                    else {
+                        const document = new UserDocument();
+                        document.user_pk = data.pk;
+                        document.type = 'id_photo';
+                        document.document_pk = data.id_photo;
+                        await EntityManager.save(document);
+                    }
+
 
                     return { status: true, data: updatedUser };
                 }

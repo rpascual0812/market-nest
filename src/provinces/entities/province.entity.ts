@@ -8,7 +8,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'provinces' })
-@Unique(['name', 'country_pk', 'psgc_code', 'region_code', 'province_code'])
+@Unique(['name', 'province_code'])
 export class Province {
     @Column({ type: 'bigint', nullable: true })
     psgc_code: number;
@@ -43,11 +43,11 @@ export class Province {
     // user_address: UserAddress;
 
     @OneToMany('UserAddress', (user_address: UserAddress) => user_address.province)
-    @JoinColumn({ name: 'pk' })
+    @JoinColumn({ name: 'province_code' })
     user_address: Array<UserAddress>;
 
     @OneToMany('SellerAddress', (seller_address: SellerAddress) => seller_address.province)
-    @JoinColumn({ name: 'pk' })
+    @JoinColumn({ name: 'province_code' })
     seller_address: Array<SellerAddress>;
 
     @ManyToOne(type => Country, country => country.province, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })

@@ -91,7 +91,7 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Get('profile')
     async find(@Request() req: any) {
-        console.log(req.user);
+        // console.log(req.user);
         // no need to fetch another as fetching is always happening in jwt.strategy
         return req.user;
         // const res = await this.usersService.find(req.user);
@@ -125,14 +125,14 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Get('last')
     async getLast(@Request() req: any) {
-        console.log('getting last user', req.user);
+        // console.log('getting last user', req.user);
         return await this.usersService.findLast(req.user);
     }
 
     @UseGuards(JwtAuthGuard)
     @Post('follow')
     async follow(@Request() req: any, @Body() body: any) {
-        console.log(body);
+        // console.log(body);
         if (body.follow == 'follow') {
             return await this.usersService.follow(req.user, body);
         }
