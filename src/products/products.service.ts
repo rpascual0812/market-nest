@@ -76,7 +76,7 @@ export class ProductsService {
                         order.measurement_pk = form.measurement;
                         order.price = 0;
                         order.status_pk = status.pk;
-                        order.seller_pk = user.pk;
+                        order.seller_pk = null;
                         EntityManager.save(order);
                     }
 
