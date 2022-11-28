@@ -9,16 +9,45 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Body() body: any, @Request() req: any) {
-        const chats = await this.chatService.findAll(body, req.user);
+        const chats = await this.chatService.findAll(req.query, req.user);
+        console.log(req.user);
+        // console.log('chats', chats);
+        if (chats[1] > 0) {
+            const chat_pks = chats[0].map(({ pk }) => pk);
+            const participants = await this.chatService.getParticipants(chat_pks, req.query);
+            console.log('participants', participants);
+            chats[0].forEach(chat => {
+                if (!chat.hasOwnProperty('chat_participants')) {
+                    chat['chat_participants'] = [];
+                }
+                // Append chat documents
 
-        // remove self from participants
-        chats[0].forEach(chat => {
-            chat.chat_participant.forEach((participant, i) => {
-                if (req.user.pk == participant.user_pk) {
-                    chat.chat_participant.splice(i, 1);
+                if (participants) {
+                    participants[0].forEach(participant => {
+                        if (chat.pk == participant.chat_pk && participant.user_pk != req.user.pk) {
+                            chat['chat_participants'].push(participant);
+                        }
+                    });
                 }
             });
-        });
+
+            console.log(chats[0]);
+        }
+        else {
+            return {
+                status: false,
+                data: [],
+                total: 0
+            }
+        }
+        // remove self from participants
+        // chats[0].forEach(chat => {
+        //     chat.forEach((participant, i) => {
+        //         if (req.user.pk == participant.user_pk) {
+        //             chat.chat_participant.splice(i, 1);
+        //         }
+        //     });
+        // });
 
         if (chats[1] > 0) {
             return {
@@ -34,5 +63,35 @@ export class ChatController {
                 total: 0
             }
         }
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('user/:pk')
+    async findByUser(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
+        let chat = await this.chatService.findByUser(pk, req.user);
+
+        if (!chat) {
+            const newChat = await this.chatService.create(pk, req.user);
+            console.log(pk, req.user);
+            chat = await this.chatService.findByUser(pk, req.user);
+        }
+        console.log(chat);
+
+        const participants = await this.chatService.getParticipants([chat['pk']], req.query);
+        // console.log('participants', participants);
+        if (!chat.hasOwnProperty('chat_participants')) {
+            chat['chat_participants'] = [];
+        }
+        // Append chat documents
+
+        if (participants) {
+            participants[0].forEach(participant => {
+                if (chat['pk'] == participant.chat_pk) {
+                    chat['chat_participants'].push(participant);
+                }
+            });
+        }
+
+        return chat;
     }
 }
