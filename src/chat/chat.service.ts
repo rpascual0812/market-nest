@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { UserDocument } from 'src/users/entities/user-document.entity';
 import { User } from 'src/users/entities/user.entity';
-import { getConnection, getRepository } from 'typeorm';
+import { EntityManager, getConnection, getRepository } from 'typeorm';
 import { ChatParticipant } from './entities/chat-participants.entity';
 import { Chat } from './entities/chat.entity';
 import { Document } from 'src/documents/entities/document.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatMessage } from './entities/chat-messages.entity';
+import { DateTime } from "luxon";
 
 @Injectable()
 export class ChatService {
@@ -148,6 +150,78 @@ export class ChatService {
                     'user_documents.document_pk=user_doc.pk',
                 )
                 .where("chat_participants.chat_pk IN (:...pk)", { pk: pks })
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async createMessage(data: any, user: any) {
+        console.log(data, user);
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            const chat = await Chat.findOne({
+                uuid: data.uuid
+            });
+
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+
+                    const message = new ChatMessage();
+                    message.chat_pk = chat.pk;
+                    message.user_pk = user.pk;
+                    message.message = data.message;
+                    const newMessage = await EntityManager.save(message);
+
+                    const parent = await EntityManager.findOne(Chat, chat.pk);
+                    parent.last_message = data.message;
+                    parent.last_message_user_pk = user.pk;
+                    parent.last_message_date = DateTime.now();
+                    const updatedChat = await EntityManager.save(parent);
+
+                    return { status: true, data: newMessage };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
+    async findMessages(pk: any, filters: any, user: any) {
+        // console.log(pk, user);
+        try {
+            return await getRepository(ChatMessage)
+                .createQueryBuilder('chat_messages')
+                .select('chat_messages')
+                .leftJoinAndSelect("chat_messages.user", "users")
+                // user documents
+                .leftJoinAndMapOne(
+                    'users.user_document',
+                    UserDocument,
+                    'user_documents',
+                    'users.pk=user_documents.user_pk and user_documents.type = \'profile_photo\''
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                .where('chat_messages.archived=false')
+                .andWhere('chat_messages.chat_pk = :pk', { pk })
+                .orderBy('chat_messages.date_created', 'DESC')
+                .skip(filters.skip)
+                .take(filters.take)
                 .getManyAndCount()
                 ;
         } catch (error) {
