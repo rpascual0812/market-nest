@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Response } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Response, HttpStatus } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ChatService } from './chat.service';
 
@@ -10,12 +10,12 @@ export class ChatController {
     @Get()
     async findAll(@Body() body: any, @Request() req: any) {
         const chats = await this.chatService.findAll(req.query, req.user);
-        console.log(req.user);
+        // console.log(req.user);
         // console.log('chats', chats);
         if (chats[1] > 0) {
             const chat_pks = chats[0].map(({ pk }) => pk);
             const participants = await this.chatService.getParticipants(chat_pks, req.query);
-            console.log('participants', participants);
+            // console.log('participants', participants);
             chats[0].forEach(chat => {
                 if (!chat.hasOwnProperty('chat_participants')) {
                     chat['chat_participants'] = [];
@@ -31,7 +31,7 @@ export class ChatController {
                 }
             });
 
-            console.log(chats[0]);
+            // console.log(chats[0]);
         }
         else {
             return {
@@ -75,7 +75,7 @@ export class ChatController {
             console.log(pk, req.user);
             chat = await this.chatService.findByUser(pk, req.user);
         }
-        console.log(chat);
+        // console.log(chat);
 
         const participants = await this.chatService.getParticipants([chat['pk']], req.query);
         // console.log('participants', participants);
@@ -93,5 +93,33 @@ export class ChatController {
         }
 
         return chat;
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('messages')
+    async saveMessage(@Param('pk') pk: string, @Body() body: any, @Request() req: any, @Response() res: any) {
+        const message = await this.chatService.createMessage(body, req.user);
+        return res.status(message.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(message);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get(':pk/messages')
+    async findMessages(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
+        let messages = await this.chatService.findMessages(pk, body, req.user);
+        console.log('messages', messages);
+        if (messages[1] > 0) {
+            return {
+                status: true,
+                data: messages[0].reverse(),
+                total: messages[1]
+            }
+        }
+        else {
+            return {
+                status: false,
+                data: [],
+                total: 0
+            }
+        }
     }
 }
