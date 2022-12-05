@@ -69,13 +69,20 @@ export class ChatController {
     @Get('user/:pk')
     async findByUser(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
         let chat = await this.chatService.findByUser(pk, req.user);
+        // console.log(chat);
 
-        if (!chat) {
+        if (chat.length == 0) {
             const newChat = await this.chatService.create(pk, req.user);
-            console.log(pk, req.user);
+            console.log('newChat', newChat);
             chat = await this.chatService.findByUser(pk, req.user);
         }
-        // console.log(chat);
+
+        chat = chat[0];
+        if (!chat) {
+            chat = await this.chatService.findByUser(pk, req.user);
+            chat = chat[0];
+        }
+        console.log('chat', chat);
 
         const participants = await this.chatService.getParticipants([chat['pk']], req.query);
         // console.log('participants', participants);
@@ -105,8 +112,7 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Get(':pk/messages')
     async findMessages(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
-        let messages = await this.chatService.findMessages(pk, body, req.user);
-        console.log('messages', messages);
+        let messages = await this.chatService.findMessages(pk, req.query, req.user);
         if (messages[1] > 0) {
             return {
                 status: true,
@@ -121,5 +127,12 @@ export class ChatController {
                 total: 0
             }
         }
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':pk/messages/read')
+    async readMessages(@Param('pk') pk: string, @Request() req: any, @Response() res: any) {
+        const result = await this.chatService.readMessages(pk, req.user);
+        return res.status(result.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(result);
     }
 }
