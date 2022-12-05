@@ -293,7 +293,7 @@ export class UsersService {
                 .createQueryBuilder('user_ratings')
                 .select('user_ratings')
                 .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
-                .leftJoinAndSelect("user_ratings.user", "users")
+                .leftJoinAndSelect("user_ratings.createdBy", "users")
                 .leftJoinAndSelect("users.user_document", "user_documents")
                 .leftJoinAndMapOne(
                     'user_documents.document',
@@ -446,6 +446,7 @@ export class UsersService {
     // }
 
     async update(data: any) {
+        console.log('updating photo');
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -460,11 +461,10 @@ export class UsersService {
                     user.mobile_number = data.mobile;
                     user.about = data.about;
                     const updatedUser = await EntityManager.save(user);
-
+                    console.log(data);
                     let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
                     if (displayPhoto) {
-                        displayPhoto.document_pk = data.display_photo;
-                        await EntityManager.save(displayPhoto);
+                        await EntityManager.update(UserDocument, { pk: displayPhoto.pk }, { document_pk: data.display_photo });
                     }
                     else {
                         const document = new UserDocument();
@@ -477,8 +477,7 @@ export class UsersService {
 
                     let idPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'id_photo' });
                     if (idPhoto) {
-                        idPhoto.document_pk = data.id_photo;
-                        await EntityManager.save(idPhoto);
+                        await EntityManager.update(UserDocument, { pk: idPhoto.pk }, { document_pk: data.id_photo });
                     }
                     else {
                         const document = new UserDocument();
@@ -487,7 +486,6 @@ export class UsersService {
                         document.document_pk = data.id_photo;
                         await EntityManager.save(document);
                     }
-
 
                     return { status: true, data: updatedUser };
                 }

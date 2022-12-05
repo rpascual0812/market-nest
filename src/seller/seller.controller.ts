@@ -134,7 +134,11 @@ export class SellerController {
         const userFollowing = await this.usersService.getUserFollowing([account['user']['pk']], req.query);
         const userFollower = await this.usersService.getUserFollower([account['user']['pk']], req.query);
 
-        const ratings = await this.usersService.getUserRatings([account['user']['pk']], req.query);
+        const pagination = {
+            skip: 0,
+            take: 10
+        };
+        const ratings = await this.usersService.getUserRatings([account['user']['pk']], pagination);
         const totalRatings = await this.usersService.getUserTotalRatings([account['user']['pk']]);
         // console.log(ratings, totalRatings);
         // console.log(userAddresses);
