@@ -164,7 +164,7 @@ export class UsersController {
 
     @Get(':pk/followings')
     async fetchFollowings(@Request() req: any, @Body() body: any) {
-        const followings = await this.usersService.getUserFollowing([req.params.pk], body);
+        const followings = await this.usersService.getUserFollowing([req.params.pk], req.query);
         const account = await this.accountsService.findOne(req.query.account_pk);
         const userPks = followings[0].map(({ user }) => user.pk);
 
@@ -202,7 +202,7 @@ export class UsersController {
 
     @Get(':pk/followers')
     async fetchFollowers(@Request() req: any, @Body() body: any) {
-        const followers = await this.usersService.getUserFollower([req.params.pk], body);
+        const followers = await this.usersService.getUserFollower([req.params.pk], req.query);
         const account = await this.accountsService.findOne(req.query.account_pk);
         const createdByPks = followers[0].map(({ createdBy }) => createdBy.pk);
 
