@@ -14,6 +14,10 @@ import { ProductRating } from './entities/product-ratings.entity';
 import { SellerAddress } from 'src/seller/entities/seller-address.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Status } from 'src/statuses/entities/status.entity';
+import { ProductSeen } from './entities/product-seen.entity';
+
+import { DateTime } from "luxon";
+import { Account } from 'src/accounts/entities/account.entity';
 
 @Injectable()
 export class ProductsService {
@@ -502,4 +506,70 @@ export class ProductsService {
             // console.log('finally...');
         }
     }
+
+    @UsePipes(ValidationPipe)
+    async seen(form: any, user: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const existing = await EntityManager.findOne(ProductSeen, { 'user_pk': user.pk, 'product_pk': form.product_pk });
+
+                    let productSeen = {};
+                    if (!existing) {
+                        const seen = new ProductSeen();
+                        seen.user_pk = user.pk;
+                        seen.product_pk = form.product_pk;
+                        productSeen = await EntityManager.save(seen);
+                    }
+                    else {
+                        EntityManager.update(ProductSeen, { pk: existing.pk }, { date_created: DateTime.now() });
+                        productSeen = await EntityManager.findOne(ProductSeen, { 'pk': existing.pk });
+                    }
+
+                    return { status: true, data: productSeen };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
+    async findAllSeen(filters: any, user: any) {
+        try {
+            return await getRepository(ProductSeen)
+                .createQueryBuilder('product_seen')
+                .andWhere("product_seen.user_pk = :user_pk", { user_pk: user.pk })
+                .select('product_seen')
+                .leftJoinAndSelect("product_seen.product", "products")
+                .leftJoinAndSelect("products.country", "countries")
+                .leftJoinAndSelect("products.measurement", "measurements")
+                .leftJoinAndSelect("products.category", "categories")
+
+                .leftJoinAndSelect("product_seen.user", "users")
+                .leftJoinAndSelect("users.user_document", "user_documents")
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
 }

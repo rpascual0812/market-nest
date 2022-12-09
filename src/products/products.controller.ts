@@ -139,6 +139,44 @@ export class ProductsController {
         // throw new InternalServerErrorException();
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('/seen')
+    async findAllSeen(@Request() req: any, @Response() res: any) {
+        const data = await this.productsService.findAllSeen(req.query, req.user);
+
+
+        if (data[1] > 0) {
+            const product_pks = data[0].map(({ product }) => product.pk);
+            const documents = await this.productsService.getProductDocuments(product_pks, req.query);
+
+            data[0].forEach(seen => {
+                if (!seen['product'].hasOwnProperty('product_documents')) {
+                    seen['product']['product_documents'] = [];
+                }
+                if (documents) {
+                    documents[0].forEach(document => {
+                        if (seen['product'].pk == document.product_pk) {
+                            seen['product']['product_documents'].push(document);
+                        }
+                    });
+                }
+            });
+
+            return res.status(HttpStatus.OK).json({
+                status: true,
+                data: data[0],
+                total: data[1]
+            });
+        }
+        else {
+            return res.status(HttpStatus.NOT_FOUND).json({
+                status: false,
+                data: [],
+                total: 0
+            });
+        }
+    }
+
     @Get(':pk')
     async findOne(@Request() req: any, @Response() res: any) {
         const product = await this.productsService.findOne(req.params);
@@ -234,4 +272,16 @@ export class ProductsController {
         const product = await this.productsService.delete(req.params.pk);
         return res.status(product.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(product);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':product_pk/seen')
+    async productSeen(@Request() req: any, @Response() res: any) {
+        const data = await this.productsService.seen(req.params, req.user);
+        if (data) {
+            return res.status(HttpStatus.OK).json({ status: 'success', data: data });
+        }
+        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
+    }
+
+
 }
