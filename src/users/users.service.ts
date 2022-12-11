@@ -55,18 +55,19 @@ export class UsersService {
         try {
             const users = await getRepository(User)
                 .createQueryBuilder('users')
-                .leftJoinAndSelect("users.account", "accounts")
-                .leftJoinAndSelect("users.gender", "genders")
-                // .leftJoinAndSelect("users.user_document", "user_documents")
                 .select('users')
+                .leftJoinAndSelect("users.account", "accounts")
                 .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified"])
+                .leftJoinAndSelect("users.gender", "genders")
                 .addSelect(['genders.pk', 'genders.name'])
+                .leftJoinAndSelect("users.country", "countries")
+                .leftJoinAndSelect("users.role", "roles")
                 // .addSelect(['user_documents'])
-                .leftJoinAndMapMany(
+                .leftJoinAndMapOne(
                     'users.user_document',
                     UserDocument,
                     'user_documents',
-                    'users.pk=user_documents.user_pk'
+                    'users.pk=user_documents.user_pk and user_documents.type = \'profile_photo\''
                 )
                 .leftJoinAndMapOne(
                     'user_documents.document',
@@ -78,6 +79,11 @@ export class UsersService {
                 //     qb.where('users.first_name ILIKE :search', { search: `%${filters.search}%` })
                 //         .orWhere('users.last_name ILIKE :search', { search: `%${filters.search}%` });
                 // }))
+                .andWhere(
+                    filters.hasOwnProperty('keyword') && filters.keyword != '' ?
+                        "(users.first_name ILIKE :keyword or users.last_name ILIKE :keyword or users.middle_name ILIKE :keyword)" :
+                        '1=1', { keyword: `%${filters.keyword}%` }
+                )
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
@@ -175,8 +181,8 @@ export class UsersService {
                 .leftJoinAndSelect("user_addresses.city", "cities")
                 .leftJoinAndSelect("user_addresses.area", "areas")
                 .where("user_addresses.user_pk IN (:...user_pk)", { user_pk: pks })
-                .skip(filters.skip)
-                .take(filters.take)
+                // .skip(filters.skip)
+                // .take(filters.take)
                 .getManyAndCount()
                 ;
         } catch (error) {
@@ -197,8 +203,8 @@ export class UsersService {
                 .leftJoinAndSelect("seller_addresses.city", "cities")
                 .leftJoinAndSelect("seller_addresses.area", "areas")
                 .where("seller_addresses.seller_pk IN (:...seller_pk)", { seller_pk: pks })
-                .skip(filters.skip)
-                .take(filters.take)
+                // .skip(filters.skip)
+                // .take(filters.take)
                 .getManyAndCount()
                 ;
         } catch (error) {

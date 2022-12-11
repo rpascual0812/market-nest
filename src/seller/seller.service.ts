@@ -89,8 +89,51 @@ export class SellerService {
 
     }
 
-    findAll() {
-        return `This action returns all seller`;
+    findAll(filters: any) {
+        return getRepository(Account)
+            .createQueryBuilder('accounts')
+            .leftJoinAndSelect("accounts.user", "users")
+            .leftJoinAndSelect("users.seller", "sellers")
+            .leftJoinAndSelect("users.gender", "genders")
+            // // user documents
+            .leftJoinAndMapMany(
+                'users.user_document',
+                UserDocument,
+                'user_documents',
+                'users.pk=user_documents.user_pk'
+            )
+            .leftJoinAndMapOne(
+                'user_documents.document',
+                Document,
+                'documents',
+                'user_documents.document_pk=documents.pk',
+            )
+
+            // // seller documents
+            .leftJoinAndMapMany(
+                'sellers.seller_document',
+                SellerDocument,
+                'seller_documents',
+                'sellers.pk=seller_documents.seller_pk'
+            )
+            .leftJoinAndMapOne(
+                'seller_documents.document',
+                Document,
+                'doc',
+                'seller_documents.document_pk=doc.pk',
+            )
+            .where('users.archived=false')
+            .andWhere('users.is_seller=true')
+            .andWhere('sellers.archived=false')
+            .andWhere(
+                filters.hasOwnProperty('keyword') ?
+                    "(users.first_name ILIKE :keyword or users.last_name ILIKE :keyword)" :
+                    '1=1', { keyword: `%${filters.keyword}%` }
+            )
+            .skip(filters.skip)
+            .take(filters.take)
+            .getManyAndCount()
+            ;
     }
 
     findOne(pk: number) {

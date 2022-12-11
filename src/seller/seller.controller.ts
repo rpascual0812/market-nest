@@ -23,14 +23,45 @@ export class SellerController {
     }
 
     @Get()
-    findAll() {
-        return this.sellerService.findAll();
+    async findAll(@Response() res: any, @Request() req: any) {
+        const data = await this.sellerService.findAll(req.query);
+        if (data[1] > 0) {
+            const seller_pks = data[0].map(({ user }) => user.seller.pk);
+            const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
+
+            data[0].forEach(seller => {
+                if (!seller.user.seller.hasOwnProperty('seller_addresses')) {
+                    seller.user.seller['seller_addresses'] = [];
+                }
+                // Append seller addresses
+                if (sellerAddresses) {
+                    sellerAddresses[0].forEach(address => {
+                        if (seller.user.seller.pk == address.seller_pk) {
+                            seller.user.seller['seller_addresses'].push(address);
+                        }
+                    });
+                }
+            });
+
+            return res.status(HttpStatus.OK).json({
+                status: true,
+                data: data[0],
+                total: data[1]
+            });
+        }
+        else {
+            return res.status(HttpStatus.NOT_FOUND).json({
+                status: false,
+                data: [],
+                total: 0
+            });
+        }
     }
 
     @Get(':pk/products')
     async sellerProducts(@Param('pk') pk: number, @Request() req: any) {
         // console.log(req.params);
-        const products = await this.productsService.findAll({}, { user_pk: pk, type: req.query.type });
+        const products = await this.productsService.findAll({ user_pk: pk, type: req.query.type });
         if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
