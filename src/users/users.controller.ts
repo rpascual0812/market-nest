@@ -80,6 +80,7 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any) {
+        console.log(req.user, req.query);
         const users = await this.usersService.findAll(req.user, req.query);
         if (users.data) {
             return users;

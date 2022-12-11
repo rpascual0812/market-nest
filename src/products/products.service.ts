@@ -1,6 +1,6 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository, getConnection, Collection } from 'typeorm';
+import { getRepository, Repository, getConnection, Collection, Brackets } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { Log } from 'src/logs/entities/log.entity';
 
@@ -214,7 +214,7 @@ export class ProductsService {
         }
     }
 
-    async findAll(data: any, filters: any) {
+    async findAll(filters: any) {
         // console.log(1, filters);
         let orderByColumn,
             orderByDirection;
@@ -302,14 +302,24 @@ export class ProductsService {
                 .andWhere(isFutureCrop ? "products.date_available > :date" : '1=1', { date: new Date() })
                 .andWhere(!isFutureCrop ? "products.date_available <= :date" : '1=1', { date: new Date() })
 
+                .andWhere(filters.hasOwnProperty('filter') && filters.filter == 'Location' ? new Brackets(qb => {
+                    qb.where("seller_addresses.address ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("provinces.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("cities.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("areas.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                }) : '1=1')
+
                 // additional where for search
                 // All
-                .andWhere(
-                    filters.hasOwnProperty('filter') && filters.filter == 'All' &&
-                        filters.hasOwnProperty('keyword') ?
-                        "products.name ILIKE :keyword" :
-                        '1=1', { keyword: `%${filters.keyword}%` }
-                )
+                .andWhere(filters.hasOwnProperty('filter') && filters.filter == 'All' ? new Brackets(qb => {
+                    qb.where("products.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("seller_addresses.address ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("provinces.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("cities.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("areas.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                }) : '1=1')
                 // Products
                 .andWhere(
                     filters.hasOwnProperty('filter') && filters.filter == 'Products' &&
@@ -333,6 +343,28 @@ export class ProductsService {
                 .leftJoinAndSelect("products.measurement", "measurements")
                 .leftJoinAndSelect("products.country", "countries")
                 .leftJoinAndSelect("products.category", "product_categories")
+
+                // user addresses
+                // .leftJoinAndMapMany(
+                //     'users.user_address',
+                //     UserAddress,
+                //     'user_addresses',
+                //     'users.pk=user_addresses.user_pk'
+                // )
+                // .leftJoinAndSelect("user_addresses.province", "provinces")
+                // .leftJoinAndSelect("user_addresses.city", "cities")
+                // .leftJoinAndSelect("user_addresses.area", "areas")
+
+                // user addresses
+                .leftJoinAndMapMany(
+                    'sellers.seller_address',
+                    SellerAddress,
+                    'seller_addresses',
+                    'sellers.pk=seller_addresses.seller_pk'
+                )
+                .leftJoinAndSelect("seller_addresses.province", "provinces")
+                .leftJoinAndSelect("seller_addresses.city", "cities")
+                .leftJoinAndSelect("seller_addresses.area", "areas")
 
                 // user documents
                 .leftJoinAndMapMany(

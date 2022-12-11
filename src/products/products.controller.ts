@@ -26,20 +26,21 @@ export class ProductsController {
 
     @Get()
     async findAll(@Request() req: any) {
-        // console.log(req.query, req.user);
-        const products = await this.productsService.findAll(req.user, req.query);
-        // console.log('products', products);
+        // console.log(req.query);
+        const products = await this.productsService.findAll(req.query);
+        // console.log('products', products[0]);
         // console.log('length', products[0].length);
         if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
-            const seller_pks = products[0].map(({ product }) => product && product.user ? product.user.seller.pk : null);
+            const seller_pks = products[0].map(({ user }) => user ? user.seller.pk : null);
 
             const documents = await this.productsService.getProductDocuments(pks, req.query);
             // console.log('documents', documents);
             const userAddresses = await this.usersService.getUserAddresses(user_pks, req.query);
 
             const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
+            // console.log(seller_pks, sellerAddresses);
             // const addresses = await this.productsService.getSellerAddresses(seller_pks, req.query);
             const ratings = await this.productsService.getProductRatings(pks, req.query);
             const totalRatings = await this.productsService.getProductTotalRatings(pks);
@@ -103,8 +104,8 @@ export class ProductsController {
                     product['seller_addresses'] = [];
                 }
                 // Append seller addresses
-                if (userAddresses) {
-                    userAddresses[0].forEach(address => {
+                if (sellerAddresses) {
+                    sellerAddresses[0].forEach(address => {
                         if (product.seller_pk == address.seller_pk) {
                             product['seller_addresses'].push(address);
                         }

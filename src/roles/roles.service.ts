@@ -1,26 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { getRepository } from 'typeorm';
+import { Role } from './entities/role.entity';
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
-  }
-
-  findAll() {
-    return `This action returns all roles`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
-  }
-
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} role`;
-  }
+    async findAll(filters: any) {
+        // console.log(filters);
+        try {
+            const roles = await getRepository(Role)
+                .createQueryBuilder('roles')
+                .select('roles')
+                .where('roles.archived=false')
+                .orderBy('roles.name')
+                .skip(filters.skip)
+                .take(filters.take)
+                .getManyAndCount()
+                ;
+            // console.log(roles);
+            return {
+                status: true,
+                data: roles[0],
+                total: roles[1]
+            }
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
 }
