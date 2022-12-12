@@ -16,11 +16,11 @@ export class UserAddress {
     @Column({ type: 'bool', default: false })
     default: boolean;
 
-    @Column({ name: 'province_pk', nullable: false })
-    province_pk: number;
+    @Column({ name: 'province_code', nullable: false })
+    province_code: number;
 
-    @Column({ name: 'city_pk', nullable: false })
-    city_pk: number;
+    @Column({ name: 'city_code', nullable: false })
+    city_code: number;
 
     @Column({ name: 'area_pk', nullable: false })
     area_pk: number;
@@ -43,11 +43,11 @@ export class UserAddress {
     user: User;
 
     @ManyToOne(type => Province, province => province.user_address, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'province_pk' })
+    @JoinColumn({ name: 'province_code' })
     province: Province;
 
     @ManyToOne(type => City, city => city.user_address, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'city_pk' })
+    @JoinColumn({ name: 'city_code' })
     city: City;
 
     @ManyToOne(type => Area, area => area.user_address, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
