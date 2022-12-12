@@ -38,8 +38,8 @@ export class SellerService {
                     const address = new SellerAddress();
                     address.type = 'home';
                     address.default = true;
-                    address.province_pk = data.province;
-                    address.city_pk = data.city;
+                    address.province_code = data.province;
+                    address.city_code = data.city;
                     address.area_pk = data.area;
                     address.address = data.address;
                     address.seller_pk = newSeller.pk;

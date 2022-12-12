@@ -9,8 +9,8 @@ export class ProvincesService {
         try {
             const users = await getRepository(Province)
                 .createQueryBuilder('provinces')
-                .select('provinces')
-                .leftJoinAndSelect("provinces.country", "countries")
+                // .select('provinces')
+                // .leftJoinAndSelect("provinces.country", "countries")
                 .skip(filters.skip)
                 .take(filters.take)
                 .orderBy('provinces.name')

@@ -13,6 +13,9 @@ import { SellerAddress } from 'src/seller/entities/seller-address.entity';
 import { UserFollow } from './entities/user-follow.entity';
 import { Log } from 'src/logs/entities/log.entity';
 import { UserRating } from './entities/user-rating.entity';
+import { Province } from 'src/provinces/entities/province.entity';
+import { City } from 'src/cities/entities/city.entity';
+import { Area } from 'src/areas/entities/area.entity';
 
 // export type User = {
 //     id: number;
@@ -53,6 +56,24 @@ export class UsersService {
 
     async findAll(data: any, filters: any) {
         try {
+            let orderByColumn,
+                orderByDirection;
+            if (filters.hasOwnProperty('orderBy')) {
+                switch (filters.orderBy) {
+                    case 'Sort by Name':
+                        orderByColumn = 'users.first_name';
+                        orderByDirection = 'ASC';
+                        break;
+                    default:
+                        orderByColumn = 'users.date_created';
+                        orderByDirection = 'DESC';
+                }
+            }
+            else {
+                orderByColumn = 'users.pk';
+                orderByDirection = 'ASC';
+            }
+
             const users = await getRepository(User)
                 .createQueryBuilder('users')
                 .select('users')
@@ -75,6 +96,31 @@ export class UsersService {
                     'documents',
                     'user_documents.document_pk=documents.pk',
                 )
+
+                .leftJoinAndMapOne(
+                    'users.user_address',
+                    UserAddress,
+                    'user_addresses',
+                    'users.pk=user_addresses.user_pk'
+                )
+                .leftJoinAndMapOne(
+                    'user_addresses.province',
+                    Province,
+                    'provinces',
+                    'user_addresses.province_code=provinces.province_code',
+                )
+                .leftJoinAndMapOne(
+                    'user_addresses.city',
+                    City,
+                    'cities',
+                    'user_addresses.city_code=cities.city_code',
+                )
+                .leftJoinAndMapOne(
+                    'user_addresses.area',
+                    Area,
+                    'areas',
+                    'user_addresses.area_pk=areas.pk',
+                )
                 // .andWhere(new Brackets(qb => {
                 //     qb.where('users.first_name ILIKE :search', { search: `%${filters.search}%` })
                 //         .orWhere('users.last_name ILIKE :search', { search: `%${filters.search}%` });
@@ -86,6 +132,7 @@ export class UsersService {
                 )
                 .skip(filters.skip)
                 .take(filters.take)
+                .orderBy(orderByColumn, orderByDirection)
                 .getManyAndCount()
                 ;
 

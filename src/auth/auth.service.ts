@@ -134,8 +134,8 @@ export class AuthService {
 
                     const address = new UserAddress;
                     address.type = 'home';
-                    address.province_pk = data.province;
-                    address.city_pk = data.city;
+                    address.province_code = data.province;
+                    address.city_code = data.city;
                     address.area_pk = data.area;
                     address.address = data.address_details;
                     address.user_pk = newUser.pk;

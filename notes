@@ -62,3 +62,6 @@ pm2 restart main
 
 #!/bin/bash
 forever restart market/dist/main.js
+
+
+cloc $(git ls-files)
