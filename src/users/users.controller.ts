@@ -22,6 +22,12 @@ export class UsersController {
         return await this.usersService.update(body);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Post()
+    async save(@Request() req: any, @Body() body: any) {
+        return await this.usersService.update(body);
+    }
+
     @Get(':pk')
     async findOne(@Request() req: any) {
         const user = await this.usersService.findOne(req.params);

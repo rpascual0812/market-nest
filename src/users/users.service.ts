@@ -499,7 +499,8 @@ export class UsersService {
     // }
 
     async update(data: any) {
-        console.log('updating photo');
+        console.log('updating user');
+        // console.log(data);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -514,30 +515,33 @@ export class UsersService {
                     user.mobile_number = data.mobile;
                     user.about = data.about;
                     const updatedUser = await EntityManager.save(user);
-                    console.log(data);
-                    let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
-                    if (displayPhoto) {
-                        await EntityManager.update(UserDocument, { pk: displayPhoto.pk }, { document_pk: data.display_photo });
-                    }
-                    else {
-                        const document = new UserDocument();
-                        document.user_pk = data.pk;
-                        document.type = 'profile_photo';
-                        document.document_pk = data.display_photo;
-                        await EntityManager.save(document);
+
+                    if (data.display_photo) {
+                        let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
+                        if (displayPhoto) {
+                            await EntityManager.update(UserDocument, { pk: displayPhoto.pk }, { document_pk: data.display_photo });
+                        }
+                        else {
+                            const document = new UserDocument();
+                            document.user_pk = data.pk;
+                            document.type = 'profile_photo';
+                            document.document_pk = data.display_photo;
+                            await EntityManager.save(document);
+                        }
                     }
 
-
-                    let idPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'id_photo' });
-                    if (idPhoto) {
-                        await EntityManager.update(UserDocument, { pk: idPhoto.pk }, { document_pk: data.id_photo });
-                    }
-                    else {
-                        const document = new UserDocument();
-                        document.user_pk = data.pk;
-                        document.type = 'id_photo';
-                        document.document_pk = data.id_photo;
-                        await EntityManager.save(document);
+                    if (data.id_photo) {
+                        let idPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'id_photo' });
+                        if (idPhoto) {
+                            await EntityManager.update(UserDocument, { pk: idPhoto.pk }, { document_pk: data.id_photo });
+                        }
+                        else {
+                            const document = new UserDocument();
+                            document.user_pk = data.pk;
+                            document.type = 'id_photo';
+                            document.document_pk = data.id_photo;
+                            await EntityManager.save(document);
+                        }
                     }
 
                     return { status: true, data: updatedUser };
