@@ -4,7 +4,7 @@ import { ArticleDocument } from './article-document.entity';
 
 @Entity({ name: 'articles' })
 @Unique(['title', 'user_pk'])
-export class Article {
+export class Article extends BaseEntity {
     @PrimaryGeneratedColumn()
     pk: number;
 

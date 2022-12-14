@@ -32,6 +32,12 @@ export class SlidersService {
                     'slider_documents.document_pk=documents.pk',
                 )
                 .leftJoinAndSelect("sliders.user", "users")
+                .where('sliders.archived=false')
+                .andWhere(
+                    filters.hasOwnProperty('keyword') ?
+                        "sliders.title ILIKE :keyword" :
+                        '1=1', { keyword: `%${filters.keyword}%` }
+                )
                 .skip(filters.skip)
                 .take(filters.take)
                 .orderBy('sliders.order', 'ASC')
@@ -115,6 +121,44 @@ export class SlidersService {
                         details: form.details,
                         icon: form.icon,
                         background: form.background
+                    });
+                    log.user_pk = user.pk;
+                    await EntityManager.save(log);
+
+                    return { status: true, data: slider };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
+    @UsePipes(ValidationPipe)
+    async delete(pk: any, user: any) {
+        console.log('deleting banner', pk);
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    await EntityManager.update(Slider, { pk }, { archived: true });
+
+                    const slider = await Slider.findOne({
+                        pk
+                    });
+
+                    // LOGS
+                    const log = new Log();
+                    log.model = 'slider';
+                    log.model_pk = slider.pk;
+                    log.details = JSON.stringify({
+                        title: slider.title,
+                        details: slider.details,
+                        archived: true
                     });
                     log.user_pk = user.pk;
                     await EntityManager.save(log);
