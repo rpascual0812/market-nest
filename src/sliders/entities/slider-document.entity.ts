@@ -1,11 +1,11 @@
 import { Document } from 'src/documents/entities/document.entity';
 import { Slider } from 'src/sliders/entities/slider.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'slider_documents' })
 @Unique(['type', 'slider_pk', 'document_pk'])
-export class SliderDocument {
+export class SliderDocument extends BaseEntity {
     @PrimaryGeneratedColumn()
     pk: number;
 

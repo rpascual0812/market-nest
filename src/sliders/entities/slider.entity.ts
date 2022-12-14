@@ -4,7 +4,7 @@ import { SliderDocument } from './slider-document.entity';
 
 @Entity({ name: 'sliders' })
 @Unique(['type', 'title'])
-export class Slider {
+export class Slider extends BaseEntity {
     @PrimaryGeneratedColumn()
     pk: number;
 
@@ -22,6 +22,9 @@ export class Slider {
 
     @Column({ name: 'order', nullable: true })
     order: number;
+
+    @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+    date_created: Date;
 
     @Column({ default: false })
     archived: boolean;

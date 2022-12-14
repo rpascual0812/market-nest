@@ -16,4 +16,16 @@ export class SlidersController {
 
         throw new InternalServerErrorException();
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post()
+    async save(@Request() req: any, @Body() body: any) {
+        const data = await this.slidersService.save(body, req.user);
+
+        if (data) {
+            return data;
+        }
+
+        throw new InternalServerErrorException();
+    }
 }
