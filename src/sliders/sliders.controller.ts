@@ -28,4 +28,16 @@ export class SlidersController {
 
         throw new InternalServerErrorException();
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(':pk')
+    async delete(@Param('pk') pk, @Request() req: any, @Body() body: any) {
+        const data = await this.slidersService.delete(pk, req.user);
+
+        if (data) {
+            return data;
+        }
+
+        throw new InternalServerErrorException();
+    }
 }
