@@ -32,6 +32,7 @@ import { StatusesModule } from './statuses/statuses.module';
 import { CategoriesModule } from './categories/categories.module';
 // import { SellersModule } from './sellers/sellers.module';
 import { SellerModule } from './seller/seller.module';
+import { ConfigurationModule } from './configuration/configuration.module';
 
 @Module({
     imports: [
@@ -62,6 +63,7 @@ import { SellerModule } from './seller/seller.module';
         StatusesModule,
         CategoriesModule,
         SellerModule,
+        ConfigurationModule,
         // SellersModule,
     ],
     controllers: [AppController],

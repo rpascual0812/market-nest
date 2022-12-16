@@ -58,7 +58,7 @@ export class ArticlesService {
 
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
-        console.log('creating banner', form);
+        console.log('creating article', form);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -75,38 +75,22 @@ export class ArticlesService {
                         article = new Article();
                     }
 
-                    article.type = 'home'; // default type of articles for now.
                     article.title = form.title;
-                    article.description = form.details;
+                    article.description = form.description;
+                    article.url = form.url;
                     article.user_pk = user.pk;
                     const _article = await EntityManager.save(article);
 
-                    if (form.icon) {
-                        if (form.icon.hasOwnProperty('pk')) {
-                            await EntityManager.update(ArticleDocument, { pk: form.icon.pk }, { document_pk: form.icon.document.pk });
-                        }
-                        else {
-                            let articleDocument = new ArticleDocument();
-                            articleDocument.user_pk = user.pk;
-                            articleDocument.article_pk = _article.pk;
-                            articleDocument.type = 'icon';
-                            articleDocument.document_pk = form.icon.document.pk;
-                            await EntityManager.save(articleDocument);
-                        }
+                    if (form.image.hasOwnProperty('pk')) {
+                        await EntityManager.update(ArticleDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
                     }
-
-                    if (form.background) {
-                        if (form.background.hasOwnProperty('pk')) {
-                            await EntityManager.update(ArticleDocument, { pk: form.background.pk }, { document_pk: form.background.document.pk });
-                        }
-                        else {
-                            let articleDocument = new ArticleDocument();
-                            articleDocument.user_pk = user.pk;
-                            articleDocument.article_pk = _article.pk;
-                            articleDocument.type = 'background';
-                            articleDocument.document_pk = form.background.document.pk;
-                            await EntityManager.save(articleDocument);
-                        }
+                    else {
+                        let articleDocument = new ArticleDocument();
+                        articleDocument.user_pk = user.pk;
+                        articleDocument.article_pk = _article.pk;
+                        articleDocument.type = 'background';
+                        articleDocument.document_pk = form.image.document.pk;
+                        await EntityManager.save(articleDocument);
                     }
 
                     // LOGS
@@ -115,7 +99,7 @@ export class ArticlesService {
                     log.model_pk = article.pk;
                     log.details = JSON.stringify({
                         title: form.title,
-                        details: form.details,
+                        details: form.description,
                         icon: form.icon,
                         background: form.background
                     });

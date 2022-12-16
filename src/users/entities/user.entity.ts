@@ -29,6 +29,7 @@ import { Category } from 'src/categories/entities/category.entity';
 import { UserFollow } from './user-follow.entity';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { ProductSeen } from 'src/products/entities/product-seen.entity';
+import { Configuration } from 'src/configuration/entities/configuration.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -218,7 +219,9 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'created_by_follow_pk' })
     user_follow_created_by: UserFollow;
 
-
+    @OneToMany('Configuration', (configuration: Configuration) => configuration.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'configuration_pk' })
+    configuration: Configuration;
 
 
 
