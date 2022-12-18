@@ -6,7 +6,7 @@ import { ConfigurationService } from './configuration.service';
 export class ConfigurationController {
     constructor(private readonly configurationService: ConfigurationService) { }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get()
     findAll(@Request() req: any, @Body() body: any) {
         return this.configurationService.findAll(req.query);

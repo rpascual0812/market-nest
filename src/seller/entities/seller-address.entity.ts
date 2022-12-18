@@ -16,7 +16,7 @@ export class SellerAddress {
     @Column({ type: 'bool', default: false })
     default: boolean;
 
-    @Column({ name: 'province_code', nullable: false })
+    @Column({ name: 'province_code', nullable: true })
     province_code: number;
 
     @Column({ name: 'city_code', nullable: false })
