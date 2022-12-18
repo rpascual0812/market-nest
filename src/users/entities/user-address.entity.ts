@@ -16,13 +16,13 @@ export class UserAddress {
     @Column({ type: 'bool', default: false })
     default: boolean;
 
-    @Column({ name: 'province_code', nullable: true })
+    @Column({ name: 'province_code', nullable: false })
     province_code: number;
 
-    @Column({ name: 'city_code', nullable: true })
+    @Column({ name: 'city_code', nullable: false })
     city_code: number;
 
-    @Column({ name: 'area_pk', nullable: true })
+    @Column({ name: 'area_pk', nullable: false })
     area_pk: number;
 
     @Column({ type: 'text', nullable: false })
