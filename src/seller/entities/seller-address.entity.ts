@@ -19,10 +19,10 @@ export class SellerAddress {
     @Column({ name: 'province_code', nullable: true })
     province_code: number;
 
-    @Column({ name: 'city_code', nullable: false })
+    @Column({ name: 'city_code', nullable: true })
     city_code: number;
 
-    @Column({ name: 'area_pk', nullable: false })
+    @Column({ name: 'area_pk', nullable: true })
     area_pk: number;
 
     @Column({ type: 'text', nullable: false })
