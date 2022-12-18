@@ -31,6 +31,8 @@ import { Seller } from 'src/seller/entities/seller.entity';
 import { ProductSeen } from 'src/products/entities/product-seen.entity';
 import { Configuration } from 'src/configuration/entities/configuration.entity';
 import { Faq } from 'src/faq/entities/faq.entity';
+import { Complaint } from 'src/complaints/entities/complaint.entity';
+import { ComplaintMessage } from 'src/complaints/entities/complaint-message.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -227,6 +229,14 @@ export class User extends BaseEntity {
     @OneToMany('Faq', (faq: Faq) => faq.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'faq_pk' })
     faq: Faq;
+
+    @OneToMany('Complaint', (complaint: Complaint) => complaint.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'complaint_pk' })
+    complaint: Complaint;
+
+    @OneToMany('Complaint', (complaint: Complaint) => complaint.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'complaint_pk' })
+    complaint_message: ComplaintMessage;
 
 
 

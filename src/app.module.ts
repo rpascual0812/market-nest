@@ -34,6 +34,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { SellerModule } from './seller/seller.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { FaqModule } from './faq/faq.module';
+import { ComplaintsModule } from './complaints/complaints.module';
 
 @Module({
     imports: [
@@ -66,6 +67,7 @@ import { FaqModule } from './faq/faq.module';
         SellerModule,
         ConfigurationModule,
         FaqModule,
+        ComplaintsModule,
         // SellersModule,
     ],
     controllers: [AppController],
