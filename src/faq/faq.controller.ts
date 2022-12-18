@@ -22,4 +22,10 @@ export class FaqController {
     findAll(@Request() req: any, @Body() body: any) {
         return this.faqService.findAll(req.query);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('update')
+    update(@Request() req: any, @Body() body: any) {
+        return this.faqService.update(body, req.user);
+    }
 }

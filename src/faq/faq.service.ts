@@ -2,16 +2,10 @@ import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/com
 import { Log } from 'src/logs/entities/log.entity';
 import { getConnection, getRepository, Repository } from 'typeorm';
 
-import { CreateFaqDto } from './dto/create-faq.dto';
-import { UpdateFaqDto } from './dto/update-faq.dto';
 import { Faq } from './entities/faq.entity';
 
 @Injectable()
 export class FaqService {
-    create(createFaqDto: CreateFaqDto) {
-        return 'This action adds a new faq';
-    }
-
     async findAll(filters: any) {
         try {
             const faqs = await getRepository(Faq)
@@ -23,6 +17,7 @@ export class FaqService {
                     { keyword: `${filters.keyword}` }
                 )
                 .leftJoinAndSelect("faq.user", "users")
+                .where('faq.archived=false')
                 .orderBy('faq.order')
                 .getManyAndCount()
                 ;
@@ -85,6 +80,37 @@ export class FaqService {
                     await EntityManager.save(log);
 
                     return { status: true, data: faq };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
+    @UsePipes(ValidationPipe)
+    async update(body: any, user: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const fields = body.faq;
+                    const filters = { 'pk': body.pk };
+                    const res = await EntityManager.update(Faq, filters, fields);
+
+                    // LOGS
+                    const log = new Log();
+                    log.model = 'complaints';
+                    log.model_pk = body.pk;
+                    log.details = JSON.stringify(body.faq);
+                    log.user_pk = user.pk;
+                    await EntityManager.save(log);
+
+                    return { status: true, data: res };
                 }
             );
         } catch (err) {
