@@ -30,6 +30,7 @@ import { UserFollow } from './user-follow.entity';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { ProductSeen } from 'src/products/entities/product-seen.entity';
 import { Configuration } from 'src/configuration/entities/configuration.entity';
+import { Faq } from 'src/faq/entities/faq.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -222,6 +223,10 @@ export class User extends BaseEntity {
     @OneToMany('Configuration', (configuration: Configuration) => configuration.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'configuration_pk' })
     configuration: Configuration;
+
+    @OneToMany('Faq', (faq: Faq) => faq.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'faq_pk' })
+    faq: Faq;
 
 
 
