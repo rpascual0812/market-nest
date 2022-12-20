@@ -19,6 +19,7 @@ export class ComplaintsService {
                     { keyword: `%${filters.keyword}%` }
                 )
                 .andWhere("complaints.status = :status", { status: filters.status })
+                .andWhere("complaints.type = :type", { type: filters.type })
                 .leftJoinAndSelect("complaints.user", "users")
                 .orderBy('complaints.date_created', 'DESC')
                 .getManyAndCount()

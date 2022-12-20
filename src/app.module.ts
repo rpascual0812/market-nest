@@ -35,6 +35,7 @@ import { SellerModule } from './seller/seller.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { FaqModule } from './faq/faq.module';
 import { ComplaintsModule } from './complaints/complaints.module';
+import { FeedbackModule } from './feedback/feedback.module';
 
 @Module({
     imports: [
@@ -68,6 +69,7 @@ import { ComplaintsModule } from './complaints/complaints.module';
         ConfigurationModule,
         FaqModule,
         ComplaintsModule,
+        FeedbackModule,
         // SellersModule,
     ],
     controllers: [AppController],

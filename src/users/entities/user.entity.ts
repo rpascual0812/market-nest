@@ -33,6 +33,7 @@ import { Configuration } from 'src/configuration/entities/configuration.entity';
 import { Faq } from 'src/faq/entities/faq.entity';
 import { Complaint } from 'src/complaints/entities/complaint.entity';
 import { ComplaintMessage } from 'src/complaints/entities/complaint-message.entity';
+import { Feedback } from 'src/feedback/entities/feedback.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -238,6 +239,7 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'complaint_pk' })
     complaint_message: ComplaintMessage;
 
-
-
+    @OneToMany('Feedback', (feedback: Feedback) => feedback.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'feedback_pk' })
+    feedback: Feedback;
 }
