@@ -78,7 +78,7 @@ export class AuthService {
                 this.emailsService.to = data.email;
                 this.emailsService.to_name = user.first_name + ' ' + user.last_name;
                 this.emailsService.subject = 'Password Reset';
-                this.emailsService.body = '<a href="' + data.url + '/auth/reset-password/' + uuid + '">Please follow this link to reset your password</a>'; // MODIFY: must be a template from the database
+                this.emailsService.body = '<a href="' + data.url + '/reset-password/' + uuid + '">Please follow this link to reset your password</a>'; // MODIFY: must be a template from the database
 
                 const newEmail = await this.emailsService.create();
                 if (newEmail) {

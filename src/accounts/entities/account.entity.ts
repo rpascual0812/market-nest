@@ -19,6 +19,9 @@ export class Account extends BaseEntity {
     @Column({ default: false })
     verified: boolean;
 
+    @Column({ type: 'jsonb', nullable: true })
+    password_reset: Date;
+
     @Column({ default: false })
     archived: boolean;
 
