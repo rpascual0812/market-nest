@@ -35,7 +35,7 @@ export class EmailsService {
 
         const obj: any = {
             account: this.account_pk,
-            user: this.user_pk,
+            user_pk: this.user_pk,
             uuid: this.uuid,
             from: this.from,
             from_name: this.from_name,
