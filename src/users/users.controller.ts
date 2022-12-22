@@ -28,6 +28,12 @@ export class UsersController {
         return await this.usersService.update(body);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('profile')
+    async find(@Request() req: any) {
+        return await this.usersService.find(req.user);
+    }
+
     @Get(':pk')
     async findOne(@Request() req: any) {
         const user = await this.usersService.findOne(req.params);
@@ -93,17 +99,6 @@ export class UsersController {
         }
 
         throw new InternalServerErrorException();
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    async find(@Request() req: any) {
-        // console.log(req.user);
-        // no need to fetch another as fetching is always happening in jwt.strategy
-        return req.user;
-        // const res = await this.usersService.find(req.user);
-        // console.log(res);
-        // return res;
     }
 
     @UseGuards(JwtAuthGuard)
