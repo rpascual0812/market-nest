@@ -8,6 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from './utilities/upload.utils';
 import { DocumentsService } from './documents/documents.service';
+import { Role } from './roles/entities/role.entity';
 
 @Controller()
 export class AppController {
@@ -19,7 +20,14 @@ export class AppController {
     @UseGuards(LocalAuthGuard)
     @Post('login')
     async login(@Response() res: any, @Request() req) {
-        const user = await this.authService.login(req.user);
+        const role = await Role.findOne({
+            name: req.body.role
+        });
+
+        let account = req.user;
+        account.role_pk = role.pk;
+
+        const user = await this.authService.login(account);
         // console.log(user);
         if (user) {
             return res.status(HttpStatus.OK).json({ status: 'success', user });

@@ -46,9 +46,11 @@ PreconditionFailedException
 pg_dump -U postgres -W -F p -h localhost -f community_market-221018.sql community_market
 psql -U postgres -d community_market221022 -f db/community_market-221022.sql
 
-scp -r samdhana@172.31.21.231:/home/samdhana/market/assets/images /var/www/html/market-nest/assets
+scp -r samdhana@13.250.104.113:/home/samdhana/market/assets/images /var/www/html/market-nest/assets
 
-scp -r market-admin samdhana@172.31.21.231:/home/samdhana/
+scp -r market-admin samdhana@13.250.104.113:/home/samdhana/
+
+scp -r /var/www/html/samdhana-admin/dist/market-admin samdhana@13.250.104.113:/var/www/html/
 
 market
 cd /home/rafael/Documents/Market && ./market
@@ -69,9 +71,10 @@ cloc $(git ls-files)
 
 
 server {
-    listen 80;
+    listen 80 default_server;
+	listen [::]:80 default_server;
     server_name _;
-    root /var/www/html/samdhana-admin/dist/market-admin;
+    root /var/www/html/market-admin;
     index index.html;
     location / {        
         try_files $uri $uri/ /index.html;
@@ -80,4 +83,4 @@ server {
     location = /50x.html {
         root html;
     }
- }
+}

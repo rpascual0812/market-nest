@@ -15,6 +15,7 @@ import { UserDocument } from 'src/users/entities/user-document.entity';
 import { UserAddress } from 'src/users/entities/user-address.entity';
 import { Email } from 'src/emails/entities/email.entity';
 import { SellerService } from 'src/seller/seller.service';
+import { Role } from 'src/roles/entities/role.entity';
 
 @Injectable()
 export class AuthService {
@@ -44,6 +45,10 @@ export class AuthService {
         this.sessionsService.create(account);
 
         let user = await this.accountsService.findOne(account.pk);
+        console.log(user.user.role_pk, account.role_pk);
+        if (user.user.role_pk != account.role_pk) {
+            return {};
+        }
 
         // get seller
         account.seller_pk = 0;
@@ -116,6 +121,10 @@ export class AuthService {
                     account.password = data.password;
                     const newAccount = await EntityManager.save(account);
 
+                    const role = await Role.findOne({
+                        name: 'end-user'
+                    });
+
                     // create user
                     const uuid = uuidv4();
                     const user = new User();
@@ -127,7 +136,7 @@ export class AuthService {
                     user.mobile_number = data.mobile;
                     user.email_address = data.email;
                     user.about = data.about;
-                    user.role_pk = 1;
+                    user.role_pk = role.pk;
                     user.country_pk = 173;
                     user.account_pk = newAccount.pk;
                     const newUser = await EntityManager.save(user);
