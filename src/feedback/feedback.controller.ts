@@ -7,6 +7,12 @@ export class FeedbackController {
     constructor(private readonly feedbackService: FeedbackService) { }
 
     @UseGuards(JwtAuthGuard)
+    @Post()
+    create(@Request() req: any, @Body() body: any) {
+        return this.feedbackService.save(body, req.user);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get()
     findAll(@Request() req: any, @Body() body: any) {
         return this.feedbackService.findAll(req.query);
