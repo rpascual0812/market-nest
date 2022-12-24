@@ -7,6 +7,40 @@ import { Document } from 'src/documents/entities/document.entity';
 
 @Injectable()
 export class FeedbackService {
+    async save(body: any, user: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    // New Feedback
+                    const feedback = new Feedback();
+                    feedback.message = body.message;
+                    feedback.user_pk = user.pk;
+                    const newFeedback = await EntityManager.save(feedback);
+
+                    // LOGS
+                    const log = new Log();
+                    log.model = 'complaints';
+                    log.model_pk = newFeedback.pk;
+                    log.details = JSON.stringify({
+                        message: body.message,
+                    });
+                    log.user_pk = user.pk;
+                    await EntityManager.save(log);
+
+                    return { status: true, data: newFeedback };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
     async findAll(filters: any) {
         try {
             const feedbacks = await getRepository(Feedback)
