@@ -74,29 +74,31 @@ export class ComplaintsService {
     async save(form: any, user: any) {
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
-
+        // console.log('complaint', form);
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
                     let complaint = null;
-                    if (form.pk) {
+                    if (form.hasOwnProperty('pk')) {
                         complaint = await complaint.findOne({
                             pk: form.pk
                         });
                     }
                     else {
-                        complaint = new complaint();
+                        complaint = new Complaint();
                     }
 
-                    const lastOrder = await getRepository(complaint)
-                        .createQueryBuilder('complaints')
-                        .orderBy('"order"', "DESC")
-                        .getOne();
-
-                    complaint.question = form.question;
-                    complaint.answer = form.answer;
+                    complaint.type = form.type;
+                    complaint.subject = form.subject;
                     complaint.user_pk = user.pk;
+                    complaint.status = 'Open';
                     const _complaint = await EntityManager.save(complaint);
+
+                    let message = new ComplaintMessage();
+                    message.message = form.message;
+                    message.complaint_pk = _complaint.pk;
+                    message.user_pk = user.pk;
+                    const _complaintMessage = await EntityManager.save(message);
 
                     // LOGS
                     const log = new Log();
@@ -105,6 +107,7 @@ export class ComplaintsService {
                     log.details = JSON.stringify({
                         type: form.type,
                         subject: form.subject,
+                        message: form.message,
                         user_pk: user.pk,
                         status: 'Open'
                     });

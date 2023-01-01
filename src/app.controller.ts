@@ -51,7 +51,7 @@ export class AppController {
     async forgot(@Response() res: any, @Request() req, @Body() body): Promise<any> {
         const newForgot = await this.authService.forgotPassword(body);
         if (newForgot) {
-            return res.status(HttpStatus.OK).json({ status: 'success' });
+            return res.status(HttpStatus.OK).json(newForgot);
         }
         return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
