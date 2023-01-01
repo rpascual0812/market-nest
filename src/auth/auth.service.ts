@@ -69,10 +69,23 @@ export class AuthService {
     }
 
     async forgotPassword(data: any) {
+        // console.log(data);
         const user = await this.usersService.findByEmail(data.email);
+        // console.log(user);
         if (user) {
-            const uuid = uuidv4();
-            const fields = { password_reset: { token: uuid, expiration: DateTime.now().plus({ hours: 1 }) } };
+            let uuid = uuidv4();
+
+            if (data.device == 'mobile') {
+                let randomNumbers = [];
+                for (let i = 0; i < 4; i++) {
+                    const num = Math.floor(Math.random() * 10);
+                    randomNumbers.push(num);
+                }
+
+                uuid = randomNumbers.join('');
+            }
+            // console.log('uuid', uuid);
+            const fields = data.device == 'mobile' ? { password_reset: { token: uuid, expiration: DateTime.now().plus({ hours: 1 }) } } : { password_reset: { token: uuid, expiration: DateTime.now().plus({ hours: 1 }) } };
             const updated = await this.accountsService.update(user.account_pk, fields);
 
             if (updated) {
@@ -83,12 +96,15 @@ export class AuthService {
                 this.emailsService.to = data.email;
                 this.emailsService.to_name = user.first_name + ' ' + user.last_name;
                 this.emailsService.subject = 'Password Reset';
-                this.emailsService.body = '<a href="' + data.url + '/reset-password/' + uuid + '">Please follow this link to reset your password</a>'; // MODIFY: must be a template from the database
+                this.emailsService.body = data.device == 'mobile' ? uuid : '<a href="' + data.url + '/reset-password/' + uuid + '">Please follow this link to reset your password</a>'; // MODIFY: must be a template from the database
 
                 const newEmail = await this.emailsService.create();
                 if (newEmail) {
                     return true;
                 }
+                return {
+                    status: true, data: fields
+                };
             }
             return false;
         }
@@ -98,7 +114,6 @@ export class AuthService {
     async resetPassword(data: any): Promise<any> {
         const password = await this.accountsService.getHash(data.password);
         const account = await this.resetToken(data.token);
-
         const fields = { password };
         return await this.accountsService.update(account.pk, fields);
     }
