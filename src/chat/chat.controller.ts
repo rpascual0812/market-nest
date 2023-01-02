@@ -68,21 +68,20 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Get('user/:pk')
     async findByUser(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
-        let chat = await this.chatService.findByUser(pk, req.user);
-        // console.log(chat);
+        let chat = await this.chatService.findByUser(pk, req.user, req.query);
 
         if (chat.length == 0) {
             const newChat = await this.chatService.create(pk, req.user);
-            console.log('newChat', newChat);
-            chat = await this.chatService.findByUser(pk, req.user);
+            // console.log('newChat', newChat);
+            chat = await this.chatService.findByUser(pk, req.user, req.query);
         }
 
         chat = chat[0];
         if (!chat) {
-            chat = await this.chatService.findByUser(pk, req.user);
+            chat = await this.chatService.findByUser(pk, req.user, req.query);
             chat = chat[0];
         }
-        console.log('chat', chat);
+        // console.log('chat', chat);
 
         const participants = await this.chatService.getParticipants([chat['pk']], req.query);
         // console.log('participants', participants);

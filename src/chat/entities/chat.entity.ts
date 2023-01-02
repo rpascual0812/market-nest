@@ -11,6 +11,9 @@ export class Chat extends BaseEntity {
     @Column({ type: 'text', nullable: false })
     uuid: string;
 
+    @Column({ type: 'text', default: 'chat' })
+    type: string;
+
     @Column({ type: 'text', nullable: true })
     title: string;
 
