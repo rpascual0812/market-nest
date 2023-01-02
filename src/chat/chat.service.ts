@@ -81,6 +81,7 @@ export class ChatService {
                     'user_documents.document_pk=user_doc.pk',
                 )
                 .where('chats.archived=false')
+                .andWhere('chats.type = :type', { type: filters.type })
                 .andWhere('chat_participants.user_pk = :user_pk', { user_pk: user.pk })
 
 
@@ -122,7 +123,7 @@ export class ChatService {
     //     }
     // }
 
-    async findByUser(pk: any, user: any) {
+    async findByUser(pk: any, user: any, query: any) {
         try {
             const entityManager = getManager();
             return await entityManager.query(`
@@ -130,9 +131,10 @@ export class ChatService {
                 chats.*
             from chats
             left join chat_participants on (chats.pk = chat_participants.chat_pk)
+            where chats.type = $1
             group by chats.pk, uuid
-            having $1 = ANY(array_agg(chat_participants.user_pk)) and $2 = ANY(array_agg(chat_participants.user_pk))
-            `, [pk, user.pk]);
+            having $2 = ANY(array_agg(chat_participants.user_pk)) and $3 = ANY(array_agg(chat_participants.user_pk))
+            `, [query.type, pk, user.pk]);
             // return await getRepository(Chat)
             //     .createQueryBuilder('chats')
             //     .select('chats')
@@ -202,7 +204,7 @@ export class ChatService {
     }
 
     async createMessage(data: any, user: any) {
-        console.log(data, user);
+        // console.log(data, user);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
