@@ -43,21 +43,54 @@ export class ConfigurationService {
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    await EntityManager.update(Configuration, { group: 'agreement', name: 'disclaimer' }, { value: form.disclaimer });
-                    await EntityManager.update(Configuration, { group: 'agreement', name: 'legal' }, { value: form.legal });
-                    await EntityManager.update(Configuration, { group: 'agreement', name: 'terms' }, { value: form.terms });
 
-                    const disclaimer = await Configuration.findOne({
+                    let disclaimer = await Configuration.findOne({
                         group: 'agreement', name: 'disclaimer'
                     });
 
-                    const legal = await Configuration.findOne({
+                    let legal = await Configuration.findOne({
                         group: 'agreement', name: 'legal'
                     });
 
-                    const terms = await Configuration.findOne({
+                    let terms = await Configuration.findOne({
                         group: 'agreement', name: 'terms'
                     });
+
+                    if (disclaimer) {
+                        await EntityManager.update(Configuration, { group: 'agreement', name: 'disclaimer' }, { value: form.disclaimer });
+                    }
+                    else {
+                        const _disclaimer = new Configuration();
+                        _disclaimer.group = 'agreement';
+                        _disclaimer.name = 'disclaimer';
+                        _disclaimer.value = form.disclaimer;
+                        _disclaimer.user_pk = user.pk;
+                        disclaimer = await EntityManager.save(_disclaimer);
+                    }
+
+                    if (legal) {
+                        await EntityManager.update(Configuration, { group: 'agreement', name: 'legal' }, { value: form.legal });
+                    }
+                    else {
+                        const _legal = new Configuration();
+                        _legal.group = 'agreement';
+                        _legal.name = 'legal';
+                        _legal.value = form.legal;
+                        _legal.user_pk = user.pk;
+                        legal = await EntityManager.save(_legal);
+                    }
+
+                    if (terms) {
+                        await EntityManager.update(Configuration, { group: 'agreement', name: 'terms' }, { value: form.terms });
+                    }
+                    else {
+                        const _terms = new Configuration();
+                        _terms.group = 'agreement';
+                        _terms.name = 'terms';
+                        _terms.value = form.terms;
+                        _terms.user_pk = user.pk;
+                        terms = await EntityManager.save(_terms);
+                    }
 
                     // LOGS
                     // Disclaimer
