@@ -169,7 +169,11 @@ export class User extends BaseEntity {
 
     @OneToMany('Notification', (notification: Notification) => notification.user)
     @JoinColumn({ name: 'pk' })
-    notification: Array<Notification>;
+    notification_user: Array<Notification>;
+
+    @OneToMany('Notification', (notification: Notification) => notification.sender)
+    @JoinColumn({ name: 'pk' })
+    notification_created_by: Array<Notification>;
 
     @OneToMany('Chat', (chat: Chat) => chat.user)
     @JoinColumn({ name: 'pk' })

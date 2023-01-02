@@ -1,26 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Log } from 'src/logs/entities/log.entity';
+import { UserDocument } from 'src/users/entities/user-document.entity';
+import { getConnection, getRepository, Repository } from 'typeorm';
+import { Notification } from './entities/notification.entity';
+import { Document } from 'src/documents/entities/document.entity';
 
 @Injectable()
 export class NotificationsService {
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
-  }
+    async findAll() {
+        try {
+            const notifications = await getRepository(Notification)
+                .createQueryBuilder('notifications')
+                .select('notifications')
 
-  findAll() {
-    return `This action returns all notifications`;
-  }
+                .leftJoinAndSelect("notifications.user", "users")
+                .leftJoinAndMapOne(
+                    'users.user_document',
+                    UserDocument,
+                    'user_documents',
+                    'users.pk=user_documents.user_pk and user_documents.type = \'profile_photo\''
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'documents',
+                    'user_documents.document_pk=documents.pk',
+                )
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
-  }
+                .leftJoinAndSelect("notifications.sender", "sender")
+                .leftJoinAndMapOne(
+                    'sender.user_document',
+                    UserDocument,
+                    'user_docs',
+                    'sender.pk=user_docs.user_pk and user_docs.type = \'profile_photo\''
+                )
+                .leftJoinAndMapOne(
+                    'user_docs.document',
+                    Document,
+                    'docs',
+                    'user_docs.document_pk=docs.pk',
+                )
 
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
+                .orderBy('notifications.date_created', 'DESC')
+                .getManyAndCount()
+                ;
 
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
-  }
+            return {
+                status: true,
+                data: notifications[0],
+                total: notifications[1]
+            }
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
 }

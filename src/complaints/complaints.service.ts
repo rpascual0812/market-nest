@@ -5,6 +5,7 @@ import { ComplaintMessage } from './entities/complaint-message.entity';
 import { Complaint } from './entities/complaint.entity';
 import { Document } from 'src/documents/entities/document.entity';
 import { UserDocument } from 'src/users/entities/user-document.entity';
+import { ComplaintDocument } from './entities/complaint-document.entity';
 
 @Injectable()
 export class ComplaintsService {
@@ -21,6 +22,18 @@ export class ComplaintsService {
                 .andWhere("complaints.status = :status", { status: filters.status })
                 .andWhere("complaints.type = :type", { type: filters.type })
                 .leftJoinAndSelect("complaints.user", "users")
+                .leftJoinAndMapOne(
+                    'complaints.complaint_document',
+                    ComplaintDocument,
+                    'complaint_documents',
+                    'complaints.pk=complaint_documents.complaint_pk'
+                )
+                .leftJoinAndMapOne(
+                    'complaint_documents.document',
+                    Document,
+                    'documents',
+                    'complaint_documents.document_pk=documents.pk',
+                )
                 .orderBy('complaints.date_created', 'DESC')
                 .getManyAndCount()
                 ;
@@ -98,7 +111,12 @@ export class ComplaintsService {
                     message.message = form.message;
                     message.complaint_pk = _complaint.pk;
                     message.user_pk = user.pk;
-                    const _complaintMessage = await EntityManager.save(message);
+                    await EntityManager.save(message);
+
+                    let document = new ComplaintDocument();
+                    document.complaint_pk = _complaint.pk;
+                    document.document_pk = form.product_photo;
+                    await EntityManager.save(document);
 
                     // LOGS
                     const log = new Log();

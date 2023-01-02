@@ -30,7 +30,7 @@ export class Chat extends BaseEntity {
      * Relationship
      */
 
-    @ManyToOne('User', (user: User) => user.notification, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne('User', (user: User) => user.notification_user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'last_message_user_pk' })
     user: User;
 
