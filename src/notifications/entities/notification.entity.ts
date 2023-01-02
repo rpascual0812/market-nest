@@ -15,8 +15,14 @@ export class Notification extends BaseEntity {
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 
+    @Column({ name: 'sender_pk', nullable: false })
+    sender_pk: number;
+
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
+
+    @Column({ default: false })
+    read: boolean;
 
     @Column({ default: false })
     archived: boolean;
@@ -25,7 +31,11 @@ export class Notification extends BaseEntity {
      * Relationship
      */
 
-    @ManyToOne('User', (user: User) => user.notification, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne('User', (user: User) => user.notification_user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
+
+    @ManyToOne('User', (user: User) => user.notification_created_by, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'sender_pk' })
+    sender: User;
 }
