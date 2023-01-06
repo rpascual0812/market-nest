@@ -1,7 +1,5 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { getConnection, getRepository, Repository } from 'typeorm';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { Order } from './entities/order.entity';
 import { Log } from 'src/logs/entities/log.entity';
