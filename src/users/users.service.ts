@@ -130,6 +130,7 @@ export class UsersService {
                         "(users.first_name ILIKE :keyword or users.last_name ILIKE :keyword or users.middle_name ILIKE :keyword)" :
                         '1=1', { keyword: `%${filters.keyword}%` }
                 )
+                .andWhere("role_pk != 1")
                 .skip(filters.skip)
                 .take(filters.take)
                 .orderBy(orderByColumn, orderByDirection)
