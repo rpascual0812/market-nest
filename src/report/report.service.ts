@@ -61,4 +61,33 @@ export class ReportService {
             ;
     }
 
+    async totalOrders() {
+        return await getRepository(Order)
+            .createQueryBuilder('orders')
+            .select('orders')
+            .where('orders.archived=false')
+            .getManyAndCount()
+            ;
+    }
+
+    async closedOrders() {
+        return await getRepository(Order)
+            .createQueryBuilder('orders')
+            .select('orders')
+            .where('orders.archived=false')
+            .andWhere('orders.status_pk=9')
+            .getManyAndCount()
+            ;
+    }
+
+    async cancelledOrders() {
+        return await getRepository(Order)
+            .createQueryBuilder('orders')
+            .select('orders')
+            .where('orders.archived=false')
+            .andWhere('orders.status_pk=3')
+            .getManyAndCount()
+            ;
+    }
+
 }
