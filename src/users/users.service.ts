@@ -512,8 +512,7 @@ export class UsersService {
     // }
 
     async update(data: any) {
-        console.log('updating user');
-        // console.log(data);
+        console.log('updating user', data);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -523,6 +522,7 @@ export class UsersService {
                     const user = await EntityManager.findOne(User, data.pk);
                     user.first_name = data.first_name;
                     user.last_name = data.last_name;
+                    user.gender_pk = data.gender;
                     user.birthdate = data.birthdate;
                     user.email_address = data.email;
                     user.mobile_number = data.mobile;
