@@ -1,5 +1,5 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { getConnection, getManager, getRepository, Repository } from 'typeorm';
 import { Order } from 'src/orders/entities/order.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -61,33 +61,41 @@ export class ReportService {
             ;
     }
 
-    async totalOrders() {
+    async countOrders(filters: any, user: any) {
         return await getRepository(Order)
             .createQueryBuilder('orders')
             .select('orders')
             .where('orders.archived=false')
+            .andWhere(filters.hasOwnProperty('type') && filters.type == 'closed' ? "orders.status_pk=9" : '1=1')
+            .andWhere(filters.hasOwnProperty('type') && filters.type == 'cancelled' ? "orders.status_pk=3" : '1=1')
             .getManyAndCount()
             ;
     }
 
-    async closedOrders() {
-        return await getRepository(Order)
-            .createQueryBuilder('orders')
-            .select('orders')
-            .where('orders.archived=false')
-            .andWhere('orders.status_pk=9')
-            .getManyAndCount()
-            ;
+    async countOrdersByCategories(filters: any, user: any) {
+        try {
+            const entityManager = getManager();
+            return await entityManager.query(`
+            select
+                products.category_pk, categories.name
+            from orders
+            left join products on (orders.product_pk = products.pk)
+            left join categories on (products.category_pk = categories.pk)
+            where orders.archived = false
+            group by products.category_pk, categories.name
+            `);
+        } catch (error) {
+            return {
+                status: false
+            }
+        }
+        // return await getRepository(Order)
+        //     .createQueryBuilder('orders')
+        //     .select('products.category_pk')
+        //     .leftJoin("orders.product", "products")
+        //     .where('orders.archived=false')
+        //     .groupBy('products.category_pk')
+        //     .getManyAndCount()
+        //     ;
     }
-
-    async cancelledOrders() {
-        return await getRepository(Order)
-            .createQueryBuilder('orders')
-            .select('orders')
-            .where('orders.archived=false')
-            .andWhere('orders.status_pk=3')
-            .getManyAndCount()
-            ;
-    }
-
 }
