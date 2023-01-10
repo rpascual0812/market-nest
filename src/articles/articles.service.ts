@@ -2,7 +2,7 @@ import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Document } from 'src/documents/entities/document.entity';
 import { Log } from 'src/logs/entities/log.entity';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Brackets, getConnection, getRepository, Repository } from 'typeorm';
 import { ArticleDocument } from './entities/article-document.entity';
 import { Article } from './entities/article.entity';
 
@@ -31,11 +31,18 @@ export class ArticlesService {
                     'article_documents.document_pk=documents.pk',
                 )
                 .where('articles.archived=false')
-                .andWhere(
-                    filters.hasOwnProperty('keyword') ?
-                        "articles.title ILIKE :keyword" :
-                        '1=1', { keyword: `%${filters.keyword}%` }
-                )
+                // .andWhere(
+                //     filters.hasOwnProperty('keyword') ?
+                //         "articles.title ILIKE :keyword" :
+                //         '1=1', { keyword: `%${filters.keyword}%` }
+                // )
+                .andWhere(filters.hasOwnProperty('keyword') ? new Brackets(qb => {
+                    qb.where("articles.title ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("articles.url ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("articles.description ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                }) : '1=1')
                 .leftJoinAndSelect("articles.user", "users")
                 .skip(filters.skip)
                 .take(filters.take)
