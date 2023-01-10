@@ -1,5 +1,5 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
-import { getConnection, getManager, getRepository, Repository } from 'typeorm';
+import { Brackets, getConnection, getManager, getRepository, Repository } from 'typeorm';
 import { Order } from 'src/orders/entities/order.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -49,11 +49,19 @@ export class ReportService {
             .andWhere(filters.hasOwnProperty('status') && status ? "orders.status_pk = :status_pk" : '1=1', { status_pk: status_pk })
             .andWhere(filters.hasOwnProperty('user_pk') && !filters.hasOwnProperty('seller') ? "orders.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
             .andWhere(filters.hasOwnProperty('seller') ? "products.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
-            .andWhere(
-                filters.hasOwnProperty('keyword') ?
-                    "products.name ILIKE :keyword" :
-                    '1=1', { keyword: `%${filters.keyword}%` }
-            )
+            // .andWhere(
+            //     filters.hasOwnProperty('keyword') ?
+            //         "products.name ILIKE :keyword" :
+            //         '1=1', { keyword: `%${filters.keyword}%` }
+            // )
+            .andWhere(filters.hasOwnProperty('keyword') ? new Brackets(qb => {
+                qb.where("products.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                    .orWhere("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                    .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                    .orWhere('"users as seller_user"."first_name" ILIKE :keyword', { keyword: `%${filters.keyword}%` })
+                    .orWhere('"users as seller_user"."last_name" ILIKE :keyword', { keyword: `%${filters.keyword}%` })
+                    .orWhere("statuses.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+            }) : '1=1')
             .skip(filters.skip)
             .take(filters.take)
             .orderBy('orders.pk', 'DESC')
