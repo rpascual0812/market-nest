@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserDocument } from 'src/users/entities/user-document.entity';
 import { User } from 'src/users/entities/user.entity';
-import { EntityManager, getConnection, getRepository, getManager } from 'typeorm';
+import { EntityManager, getConnection, getRepository, getManager, Brackets } from 'typeorm';
 import { ChatParticipant } from './entities/chat-participants.entity';
 import { Chat } from './entities/chat.entity';
 import { Document } from 'src/documents/entities/document.entity';
@@ -81,9 +81,16 @@ export class ChatService {
                     'user_documents.document_pk=user_doc.pk',
                 )
                 .where('chats.archived=false')
-                .andWhere('chats.type = :type', { type: filters.type })
-                .andWhere('chat_participants.user_pk = :user_pk', { user_pk: user.pk })
+                // .andWhere('chats.type = :type', { type: filters.type })
+                // .andWhere('chat_participants.user_pk = :user_pk', { user_pk: user.pk })
+                .andWhere(filters.hasOwnProperty('type') && filters.type == 'chat' ? new Brackets(qb => {
+                    qb.where("chats.type = :type", { type: filters.type })
+                        .andWhere("chat_participants.user_pk = :user_pk", { user_pk: user.pk })
+                }) : '1=1')
 
+                .andWhere(filters.hasOwnProperty('type') && filters.type == 'support' ? new Brackets(qb => {
+                    qb.where("chats.type = :type", { type: filters.type })
+                }) : '1=1')
 
                 .orderBy('chats.last_message_date', 'DESC')
                 .skip(filters.skip)
@@ -242,8 +249,39 @@ export class ChatService {
         }
     }
 
+    async findMessage(pk: any) {
+        try {
+            return await getRepository(ChatMessage)
+                .createQueryBuilder('chat_messages')
+                .select('chat_messages')
+                .leftJoinAndSelect("chat_messages.user", "users")
+                // user documents
+                .leftJoinAndMapOne(
+                    'users.user_document',
+                    UserDocument,
+                    'user_documents',
+                    'users.pk=user_documents.user_pk and user_documents.type = \'profile_photo\''
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                .where('chat_messages.pk = :pk', { pk })
+                .getOneOrFail()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
     async findMessages(pk: any, filters: any, user: any) {
-        // console.log(pk, user);
+        // console.log('findMessages', filters);
         try {
             return await getRepository(ChatMessage)
                 .createQueryBuilder('chat_messages')

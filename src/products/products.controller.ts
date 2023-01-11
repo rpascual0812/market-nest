@@ -33,7 +33,7 @@ export class ProductsController {
         if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
-            const seller_pks = products[0].map(({ user }) => user ? user.seller.pk : null);
+            const seller_pks = products[0].map(({ user }) => user && user.seller ? user.seller.pk : null);
 
             const documents = await this.productsService.getProductDocuments(pks, req.query);
             // console.log('documents', documents);
