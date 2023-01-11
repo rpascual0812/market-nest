@@ -9,6 +9,7 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Body() body: any, @Request() req: any) {
+        console.log(req.query);
         const chats = await this.chatService.findAll(req.query, req.user);
         // console.log(req.user);
         // console.log('chats', chats);
@@ -105,12 +106,17 @@ export class ChatController {
     @Post('messages')
     async saveMessage(@Param('pk') pk: string, @Body() body: any, @Request() req: any, @Response() res: any) {
         const message = await this.chatService.createMessage(body, req.user);
-        return res.status(message.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(message);
+        console.log('message', message['data'].pk);
+
+        const newMessage = await this.chatService.findMessage(message['data'].pk);
+
+        return res.status(message.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json({ status: true, data: newMessage });
     }
 
     @UseGuards(JwtAuthGuard)
     @Get(':pk/messages')
     async findMessages(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
+        // console.log(body, req);
         let messages = await this.chatService.findMessages(pk, req.query, req.user);
         if (messages[1] > 0) {
             return {
