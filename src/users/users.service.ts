@@ -176,6 +176,7 @@ export class UsersService {
     }
 
     async find(account: any) {
+        console.log('profile account', account);
         return await getRepository(User)
             .createQueryBuilder('users')
             .select('users')
