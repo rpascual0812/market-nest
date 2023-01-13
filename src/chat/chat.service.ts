@@ -11,7 +11,7 @@ import { DateTime } from "luxon";
 
 @Injectable()
 export class ChatService {
-    async create(pk: any, user: any) {
+    async create(pk: any, user: any, params: any) {
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -23,6 +23,7 @@ export class ChatService {
                     chat.title = null;
                     chat.last_message = null;
                     chat.last_message_user_pk = null;
+                    chat.type = params.type;
                     const newchat = await EntityManager.save(chat);
 
                     if (newchat) {
@@ -83,12 +84,12 @@ export class ChatService {
                 .where('chats.archived=false')
                 // .andWhere('chats.type = :type', { type: filters.type })
                 // .andWhere('chat_participants.user_pk = :user_pk', { user_pk: user.pk })
-                .andWhere(filters.hasOwnProperty('type') && filters.type == 'chat' ? new Brackets(qb => {
+                .andWhere(filters.role == 'end-user' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
                         .andWhere("chat_participants.user_pk = :user_pk", { user_pk: user.pk })
                 }) : '1=1')
 
-                .andWhere(filters.hasOwnProperty('type') && filters.type == 'support' ? new Brackets(qb => {
+                .andWhere(filters.role == 'admin' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
                 }) : '1=1')
 

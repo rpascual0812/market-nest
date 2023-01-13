@@ -64,6 +64,8 @@ npm run build
 pm2 restart main
 
 #!/bin/bash
+# forever start must be inside the project root directory
+# cd market && forever start dist/main.js
 forever restart market/dist/main.js
 
 cloc $(git ls-files)
