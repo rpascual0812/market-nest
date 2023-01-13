@@ -9,7 +9,7 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Body() body: any, @Request() req: any) {
-        console.log(req.query);
+        // console.log(req.query);
         const chats = await this.chatService.findAll(req.query, req.user);
         // console.log(req.user);
         // console.log('chats', chats);
@@ -72,7 +72,7 @@ export class ChatController {
         let chat = await this.chatService.findByUser(pk, req.user, req.query);
 
         if (chat.length == 0) {
-            const newChat = await this.chatService.create(pk, req.user);
+            const newChat = await this.chatService.create(pk, req.user, req.query);
             // console.log('newChat', newChat);
             chat = await this.chatService.findByUser(pk, req.user, req.query);
         }
@@ -84,9 +84,9 @@ export class ChatController {
         }
         // console.log('chat', chat);
 
-        const participants = await this.chatService.getParticipants([chat['pk']], req.query);
+        const participants = await this.chatService.getParticipants([chat ? chat['pk'] : null], req.query);
         // console.log('participants', participants);
-        if (!chat.hasOwnProperty('chat_participants')) {
+        if (chat && !chat.hasOwnProperty('chat_participants')) {
             chat['chat_participants'] = [];
         }
         // Append chat documents
@@ -111,6 +111,13 @@ export class ChatController {
         const newMessage = await this.chatService.findMessage(message['data'].pk);
 
         return res.status(message.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json({ status: true, data: newMessage });
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get(':uuid/messages/:pk')
+    async findMessage(@Param('uuid') uuid: string, @Param('pk') pk: string, @Body() body: any, @Request() req: any) {
+        console.log(uuid, pk);
+        return await this.chatService.findMessage(pk);
     }
 
     @UseGuards(JwtAuthGuard)
