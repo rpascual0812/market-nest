@@ -175,8 +175,7 @@ export class UsersService {
             ;
     }
 
-    async find(account: any) {
-        console.log('profile account', account);
+    async find(user: any) {
         return await getRepository(User)
             .createQueryBuilder('users')
             .select('users')
@@ -195,7 +194,7 @@ export class UsersService {
                 'documents',
                 'user_documents.document_pk=documents.pk',
             )
-            .where("accounts.pk = :pk", { pk: account.pk })
+            .where("accounts.pk = :pk", { pk: user.account.pk })
             .getOne()
             ;
     }
