@@ -7,7 +7,7 @@ import { Document } from 'src/documents/entities/document.entity';
 
 @Injectable()
 export class NotificationsService {
-    async findAll() {
+    async findAll(user: any) {
         try {
             const notifications = await getRepository(Notification)
                 .createQueryBuilder('notifications')
@@ -40,6 +40,7 @@ export class NotificationsService {
                     'docs',
                     'user_docs.document_pk=docs.pk',
                 )
+                .where('notifications.user_pk = :pk', { pk: user.pk })
 
                 .orderBy('notifications.date_created', 'DESC')
                 .getManyAndCount()
