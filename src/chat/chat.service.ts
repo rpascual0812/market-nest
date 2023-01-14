@@ -50,7 +50,7 @@ export class ChatService {
     }
 
     async findAll(filters: any, user: any) {
-        // console.log(filters, user);
+        console.log(filters);
         try {
             return await getRepository(Chat)
                 .createQueryBuilder('chats')
@@ -87,6 +87,10 @@ export class ChatService {
                 .andWhere(filters.role == 'end-user' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
                         .andWhere("chat_participants.user_pk = :user_pk", { user_pk: user.pk })
+                }) : '1=1')
+                .andWhere(filters.hasOwnProperty('keyword') && filters.keyword != '' ? new Brackets(qb => {
+                    qb.where("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                 }) : '1=1')
 
                 .andWhere(filters.role == 'admin' ? new Brackets(qb => {

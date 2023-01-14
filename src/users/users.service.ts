@@ -16,6 +16,7 @@ import { UserRating } from './entities/user-rating.entity';
 import { Province } from 'src/provinces/entities/province.entity';
 import { City } from 'src/cities/entities/city.entity';
 import { Area } from 'src/areas/entities/area.entity';
+import { Notification } from 'src/notifications/entities/notification.entity';
 
 // export type User = {
 //     id: number;
@@ -450,6 +451,13 @@ export class UsersService {
                     follow.user_pk = data.user_pk;
                     follow.created_by = user.pk;
                     const newFollow = await EntityManager.save(follow);
+
+                    const notification = new Notification();
+                    notification.title = 'Follow';
+                    notification.details = user.first_name + ' ' + user.last_name + ' followed you.';
+                    notification.user_pk = data.user_pk;
+                    notification.sender_pk = user.pk;
+                    await EntityManager.save(notification);
 
                     // LOGS
                     const uuid = uuidv4();
