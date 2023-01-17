@@ -61,7 +61,8 @@ export class SellerController {
     @Get(':pk/products')
     async sellerProducts(@Param('pk') pk: number, @Request() req: any) {
         // console.log(req.params);
-        const products = await this.productsService.findAll({ user_pk: pk, type: req.query.type });
+        const products = await this.productsService.findAll({ user_pk: pk, type: req.query.type, orderBy: req.query.orderBy });
+        console.log(products);
         if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
