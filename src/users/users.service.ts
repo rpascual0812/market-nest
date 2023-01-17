@@ -441,6 +441,7 @@ export class UsersService {
     // }
 
     async follow(user: any, data: any) {
+        // console.log('follow', data, user);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -483,6 +484,7 @@ export class UsersService {
     }
 
     async unfollow(user: any, data: any) {
+        // console.log('unfollow', data, user);
         try {
             return await getConnection()
                 .createQueryBuilder()
@@ -520,7 +522,7 @@ export class UsersService {
     // }
 
     async update(data: any) {
-        console.log('updating user', data);
+        // console.log('updating user', data);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 

@@ -92,7 +92,7 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any) {
-        console.log(req.user, req.query);
+        // console.log(req.user, req.query);
         const users = await this.usersService.findAll(req.user, req.query);
         if (users.data) {
             return users;
@@ -146,22 +146,8 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Post('followedByUser')
     async followedByUser(@Request() req: any, @Body() body: any) {
-        const followings = await this.usersService.followedByUser([req.user.pk], [body.user_pk]);
-
-        if (followings[1] > 0) {
-            return {
-                status: true,
-                data: followings[0],
-                total: followings[1]
-            }
-        }
-        else {
-            return {
-                status: false,
-                data: [],
-                total: 0
-            }
-        }
+        // console.log(req.user.pk, body.user_pk);
+        return await this.usersService.followedByUser([req.user.pk], [body.user_pk]);
     }
 
     @Get(':pk/followings')

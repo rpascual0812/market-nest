@@ -249,7 +249,7 @@ export class ProductsService {
                     orderByDirection = 'ASC';
                     break;
                 case 'Sort by Category':
-                    orderByColumn = 'products.category_pk';
+                    orderByColumn = 'categories.name';
                     orderByDirection = 'ASC';
                     break;
                 default:
@@ -342,7 +342,7 @@ export class ProductsService {
 
                 .leftJoinAndSelect("products.measurement", "measurements")
                 .leftJoinAndSelect("products.country", "countries")
-                .leftJoinAndSelect("products.category", "product_categories")
+                .leftJoinAndSelect("products.category", "categories")
 
                 // user addresses
                 // .leftJoinAndMapMany(
