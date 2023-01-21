@@ -100,7 +100,9 @@ export class AuthService {
 
                 const newEmail = await this.emailsService.create();
                 if (newEmail) {
-                    return true;
+                    return {
+                        status: true, data: fields
+                    };
                 }
                 return {
                     status: true, data: fields
