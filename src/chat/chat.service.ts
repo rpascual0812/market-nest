@@ -321,8 +321,32 @@ export class ChatService {
         }
     }
 
+    async getUnreadMessages(pks: any, user: any) {
+        // console.log('get unread messages', pks, user.pk);
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        // console.log(pks);
+        // console.log(user.pk);
+        try {
+            return await getRepository(ChatMessage)
+                .createQueryBuilder('chat_messages')
+                .select('chat_messages')
+                .where('chat_messages.archived=false')
+                .andWhere('chat_messages.read=false')
+                .andWhere("chat_messages.chat_pk IN (:...pk)", { pk: pks })
+                .andWhere("chat_messages.user_pk NOT IN (:...user_pk)", { user_pk: [user.pk] })
+                .getManyAndCount()
+                ;
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
     async readMessages(chat_pk: any, user: any) {
-        console.log('read messages', chat_pk, user.pk);
+        // console.log('read messages', chat_pk, user.pk);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 

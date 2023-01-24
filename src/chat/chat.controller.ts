@@ -16,8 +16,10 @@ export class ChatController {
         if (chats[1] > 0) {
             const chat_pks = chats[0].map(({ pk }) => pk);
             const participants = await this.chatService.getParticipants(chat_pks, req.query);
-            // console.log('participants', participants);
+            const unread_messages = await this.chatService.getUnreadMessages(chat_pks, req.user);
+            console.log('unread', unread_messages);
             chats[0].forEach(chat => {
+                chat.unread = 0;
                 if (!chat.hasOwnProperty('chat_participants')) {
                     chat['chat_participants'] = [];
                 }
@@ -27,6 +29,14 @@ export class ChatController {
                     participants[0].forEach(participant => {
                         if (chat.pk == participant.chat_pk && participant.user_pk != req.user.pk) {
                             chat['chat_participants'].push(participant);
+                        }
+                    });
+                }
+
+                if (unread_messages) {
+                    unread_messages[0].forEach(message => {
+                        if (chat.pk == message.chat_pk) {
+                            chat.unread++;
                         }
                     });
                 }
