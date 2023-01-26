@@ -13,8 +13,8 @@ export class ChatParticipant extends BaseEntity {
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 
-    @Column({ default: false })
-    unread: boolean;
+    // @Column({ default: false })
+    // unread: boolean;
 
     /**
      * Relationship

@@ -16,10 +16,10 @@ export class ChatController {
         if (chats[1] > 0) {
             const chat_pks = chats[0].map(({ pk }) => pk);
             const participants = await this.chatService.getParticipants(chat_pks, req.query);
-            const unread_messages = await this.chatService.getUnreadMessages(chat_pks, req.user);
-            console.log('unread', unread_messages);
+            // const unread_messages = await this.chatService.getUnreadMessages(chat_pks, req.user);
+            // console.log('unread', unread_messages);
             chats[0].forEach(chat => {
-                chat.unread = 0;
+                chat.read = false;
                 if (!chat.hasOwnProperty('chat_participants')) {
                     chat['chat_participants'] = [];
                 }
@@ -33,16 +33,22 @@ export class ChatController {
                     });
                 }
 
-                if (unread_messages) {
-                    unread_messages[0].forEach(message => {
-                        if (chat.pk == message.chat_pk) {
-                            chat.unread++;
-                        }
-                    });
-                }
+                chat.chat_messages_read.forEach(read => {
+                    if (read.user_pk == req.user.pk) {
+                        chat.read = true;
+                    }
+                });
+
+                // if (unread_messages) {
+                //     unread_messages[0].forEach(message => {
+                //         if (chat.pk == message.chat_pk) {
+                //             chat.read++;
+                //         }
+                //     });
+                // }
             });
 
-            // console.log(chats[0]);
+            // console.log('chats', chats[0]);
         }
         else {
             return {
@@ -80,12 +86,14 @@ export class ChatController {
     @Get('user/:pk')
     async findByUser(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
         let chat = await this.chatService.findByUser(pk, req.user, req.query);
-
+        // console.log(1, chat);
         if (chat.length == 0) {
             const newChat = await this.chatService.create(pk, req.user, req.query);
             // console.log('newChat', newChat);
             chat = await this.chatService.findByUser(pk, req.user, req.query);
+            // console.log(2, chat);
         }
+        // console.log(3, chat);
 
         chat = chat[0];
         if (!chat) {
@@ -108,7 +116,7 @@ export class ChatController {
                 }
             });
         }
-
+        // console.log('fetch chat', chat);
         return chat;
     }
 
@@ -116,7 +124,7 @@ export class ChatController {
     @Post('messages')
     async saveMessage(@Param('pk') pk: string, @Body() body: any, @Request() req: any, @Response() res: any) {
         const message = await this.chatService.createMessage(body, req.user);
-        console.log('message', message['data'].pk);
+        // console.log('message', message['data'].pk);
 
         const newMessage = await this.chatService.findMessage(message['data'].pk);
 
@@ -126,7 +134,7 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Get(':uuid/messages/:pk')
     async findMessage(@Param('uuid') uuid: string, @Param('pk') pk: string, @Body() body: any, @Request() req: any) {
-        console.log(uuid, pk);
+        // console.log(uuid, pk);
         return await this.chatService.findMessage(pk);
     }
 
@@ -154,7 +162,14 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Post(':pk/messages/read')
     async readMessages(@Param('pk') pk: string, @Request() req: any, @Response() res: any) {
-        const result = await this.chatService.readMessages(pk, req.user);
-        return res.status(result.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(result);
+        let messages = await this.chatService.readMessages(pk, req.user);
+
+        messages.forEach(message => {
+            message.chat_messages_read.forEach(read => {
+
+                console.log(read);
+            });
+        });
+        // return res.status(result.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(result);
     }
 }
