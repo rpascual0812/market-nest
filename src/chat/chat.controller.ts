@@ -162,14 +162,13 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Post(':pk/messages/read')
     async readMessages(@Param('pk') pk: string, @Request() req: any, @Response() res: any) {
-        let messages = await this.chatService.readMessages(pk, req.user);
-
-        messages.forEach(message => {
-            message.chat_messages_read.forEach(read => {
-
-                console.log(read);
-            });
+        const messages = await this.chatService.getMessages(pk, req.user);
+        messages.forEach(async message => {
+            const chatReads = await this.chatService.getMessageRead(message.pk, req.user);
+            if (chatReads.length == 0) {
+                await this.chatService.setReadMessage(pk, message.pk, req.user);
+            }
         });
-        // return res.status(result.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json(result);
+        return res.status(HttpStatus.OK).json(messages);
     }
 }
