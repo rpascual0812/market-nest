@@ -86,7 +86,7 @@ export class FaqService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -117,7 +117,7 @@ export class FaqService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 }

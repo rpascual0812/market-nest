@@ -35,6 +35,7 @@ const config: ConnectionOptions = {
         // to be compiled into dist/ folder.
         migrationsDir: 'src/migrations',
     },
+    // extra: { connectionLimit: 10 }
 };
 
 export = config;

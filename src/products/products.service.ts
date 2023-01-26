@@ -109,7 +109,7 @@ export class ProductsService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -170,7 +170,7 @@ export class ProductsService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -516,7 +516,6 @@ export class ProductsService {
             return { status: false, code: err.code };
         } finally {
             await queryRunner.release();
-            // console.log('finally...');
         }
     }
 
@@ -535,7 +534,7 @@ export class ProductsService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -568,7 +567,7 @@ export class ProductsService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 

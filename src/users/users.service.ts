@@ -479,7 +479,7 @@ export class UsersService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -496,8 +496,6 @@ export class UsersService {
         } catch (err) {
             console.log(err);
             return { status: false, code: err.code };
-        } finally {
-            // console.log('finally...');
         }
     }
 
@@ -574,7 +572,7 @@ export class UsersService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
 
     }

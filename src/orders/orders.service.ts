@@ -102,7 +102,7 @@ export class OrdersService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -131,7 +131,7 @@ export class OrdersService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
