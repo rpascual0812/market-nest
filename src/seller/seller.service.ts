@@ -83,7 +83,7 @@ export class SellerService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
 
 

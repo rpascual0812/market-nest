@@ -44,9 +44,9 @@ export class ChatService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: err.code, data: null };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -118,29 +118,26 @@ export class ChatService {
         }
     }
 
-    // async findOne(pk: any) {
-    //     try {
-    //         return await getRepository(Chat)
-    //             .createQueryBuilder('chats')
-    //             .select('chats')
-
-    //             .leftJoinAndMapMany(
-    //                 'chats.chat_participant',
-    //                 ChatParticipant,
-    //                 'chat_participants',
-    //                 'chats.pk=chat_participants.chat_pk'
-    //             )
-    //             .where('chats.pk = :pk', { pk })
-    //             .getOne()
-    //             ;
-    //     } catch (error) {
-    //         console.log(error);
-    //         // SAVE ERROR
-    //         return {
-    //             status: false
-    //         }
-    //     }
-    // }
+    async findOne(pk: any) {
+        try {
+            const entityManager = getManager();
+            return await entityManager.query(`
+            select
+                chats.*
+            from chats
+            left join chat_participants on (chats.pk = chat_participants.chat_pk)
+            where chats.pk = $1
+            group by chats.pk, uuid
+            `, [pk]);
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false,
+                data: null
+            }
+        }
+    }
 
     async findByUser(pk: any, user: any, query: any) {
         try {
@@ -179,7 +176,8 @@ export class ChatService {
             console.log(error);
             // SAVE ERROR
             return {
-                status: false
+                status: false,
+                data: null
             }
         }
     }
@@ -247,6 +245,12 @@ export class ChatService {
                     parent.last_message_date = DateTime.now();
                     const updatedChat = await EntityManager.save(parent);
 
+                    const message_read = new ChatMessagesRead();
+                    message_read.chat_pk = chat.pk;
+                    message_read.user_pk = user.pk;
+                    message_read.chat_message_pk = newMessage.pk;
+                    const newChatMessage = await EntityManager.save(message_read);
+
                     // await EntityManager.update(ChatParticipant, { chat_pk: chat.pk }, { unread: true }); // set all participants to unread true then,
                     // await EntityManager.update(ChatParticipant, { chat_pk: chat.pk, user_pk: user.pk }, { unread: false }); // set sender to unread false
 
@@ -257,7 +261,7 @@ export class ChatService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -343,7 +347,7 @@ export class ChatService {
             console.log(err);
             return [];
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -362,7 +366,7 @@ export class ChatService {
             console.log(err);
             return [];
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 
@@ -386,7 +390,7 @@ export class ChatService {
             console.log(err);
             return [];
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
     }
 

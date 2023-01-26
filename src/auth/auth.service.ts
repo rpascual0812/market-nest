@@ -199,7 +199,7 @@ export class AuthService {
             console.log(err);
             return { status: false, code: err.code };
         } finally {
-            // console.log('finally...');
+            await queryRunner.release();
         }
 
         // data.password = await this.accountsService.getHash(data.password);
