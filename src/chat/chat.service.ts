@@ -328,71 +328,17 @@ export class ChatService {
         }
     }
 
-    async getUnreadMessages(pks: any, user: any) {
+    async getMessages(pk: any, user: any) {
         // console.log('get unread messages', pks, user.pk);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
-        console.log(pks);
-        console.log(user.pk);
         try {
-            return await getRepository(ChatMessagesRead)
-                .createQueryBuilder('chat_messages_read')
-                .select('chat_messages_read')
-                .andWhere("chat_messages_read.chat_pk IN (:...pk)", { pk: pks })
-                .andWhere("chat_messages_read.user_pk NOT IN (:...user_pk)", { user_pk: [user.pk] })
-                .getManyAndCount()
+            return await getRepository(ChatMessage)
+                .createQueryBuilder('chat_messages')
+                .select('chat_messages')
+                .andWhere("chat_messages.chat_pk IN (:...pk)", { pk: [pk] })
+                .getMany()
                 ;
-        } catch (err) {
-            console.log(err);
-            return { status: false, code: err.code };
-        } finally {
-            // console.log('finally...');
-        }
-    }
-
-    async readMessages(chat_pk: any, user: any) {
-        // console.log('read messages', chat_pk, user.pk);
-        const queryRunner = getConnection().createQueryRunner();
-        await queryRunner.connect();
-
-        try {
-            return await queryRunner.manager.transaction(
-                async (EntityManager) => {
-                    // console.log('chat pk', chat_pk);
-                    return await getRepository(ChatMessage)
-                        .createQueryBuilder('chat_messages')
-                        .select('chat_messages')
-                        .leftJoinAndSelect("chat_messages.chat_messages_read", "chat_messages_read")
-
-                        .andWhere("chat_messages.chat_pk IN (:...pk)", { pk: [chat_pk] })
-                        .getMany()
-                        ;
-                    // console.log('messages', messages);
-                    // messages.forEach(message => {
-                    //     console.log(message);
-                    //     console.log(message['chat_message_read']);
-                    //     // let found = false;
-                    //     // message.chat_message_read.forEach(read => {
-                    //     //     if (read.user_pk == user.pk) {
-                    //     //         found = true;
-                    //     //     }
-                    //     // });
-                    //     // console.log('found', found);
-                    //     // if (!found) {
-                    //     //     const message_read = new ChatMessageRead();
-                    //     //     message_read.chat_pk = chat_pk;
-                    //     //     message_read.chat_message_pk = message.pk;
-                    //     //     message_read.user_pk = user.pk;
-                    //     //     message_read.read = true;
-                    //     //     EntityManager.save(message_read);
-                    //     // }
-                    // });
-                    // console.log('user', user.pk);
-                    // console.log('messages', messages);
-                    // await EntityManager.update(ChatParticipant, { chat_pk, user_pk: user.pk }, { unread: false });
-                    // return { status: true };
-                }
-            );
         } catch (err) {
             console.log(err);
             return [];
@@ -400,4 +346,98 @@ export class ChatService {
             // console.log('finally...');
         }
     }
+
+    async getMessageRead(pk: any, user: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        try {
+            return await getRepository(ChatMessagesRead)
+                .createQueryBuilder('chat_messages_read')
+                .select('chat_messages_read')
+                .andWhere("chat_messages_read.chat_message_pk = :pk", { pk })
+                .andWhere("chat_messages_read.user_pk = :user_pk", { user_pk: user.pk })
+                .getMany()
+                ;
+        } catch (err) {
+            console.log(err);
+            return [];
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
+    async setReadMessage(pk: any, message_pk: any, user: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const messageRead = new ChatMessagesRead();
+                    messageRead.chat_pk = pk;
+                    messageRead.chat_message_pk = message_pk;
+                    messageRead.user_pk = user.pk;
+                    messageRead.read = true;
+                    const ret = await EntityManager.save(messageRead);
+
+                    return { status: true, data: ret };
+                });
+
+        } catch (err) {
+            console.log(err);
+            return [];
+        } finally {
+            // console.log('finally...');
+        }
+    }
+
+    // async readMessages(chat_pk: any, user: any) {
+    //     // console.log('read messages', chat_pk, user.pk);
+    //     const queryRunner = getConnection().createQueryRunner();
+    //     await queryRunner.connect();
+
+    //     try {
+    //         return await queryRunner.manager.transaction(
+    //             async (EntityManager) => {
+    //                 // console.log('chat pk', chat_pk);
+    //                 return await getRepository(ChatMessage)
+    //                     .createQueryBuilder('chat_messages')
+    //                     .select('chat_messages')
+    //                     .leftJoinAndSelect("chat_messages.chat_messages_read", "chat_messages_read")
+
+    //                     .andWhere("chat_messages.chat_pk IN (:...pk)", { pk: [chat_pk] })
+    //                     .getMany()
+    //                     ;
+    //                 // console.log('messages', messages);
+    //                 // messages.forEach(message => {
+    //                 //     console.log(message);
+    //                 //     console.log(message['chat_message_read']);
+    //                 //     // let found = false;
+    //                 //     // message.chat_message_read.forEach(read => {
+    //                 //     //     if (read.user_pk == user.pk) {
+    //                 //     //         found = true;
+    //                 //     //     }
+    //                 //     // });
+    //                 //     // console.log('found', found);
+    //                 //     // if (!found) {
+    //                 //     //     const message_read = new ChatMessageRead();
+    //                 //     //     message_read.chat_pk = chat_pk;
+    //                 //     //     message_read.chat_message_pk = message.pk;
+    //                 //     //     message_read.user_pk = user.pk;
+    //                 //     //     message_read.read = true;
+    //                 //     //     EntityManager.save(message_read);
+    //                 //     // }
+    //                 // });
+    //                 // console.log('user', user.pk);
+    //                 // console.log('messages', messages);
+    //                 // await EntityManager.update(ChatParticipant, { chat_pk, user_pk: user.pk }, { unread: false });
+    //                 // return { status: true };
+    //             }
+    //         );
+    //     } catch (err) {
+    //         console.log(err);
+    //         return [];
+    //     } finally {
+    //         // console.log('finally...');
+    //     }
+    // }
 }
