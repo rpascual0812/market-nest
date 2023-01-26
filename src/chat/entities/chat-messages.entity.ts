@@ -1,5 +1,6 @@
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
+import { ChatMessagesRead } from './chat-messages-read.entity';
 import { Chat } from './chat.entity';
 
 @Entity({ name: 'chat_messages' })
@@ -16,8 +17,8 @@ export class ChatMessage extends BaseEntity {
     @Column({ type: 'text', nullable: true })
     message: string;
 
-    @Column({ default: false })
-    read: boolean;
+    // @Column({ default: false })
+    // read: boolean;
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
@@ -36,4 +37,8 @@ export class ChatMessage extends BaseEntity {
     @ManyToOne('User', (user: User) => user.chat_message, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
+
+    @OneToMany('ChatMessagesRead', (chat_message_read: ChatMessagesRead) => chat_message_read.chat_message)
+    @JoinColumn({ name: 'pk' })
+    chat_messages_read: Array<ChatMessagesRead>;
 }

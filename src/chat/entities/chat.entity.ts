@@ -1,5 +1,6 @@
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
+import { ChatMessagesRead } from './chat-messages-read.entity';
 import { ChatMessage } from './chat-messages.entity';
 import { ChatParticipant } from './chat-participants.entity';
 
@@ -40,6 +41,10 @@ export class Chat extends BaseEntity {
     @OneToMany('ChatParticipant', (chat_participant: ChatParticipant) => chat_participant.chat)
     @JoinColumn({ name: 'pk' })
     chat_participant: Array<ChatParticipant>;
+
+    @OneToMany('ChatMessagesRead', (chat_message_read: ChatMessagesRead) => chat_message_read.chat)
+    @JoinColumn({ name: 'pk' })
+    chat_message_read: Array<ChatMessagesRead>;
 
     @OneToMany('ChatMessage', (chat_message: ChatMessage) => chat_message.chat)
     @JoinColumn({ name: 'pk' })

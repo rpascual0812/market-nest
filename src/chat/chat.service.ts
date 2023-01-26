@@ -8,6 +8,7 @@ import { Document } from 'src/documents/entities/document.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from './entities/chat-messages.entity';
 import { DateTime } from "luxon";
+import { ChatMessagesRead } from './entities/chat-messages-read.entity';
 
 @Injectable()
 export class ChatService {
@@ -50,7 +51,6 @@ export class ChatService {
     }
 
     async findAll(filters: any, user: any) {
-        console.log(filters);
         try {
             return await getRepository(Chat)
                 .createQueryBuilder('chats')
@@ -61,6 +61,12 @@ export class ChatService {
                     ChatParticipant,
                     'chat_participants',
                     'chats.pk=chat_participants.chat_pk'
+                )
+                .leftJoinAndMapMany(
+                    'chats.chat_messages_read',
+                    ChatMessagesRead,
+                    'chat_messages_read',
+                    'chats.pk=chat_messages_read.chat_pk'
                 )
                 .leftJoinAndMapOne(
                     'chat_participants.user',
@@ -81,6 +87,7 @@ export class ChatService {
                     'user_doc',
                     'user_documents.document_pk=user_doc.pk',
                 )
+
                 .where('chats.archived=false')
                 // .andWhere('chats.type = :type', { type: filters.type })
                 // .andWhere('chat_participants.user_pk = :user_pk', { user_pk: user.pk })
@@ -240,8 +247,8 @@ export class ChatService {
                     parent.last_message_date = DateTime.now();
                     const updatedChat = await EntityManager.save(parent);
 
-                    await EntityManager.update(ChatParticipant, { chat_pk: chat.pk }, { unread: true }); // set all participants to unread true then,
-                    await EntityManager.update(ChatParticipant, { chat_pk: chat.pk, user_pk: user.pk }, { unread: false }); // set sender to unread false
+                    // await EntityManager.update(ChatParticipant, { chat_pk: chat.pk }, { unread: true }); // set all participants to unread true then,
+                    // await EntityManager.update(ChatParticipant, { chat_pk: chat.pk, user_pk: user.pk }, { unread: false }); // set sender to unread false
 
                     return { status: true, data: newMessage };
                 }
@@ -325,16 +332,14 @@ export class ChatService {
         // console.log('get unread messages', pks, user.pk);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
-        // console.log(pks);
-        // console.log(user.pk);
+        console.log(pks);
+        console.log(user.pk);
         try {
-            return await getRepository(ChatMessage)
-                .createQueryBuilder('chat_messages')
-                .select('chat_messages')
-                .where('chat_messages.archived=false')
-                .andWhere('chat_messages.read=false')
-                .andWhere("chat_messages.chat_pk IN (:...pk)", { pk: pks })
-                .andWhere("chat_messages.user_pk NOT IN (:...user_pk)", { user_pk: [user.pk] })
+            return await getRepository(ChatMessagesRead)
+                .createQueryBuilder('chat_messages_read')
+                .select('chat_messages_read')
+                .andWhere("chat_messages_read.chat_pk IN (:...pk)", { pk: pks })
+                .andWhere("chat_messages_read.user_pk NOT IN (:...user_pk)", { user_pk: [user.pk] })
                 .getManyAndCount()
                 ;
         } catch (err) {
@@ -353,13 +358,44 @@ export class ChatService {
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    await EntityManager.update(ChatParticipant, { chat_pk, user_pk: user.pk }, { unread: false });
-                    return { status: true };
+                    // console.log('chat pk', chat_pk);
+                    return await getRepository(ChatMessage)
+                        .createQueryBuilder('chat_messages')
+                        .select('chat_messages')
+                        .leftJoinAndSelect("chat_messages.chat_messages_read", "chat_messages_read")
+
+                        .andWhere("chat_messages.chat_pk IN (:...pk)", { pk: [chat_pk] })
+                        .getMany()
+                        ;
+                    // console.log('messages', messages);
+                    // messages.forEach(message => {
+                    //     console.log(message);
+                    //     console.log(message['chat_message_read']);
+                    //     // let found = false;
+                    //     // message.chat_message_read.forEach(read => {
+                    //     //     if (read.user_pk == user.pk) {
+                    //     //         found = true;
+                    //     //     }
+                    //     // });
+                    //     // console.log('found', found);
+                    //     // if (!found) {
+                    //     //     const message_read = new ChatMessageRead();
+                    //     //     message_read.chat_pk = chat_pk;
+                    //     //     message_read.chat_message_pk = message.pk;
+                    //     //     message_read.user_pk = user.pk;
+                    //     //     message_read.read = true;
+                    //     //     EntityManager.save(message_read);
+                    //     // }
+                    // });
+                    // console.log('user', user.pk);
+                    // console.log('messages', messages);
+                    // await EntityManager.update(ChatParticipant, { chat_pk, user_pk: user.pk }, { unread: false });
+                    // return { status: true };
                 }
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return [];
         } finally {
             // console.log('finally...');
         }

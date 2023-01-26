@@ -34,6 +34,7 @@ import { Faq } from 'src/faq/entities/faq.entity';
 import { Complaint } from 'src/complaints/entities/complaint.entity';
 import { ComplaintMessage } from 'src/complaints/entities/complaint-message.entity';
 import { Feedback } from 'src/feedback/entities/feedback.entity';
+import { ChatMessagesRead } from 'src/chat/entities/chat-messages-read.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -186,6 +187,10 @@ export class User extends BaseEntity {
     @OneToMany('ChatMessage', (chat_message: ChatMessage) => chat_message.user)
     @JoinColumn({ name: 'pk' })
     chat_message: Array<ChatMessage>;
+
+    @OneToMany('ChatMessagesRead', (chat_message_read: ChatMessagesRead) => chat_message_read.user)
+    @JoinColumn({ name: 'pk' })
+    chat_messages_read: Array<ChatMessagesRead>;
 
     @OneToMany('UserCart', (user_cart: UserCart) => user_cart.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_cart_pk' })
