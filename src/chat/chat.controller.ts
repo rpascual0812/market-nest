@@ -86,7 +86,7 @@ export class ChatController {
     @Get('user/:pk')
     async findByUser(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
         let chat = await this.chatService.findByUser(pk, req.user, req.query);
-        console.log('1 chat', chat.length);
+        // console.log('1 chat', chat.length);
         if (chat.length == 0) {
             const newChat = await this.chatService.create(pk, req.user, req.query);
             console.log('2 chat', newChat);
@@ -96,7 +96,7 @@ export class ChatController {
         }
 
         chat = chat[0];
-        console.log(4, chat);
+        // console.log(4, chat);
         if (!chat) {
             chat = await this.chatService.findByUser(pk, req.user, req.query);
             chat = chat[0];
