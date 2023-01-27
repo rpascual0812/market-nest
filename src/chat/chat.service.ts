@@ -51,8 +51,23 @@ export class ChatService {
     }
 
     async findAll(filters: any, user: any) {
+        // console.log(filters);
         try {
-            return await getRepository(Chat)
+            let chat_pks = [];
+            if (filters.hasOwnProperty('keyword') && filters.keyword != '') {
+                const result = await this.participantFirst(filters, user);
+                chat_pks = result[0].map(({ chat_pk }) => chat_pk);
+            }
+
+            if (filters.hasOwnProperty('filter') && filters.filter == 'Show only unread') {
+                // const result = await this.participantFirst(filters, user);
+                const result = await this.fetchUnread(filters, user);
+                // console.log('result', result);
+                chat_pks = result.map(({ pk }) => pk);
+            }
+            // console.log('chat pks ', chat_pks);
+
+            const chats = await getRepository(Chat)
                 .createQueryBuilder('chats')
                 .select('chats')
 
@@ -74,7 +89,6 @@ export class ChatService {
                     'users',
                     'chat_participants.user=users.pk',
                 )
-                //     // user documents
                 .leftJoinAndMapOne(
                     'users.user_document',
                     UserDocument,
@@ -89,19 +103,18 @@ export class ChatService {
                 )
 
                 .where('chats.archived=false')
-                // .andWhere('chats.type = :type', { type: filters.type })
-                // .andWhere('chat_participants.user_pk = :user_pk', { user_pk: user.pk })
                 .andWhere(filters.role == 'end-user' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
                         .andWhere("chat_participants.user_pk = :user_pk", { user_pk: user.pk })
                 }) : '1=1')
-                .andWhere(filters.hasOwnProperty('keyword') && filters.keyword != '' ? new Brackets(qb => {
-                    qb.where("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
-                        .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
-                }) : '1=1')
-
                 .andWhere(filters.role == 'admin' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
+                }) : '1=1')
+                .andWhere(filters.role == 'admin' ? new Brackets(qb => {
+                    qb.where("chats.type = :type", { type: filters.type })
+                }) : '1=1')
+                .andWhere(chat_pks.length > 0 ? new Brackets(qb => {
+                    qb.where('chats.pk IN (:...pk)', { pk: chat_pks })
                 }) : '1=1')
 
                 .orderBy('chats.last_message_date', 'DESC')
@@ -109,6 +122,67 @@ export class ChatService {
                 .take(filters.take)
                 .getManyAndCount()
                 ;
+
+            // console.log(chats);
+            return chats;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async participantFirst(filters: any, user: any) {
+        try {
+            return await getRepository(ChatParticipant)
+                .createQueryBuilder('chat_participants')
+                .select('chat_participants')
+                .leftJoinAndMapOne(
+                    'chat_participants.user',
+                    User,
+                    'users',
+                    'chat_participants.user=users.pk',
+                )
+                .leftJoinAndMapOne(
+                    'users.user_document',
+                    UserDocument,
+                    'user_documents',
+                    'users.pk=user_documents.user_pk and user_documents.type = \'profile_photo\''
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                // .where("chat_participants.user_pk IN (:...pk)", { pk: [user.pk] })
+                .where(filters.hasOwnProperty('keyword') && filters.keyword != '' ? new Brackets(qb => {
+                    qb.where("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                }) : '1=1')
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async fetchUnread(filters: any, user: any) {
+        try {
+            const entityManager = getManager();
+            return await entityManager.query(`
+            select
+                chats.*
+            from chats
+            where chats.pk NOT IN (select chat_pk from chat_messages_read where user_pk = $1)
+            and chats.pk IN (select chat_pk from chat_participants where user_pk = $1)
+            `, [user.pk]);
         } catch (error) {
             console.log(error);
             // SAVE ERROR
