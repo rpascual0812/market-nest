@@ -158,7 +158,10 @@ export class ChatService {
                     'user_documents.document_pk=user_doc.pk',
                 )
                 // .where("chat_participants.user_pk IN (:...pk)", { pk: [user.pk] })
-                .where(filters.hasOwnProperty('keyword') && filters.keyword != '' ? new Brackets(qb => {
+                .andWhere(filters.hasOwnProperty('user_pk') && filters.user_pk != '' ? new Brackets(qb => {
+                    qb.where("chat_participants.user_pk = :user_pk", { user_pk: filters.user_pk })
+                }) : '1=1')
+                .andWhere(filters.hasOwnProperty('keyword') && filters.keyword != '' ? new Brackets(qb => {
                     qb.where("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                         .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                 }) : '1=1')
@@ -370,7 +373,7 @@ export class ChatService {
         }
     }
 
-    async findMessages(pk: any, filters: any, user: any) {
+    async findMessages(pks: any, filters: any, user: any) {
         // console.log('findMessages', filters);
         try {
             return await getRepository(ChatMessage)
@@ -391,7 +394,7 @@ export class ChatService {
                     'user_documents.document_pk=user_doc.pk',
                 )
                 .where('chat_messages.archived=false')
-                .andWhere('chat_messages.chat_pk = :pk', { pk })
+                .andWhere('chat_messages.chat_pk IN (:...pks)', { pks })
                 .orderBy('chat_messages.date_created', 'DESC')
                 .skip(filters.skip)
                 .take(filters.take)
@@ -468,6 +471,44 @@ export class ChatService {
         }
     }
 
+    async readAllMessages(messages: any, user: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    messages.forEach(async message => {
+                        const messageRead = await ChatMessagesRead.findOne({
+                            where: {
+                                chat_pk: message.chat_pk,
+                                chat_message_pk: message.pk,
+                                user_pk: user.pk
+                            },
+                        });
+
+                        if (!messageRead) {
+                            const messageRead = new ChatMessagesRead();
+                            messageRead.chat_pk = message.chat_pk;
+                            messageRead.chat_message_pk = message.pk;
+                            messageRead.user_pk = user.pk;
+                            messageRead.read = true;
+                            await EntityManager.save(messageRead);
+                        }
+                    });
+
+                    return { status: true };
+                });
+
+        } catch (err) {
+            console.log(err);
+            return { status: false };
+        } finally {
+            setTimeout(async () => {
+                await queryRunner.release();
+            }, 2000);
+        }
+    }
+
     // async readMessages(chat_pk: any, user: any) {
     //     // console.log('read messages', chat_pk, user.pk);
     //     const queryRunner = getConnection().createQueryRunner();
@@ -518,4 +559,6 @@ export class ChatService {
     //         // console.log('finally...');
     //     }
     // }
+
+
 }
