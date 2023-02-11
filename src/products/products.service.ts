@@ -18,6 +18,7 @@ import { ProductSeen } from './entities/product-seen.entity';
 
 import { DateTime } from "luxon";
 import { Account } from 'src/accounts/entities/account.entity';
+import { ProductInterested } from './entities/product-interested.entity';
 
 @Injectable()
 export class ProductsService {
@@ -468,6 +469,23 @@ export class ProductsService {
         }
     }
 
+    async getProductInterest(pks: any, user_pk: any) {
+        try {
+            return await getRepository(ProductInterested)
+                .createQueryBuilder('product_interested')
+                .where("product_interested.product_pk IN (:...pk)", { pk: pks })
+                .andWhere("product_interested.user_pk IN (:...user_pk)", { user_pk: [user_pk] })
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
     async findOneRatingPerUser(data: any, filters: any) {
         try {
             return await ProductRating.findOne({
@@ -600,6 +618,61 @@ export class ProductsService {
             return {
                 status: false
             }
+        }
+    }
+
+    async getInterested(filters: any) {
+        return await getRepository(ProductInterested)
+            .createQueryBuilder('product_interested')
+            .andWhere("product_interested.product_pk = :product_pk", { product_pk: filters.product_pk })
+            .select('product_interested')
+            .leftJoinAndSelect("product_interested.product", "products")
+            .leftJoinAndSelect("product_interested.user", "users")
+            .leftJoinAndSelect("users.user_document", "user_documents")
+            .leftJoinAndMapOne(
+                'user_documents.document',
+                Document,
+                'user_doc',
+                'user_documents.document_pk=user_doc.pk',
+            )
+            .skip(filters.skip)
+            .take(filters.take)
+            .getManyAndCount()
+            ;
+    }
+
+    async setInterest(filters: any, user: any) {
+        console.log(filters);
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const product = new ProductInterested();
+                    product.user_pk = user.pk;
+                    product.product_pk = filters.product_pk;
+                    const newInterest = await EntityManager.save(product);
+
+                    // LOGS
+                    const log = new Log();
+                    log.model = 'products';
+                    log.model_pk = newInterest.pk;
+                    log.details = JSON.stringify({
+                        user_pk: user.pk,
+                        uuid: filters.product_pk,
+                    });
+                    log.user_pk = user.pk;
+                    await EntityManager.save(log);
+
+                    return { status: true, data: newInterest };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            await queryRunner.release();
         }
     }
 

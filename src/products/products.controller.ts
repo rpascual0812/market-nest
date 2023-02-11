@@ -26,7 +26,6 @@ export class ProductsController {
 
     @Get()
     async findAll(@Request() req: any) {
-        // console.log(req.query);
         const products = await this.productsService.findAll(req.query);
         // console.log('products', products[0]);
         // console.log('length', products[0].length);
@@ -44,6 +43,7 @@ export class ProductsController {
             // const addresses = await this.productsService.getSellerAddresses(seller_pks, req.query);
             const ratings = await this.productsService.getProductRatings(pks, req.query);
             const totalRatings = await this.productsService.getProductTotalRatings(pks);
+            const userInterests = req.query.interest_user_pk ? await this.productsService.getProductInterest(pks, req.query.interest_user_pk) : [];
 
             products[0].forEach(product => {
                 if (!product.hasOwnProperty('product_documents')) {
@@ -108,6 +108,18 @@ export class ProductsController {
                     sellerAddresses[0].forEach(address => {
                         if (product.seller_pk == address.seller_pk) {
                             product['seller_addresses'].push(address);
+                        }
+                    });
+                }
+
+                if (!product.hasOwnProperty('interested')) {
+                    product['interested'] = [];
+                }
+
+                if (userInterests[0]) {
+                    userInterests[0].forEach(interest => {
+                        if (product.pk == interest.product_pk && req.query.interest_user_pk == interest.user_pk) {
+                            product['interested'].push(interest);
                         }
                     });
                 }
@@ -284,5 +296,35 @@ export class ProductsController {
         return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
 
+    // @UseGuards(JwtAuthGuard)
+    @Get(':product_pk/interested')
+    async getInterested(@Request() req: any, @Response() res: any) {
+        const filters = {
+            product_pk: req.params.product_pk,
+            skip: req.query.skip,
+            take: req.query.take,
+        };
+        const data = await this.productsService.getInterested(filters);
+        console.log(data);
 
+        if (data) {
+            return res.status(HttpStatus.OK).json({
+                status: true,
+                data: data[0],
+                total: data[1]
+            });
+        }
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ status: 'failed' });
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':product_pk/interested')
+    async setInterest(@Request() req: any, @Response() res: any) {
+        console.log(req.params, req.user);
+        const data = await this.productsService.setInterest(req.params, req.user);
+        if (data) {
+            return res.status(HttpStatus.OK).json({ status: 'success', data: data });
+        }
+        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
+    }
 }
