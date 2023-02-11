@@ -18,9 +18,10 @@ export class ComplaintsController {
         throw new InternalServerErrorException();
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get()
-    findAll(@Request() req: any, @Body() body: any) {
-        return this.complaintsService.findAll(req.query);
+    async findAll(@Request() req: any, @Body() body: any) {
+        return await this.complaintsService.findAll(req.query, req.user);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -53,9 +54,15 @@ export class ComplaintsController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get(':complaint_pk/messages/:pk')
+    async findMessage(@Param('complaint_pk') complaint_pk: any, @Param('pk') pk: any, @Body() body: any, @Request() req: any) {
+        return await this.complaintsService.findMessage(pk);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Post(':pk/messages')
     async sendMessage(@Param('pk') pk: any, @Body() body: any, @Request() req: any) {
-        console.log(pk, body, req.user);
+        // console.log(pk, body, req.user);
         const data = await this.complaintsService.sendMessage(pk, body, req.user);
 
         if (data) {

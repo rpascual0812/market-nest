@@ -35,6 +35,7 @@ import { Complaint } from 'src/complaints/entities/complaint.entity';
 import { ComplaintMessage } from 'src/complaints/entities/complaint-message.entity';
 import { Feedback } from 'src/feedback/entities/feedback.entity';
 import { ChatMessagesRead } from 'src/chat/entities/chat-messages-read.entity';
+import { ProductInterested } from 'src/products/entities/product-interested.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -199,6 +200,10 @@ export class User extends BaseEntity {
     @OneToMany('ProductRating', (product_rating: ProductRating) => product_rating.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_rating_pk' })
     product_rating: ProductRating;
+
+    @OneToMany('ProductInterested', (product_interested: ProductInterested) => product_interested.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'product_interested_pk' })
+    product_interested: ProductInterested;
 
     @OneToMany('ProductSeen', (product_seen: ProductSeen) => product_seen.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_seen_pk' })

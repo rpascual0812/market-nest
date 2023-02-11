@@ -6,6 +6,7 @@ import { UserCart } from 'src/users/entities/user-cart.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double, ManyToMany, BaseEntity } from 'typeorm';
 import { ProductDocument } from './product-document.entity';
+import { ProductInterested } from './product-interested.entity';
 import { ProductRating } from './product-ratings.entity';
 import { ProductSeen } from './product-seen.entity';
 
@@ -88,6 +89,10 @@ export class Product extends BaseEntity {
     @OneToMany('ProductRating', (product_rating: ProductRating) => product_rating.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_rating_pk' })
     product_rating: ProductRating[];
+
+    @OneToMany('ProductInterested', (product_interested: ProductInterested) => product_interested.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'product_interested_pk' })
+    product_interested: ProductInterested[];
 
     @OneToMany('ProductSeen', (product_seen: ProductSeen) => product_seen.product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'product_seen_pk' })

@@ -1,6 +1,6 @@
 import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Log } from 'src/logs/entities/log.entity';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Brackets, getConnection, getRepository, Repository } from 'typeorm';
 import { ComplaintMessage } from './entities/complaint-message.entity';
 import { Complaint } from './entities/complaint.entity';
 import { Document } from 'src/documents/entities/document.entity';
@@ -9,18 +9,11 @@ import { ComplaintDocument } from './entities/complaint-document.entity';
 
 @Injectable()
 export class ComplaintsService {
-    async findAll(filters: any) {
+    async findAll(filters: any, user: any) {
         try {
             const complaints = await getRepository(Complaint)
                 .createQueryBuilder('complaints')
                 .select('complaints')
-                .andWhere(
-                    filters.hasOwnProperty('keyword') && filters.keyword != '' ?
-                        "complaints.subject ILIKE :keyword" : "1=1",
-                    { keyword: `%${filters.keyword}%` }
-                )
-                .andWhere("complaints.status = :status", { status: filters.status })
-                .andWhere("complaints.type = :type", { type: filters.type })
                 .leftJoinAndSelect("complaints.user", "users")
                 .leftJoinAndMapOne(
                     'complaints.complaint_document',
@@ -34,7 +27,23 @@ export class ComplaintsService {
                     'documents',
                     'complaint_documents.document_pk=documents.pk',
                 )
+                .andWhere(
+                    filters.hasOwnProperty('keyword') && filters.keyword != '' ?
+                        "complaints.subject ILIKE :keyword" : "1=1",
+                    { keyword: `%${filters.keyword}%` }
+                )
+                .andWhere(filters.hasOwnProperty('status') && filters.status ? new Brackets(qb => {
+                    qb.where("complaints.status = :status", { status: filters.status })
+                }) : '1=1')
+                .andWhere(filters.hasOwnProperty('type') && filters.type ? new Brackets(qb => {
+                    qb.where("complaints.type = :type", { type: filters.type })
+                }) : '1=1')
+                .andWhere(filters.hasOwnProperty('user') && filters.user ? new Brackets(qb => {
+                    qb.where("complaints.user_pk = :user_pk", { user_pk: user.pk })
+                }) : '1=1')
                 .orderBy('complaints.date_created', 'DESC')
+                .skip(filters.skip)
+                .take(filters.take)
                 .getManyAndCount()
                 ;
 
@@ -73,6 +82,37 @@ export class ComplaintsService {
                 )
                 .orderBy('complaint_messages.date_created')
                 .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async findMessage(pk: any) {
+        try {
+            return await getRepository(ComplaintMessage)
+                .createQueryBuilder('complaint_messages')
+                .select('complaint_messages')
+                .andWhere("complaint_messages.pk = :pk", { pk: parseInt(pk) })
+                .leftJoinAndSelect("complaint_messages.user", "users")
+                .leftJoinAndMapOne(
+                    'users.user_document',
+                    UserDocument,
+                    'user_documents',
+                    'users.pk=user_documents.user_pk and user_documents.type = \'profile_photo\''
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                .orderBy('complaint_messages.date_created')
+                .getOne()
                 ;
         } catch (error) {
             console.log(error);
