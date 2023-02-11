@@ -320,7 +320,6 @@ export class ProductsController {
     @UseGuards(JwtAuthGuard)
     @Post(':product_pk/interested')
     async setInterest(@Request() req: any, @Response() res: any) {
-        console.log(req.params, req.user);
         const data = await this.productsService.setInterest(req.params, req.user);
         if (data) {
             return res.status(HttpStatus.OK).json({ status: 'success', data: data });
