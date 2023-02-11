@@ -642,30 +642,47 @@ export class ProductsService {
     }
 
     async setInterest(filters: any, user: any) {
-        console.log(filters);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    const product = new ProductInterested();
-                    product.user_pk = user.pk;
-                    product.product_pk = filters.product_pk;
-                    const newInterest = await EntityManager.save(product);
 
-                    // LOGS
-                    const log = new Log();
-                    log.model = 'products';
-                    log.model_pk = newInterest.pk;
-                    log.details = JSON.stringify({
-                        user_pk: user.pk,
-                        uuid: filters.product_pk,
-                    });
-                    log.user_pk = user.pk;
-                    await EntityManager.save(log);
+                    let interest = await EntityManager.findOne(ProductInterested, { 'user_pk': user.pk, 'product_pk': filters.product_pk });
 
-                    return { status: true, data: newInterest };
+                    if (interest) {
+                        await getConnection()
+                            .createQueryBuilder()
+                            .delete()
+                            .from(ProductInterested)
+                            .where("user_pk = :user_pk", { user_pk: user.pk })
+                            .where("product_pk = :product_pk", { product_pk: filters.product_pk })
+                            .execute();
+
+                        interest = null;
+                    }
+                    else {
+                        const product = new ProductInterested();
+                        product.user_pk = user.pk;
+                        product.product_pk = filters.product_pk;
+                        interest = await EntityManager.save(product);
+
+                        // LOGS
+                        const log = new Log();
+                        log.model = 'products';
+                        log.model_pk = interest.pk;
+                        log.details = JSON.stringify({
+                            user_pk: user.pk,
+                            uuid: filters.product_pk,
+                            status: 'deleted',
+                            date_created: DateTime.now
+                        });
+                        log.user_pk = user.pk;
+                        await EntityManager.save(log);
+                    }
+
+                    return { status: true, data: interest };
                 }
             );
         } catch (err) {
