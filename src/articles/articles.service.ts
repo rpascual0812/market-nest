@@ -65,7 +65,7 @@ export class ArticlesService {
 
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
-        console.log('creating article', form);
+        // console.log('creating/updating article', form);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -73,37 +73,38 @@ export class ArticlesService {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
                     let article = null;
+                    let articleObj = null;
                     if (form.pk) {
-                        article = await Article.findOne({
-                            pk: form.pk
-                        });
+                        const filters = { 'pk': form.pk };
+                        articleObj = await EntityManager.update(Article, filters, { title: form.title, description: form.description, url: form.url });
                     }
                     else {
                         article = new Article();
+                        article.title = form.title;
+                        article.description = form.description;
+                        article.url = form.url;
+                        article.user_pk = user.pk;
+                        articleObj = await EntityManager.save(article);
                     }
 
-                    article.title = form.title;
-                    article.description = form.description;
-                    article.url = form.url;
-                    article.user_pk = user.pk;
-                    const _article = await EntityManager.save(article);
-
-                    if (form.image.hasOwnProperty('pk')) {
-                        await EntityManager.update(ArticleDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
-                    }
-                    else {
-                        let articleDocument = new ArticleDocument();
-                        articleDocument.user_pk = user.pk;
-                        articleDocument.article_pk = _article.pk;
-                        articleDocument.type = 'background';
-                        articleDocument.document_pk = form.image.document.pk;
-                        await EntityManager.save(articleDocument);
+                    if (form.image) {
+                        if (form.image.hasOwnProperty('pk')) {
+                            await EntityManager.update(ArticleDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
+                        }
+                        else {
+                            let articleDocument = new ArticleDocument();
+                            articleDocument.user_pk = user.pk;
+                            articleDocument.article_pk = articleObj.pk;
+                            articleDocument.type = 'background';
+                            articleDocument.document_pk = form.image.document.pk;
+                            await EntityManager.save(articleDocument);
+                        }
                     }
 
                     // LOGS
                     const log = new Log();
                     log.model = 'article';
-                    log.model_pk = article.pk;
+                    log.model_pk = form.pk ? form.pk : article.pk;
                     log.details = JSON.stringify({
                         title: form.title,
                         details: form.description,

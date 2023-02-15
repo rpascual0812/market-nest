@@ -520,7 +520,7 @@ export class UsersService {
     // }
 
     async update(data: any) {
-        // console.log('updating user', data);
+        console.log('updating user', data);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -536,6 +536,9 @@ export class UsersService {
                     user.mobile_number = data.mobile;
                     user.about = data.about;
                     const updatedUser = await EntityManager.save(user);
+
+                    const usera = await EntityManager.update(UserAddress, { user_pk: data.pk }, { province_code: data.province, city_code: data.city, area_pk: data.area });
+                    console.log(usera);
 
                     if (data.display_photo) {
                         let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
