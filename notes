@@ -53,6 +53,9 @@ scp -r market-admin samdhana@13.250.104.113:/home/samdhana/
 
 scp -r /var/www/html/samdhana-admin/dist/market-admin samdhana@13.250.104.113:/var/www/html/
 
+
+
+
 market
 cd /home/rafael/Documents/Market && ./market
 

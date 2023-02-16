@@ -23,7 +23,8 @@ export class SlidersController {
         const data = await this.slidersService.save(body, req.user);
 
         if (data) {
-            return data;
+            const slider = await this.slidersService.find({ pk: data.data.pk });
+            return slider;
         }
 
         throw new InternalServerErrorException();
