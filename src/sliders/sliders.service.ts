@@ -59,9 +59,48 @@ export class SlidersService {
         }
     }
 
+    async find(filters: any) {
+        try {
+            const slider = await getRepository(Slider)
+                .createQueryBuilder('sliders')
+                .select('sliders')
+                .leftJoinAndMapMany(
+                    'sliders.slider_document',
+                    SliderDocument,
+                    'slider_documents',
+                    'sliders.pk=slider_documents.slider_pk'
+                )
+                .leftJoinAndMapOne(
+                    'slider_documents.document',
+                    Document,
+                    'documents',
+                    'slider_documents.document_pk=documents.pk',
+                )
+                .leftJoinAndSelect("sliders.user", "users")
+                .where('sliders.archived=false')
+                .andWhere("sliders.pk = :pk", { pk: filters.pk })
+                .skip(filters.skip)
+                .take(filters.take)
+                .orderBy('sliders.order', 'ASC')
+                .addOrderBy('slider_documents.pk', 'ASC')
+                .getOne()
+                ;
+
+            return {
+                status: true,
+                data: slider,
+            }
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
-        console.log('creating banner', form);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -78,11 +117,20 @@ export class SlidersService {
                         slider = new Slider();
                     }
 
+                    // get the last slider's order
+                    const lastSlider = await getRepository(Slider)
+                        .createQueryBuilder('sliders')
+                        .select('sliders')
+                        .orderBy('sliders.order', 'DESC')
+                        .getOne()
+                        ;
+
                     slider.type = 'home'; // default type of sliders for now.
                     slider.title = form.title;
                     slider.details = form.details;
                     slider.user_pk = user.pk;
-                    const _slider = await EntityManager.save(slider);
+                    slider.order = lastSlider.order + 1
+                    slider = await EntityManager.save(slider);
 
                     if (form.icon) {
                         if (form.icon.hasOwnProperty('pk')) {
@@ -91,7 +139,7 @@ export class SlidersService {
                         else {
                             let sliderDocument = new SliderDocument();
                             sliderDocument.user_pk = user.pk;
-                            sliderDocument.slider_pk = _slider.pk;
+                            sliderDocument.slider_pk = slider.pk;
                             sliderDocument.type = 'icon';
                             sliderDocument.document_pk = form.icon.document.pk;
                             await EntityManager.save(sliderDocument);
@@ -105,7 +153,7 @@ export class SlidersService {
                         else {
                             let sliderDocument = new SliderDocument();
                             sliderDocument.user_pk = user.pk;
-                            sliderDocument.slider_pk = _slider.pk;
+                            sliderDocument.slider_pk = slider.pk;
                             sliderDocument.type = 'background';
                             sliderDocument.document_pk = form.background.document.pk;
                             await EntityManager.save(sliderDocument);
@@ -130,7 +178,7 @@ export class SlidersService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, data: null, code: err.code };
         } finally {
             await queryRunner.release();
         }
