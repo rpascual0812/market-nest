@@ -1,6 +1,6 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository, getConnection, Collection, Brackets } from 'typeorm';
+import { getRepository, Repository, getConnection, Collection, Brackets, getManager } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { Log } from 'src/logs/entities/log.entity';
 
@@ -395,6 +395,186 @@ export class ProductsService {
         }
     }
 
+    async findBestSellers(filters: any) {
+        try {
+            let types = [];
+            let isFutureCrop = false;
+            if (filters.hasOwnProperty('type') && filters.type) {
+                types = filters.type.split(',');
+                types.forEach((type, i) => {
+                    if (type == 'future_crop') {
+                        isFutureCrop = true;
+                        types[i] = 'product';
+                    }
+                });
+            }
+
+            return await getRepository(Product)
+                .createQueryBuilder('products')
+                .select('products')
+                .addSelect(
+                    qb =>
+                        qb
+                            .select('COUNT(*)', 'sales')
+                            .from(Order, 'orders')
+                            .where('orders.product_pk = products.pk'),
+                    'sales',
+                )
+                .where('products.archived=false')
+                .andWhere("products.type = 'product'")
+                .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type: types })
+                .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
+                .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_available) = :year" : '1=1', { year: filters.year })
+                .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
+                .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
+                .andWhere(isFutureCrop ? "products.date_available > :date" : '1=1', { date: new Date() })
+                .andWhere(!isFutureCrop ? "products.date_available <= :date" : '1=1', { date: new Date() })
+
+                .andWhere(filters.hasOwnProperty('filter') && filters.filter == 'All' ? new Brackets(qb => {
+                    qb.where("products.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("seller_addresses.address ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("provinces.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("cities.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("areas.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                }) : '1=1')
+                .andWhere(
+                    filters.hasOwnProperty('filter') && filters.filter == 'Products' &&
+                        filters.hasOwnProperty('keyword') ?
+                        "products.name ILIKE :keyword" :
+                        '1=1', { keyword: `%${filters.keyword}%` }
+                )
+                .skip(filters.skip)
+                .take(filters.take)
+                .orderBy('sales', 'DESC')
+                .getRawMany()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return []
+        }
+    }
+
+    async findHighestRated(filters: any) {
+        try {
+            let types = [];
+            let isFutureCrop = false;
+            if (filters.hasOwnProperty('type') && filters.type) {
+                types = filters.type.split(',');
+                types.forEach((type, i) => {
+                    if (type == 'future_crop') {
+                        isFutureCrop = true;
+                        types[i] = 'product';
+                    }
+                });
+            }
+
+            return await getRepository(Product)
+                .createQueryBuilder('products')
+                .select('products')
+                .addSelect(
+                    qb =>
+                        qb
+                            .select('COALESCE(SUM(rating),SUM(rating),0)', 'rating')
+                            .from(ProductRating, 'product_ratings')
+                            .where('product_ratings.product_pk = products.pk'),
+                    'rating',
+                )
+                .where('products.archived=false')
+                .andWhere("products.type = 'product'")
+                .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type: types })
+                .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
+                .andWhere(filters.hasOwnProperty('year') ? "date_part('year', products.date_available) = :year" : '1=1', { year: filters.year })
+                .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
+                .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
+                .andWhere(isFutureCrop ? "products.date_available > :date" : '1=1', { date: new Date() })
+                .andWhere(!isFutureCrop ? "products.date_available <= :date" : '1=1', { date: new Date() })
+
+                .andWhere(filters.hasOwnProperty('filter') && filters.filter == 'All' ? new Brackets(qb => {
+                    qb.where("products.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("seller_addresses.address ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("provinces.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("cities.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("areas.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                }) : '1=1')
+                .andWhere(
+                    filters.hasOwnProperty('filter') && filters.filter == 'Products' &&
+                        filters.hasOwnProperty('keyword') ?
+                        "products.name ILIKE :keyword" :
+                        '1=1', { keyword: `%${filters.keyword}%` }
+                )
+                .orderBy('rating', 'DESC')
+                .skip(filters.skip)
+                .take(filters.take)
+                .getRawMany()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return []
+        }
+    }
+
+    async findByPks(pks: any) {
+        try {
+            return await getRepository(Product)
+                .createQueryBuilder('products')
+                .where('products.archived=false')
+                .where('products.pk in (:...pks)', { pks })
+
+                .leftJoinAndSelect("products.user", "users")
+                .select('products')
+                .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+
+                .leftJoinAndSelect("users.seller", "sellers")
+                .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
+
+                .leftJoinAndSelect("users.account", "accounts")
+                .addSelect(['accounts.pk'])
+
+                .leftJoinAndSelect("products.measurement", "measurements")
+                .leftJoinAndSelect("products.country", "countries")
+                .leftJoinAndSelect("products.category", "categories")
+
+                // user addresses
+                .leftJoinAndMapMany(
+                    'sellers.seller_address',
+                    SellerAddress,
+                    'seller_addresses',
+                    'sellers.pk=seller_addresses.seller_pk'
+                )
+                .leftJoinAndSelect("seller_addresses.province", "provinces")
+                .leftJoinAndSelect("seller_addresses.city", "cities")
+                .leftJoinAndSelect("seller_addresses.area", "areas")
+
+                // user documents
+                .leftJoinAndMapMany(
+                    'products.user_document',
+                    UserDocument,
+                    'user_documents',
+                    'products.user_pk=user_documents.user_pk'
+                )
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'user_doc',
+                    'user_documents.document_pk=user_doc.pk',
+                )
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
     async getProductDocuments(pks: any, filters: any) {
         try {
             return await getRepository(ProductDocument)
@@ -692,5 +872,7 @@ export class ProductsService {
             await queryRunner.release();
         }
     }
+
+
 
 }

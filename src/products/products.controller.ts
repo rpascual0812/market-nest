@@ -26,10 +26,25 @@ export class ProductsController {
 
     @Get()
     async findAll(@Request() req: any) {
-        const products = await this.productsService.findAll(req.query);
+        let products;
+        let initialProducts;
+        if (req.query.orderBy == 'Best Seller') {
+            initialProducts = await this.productsService.findBestSellers(req.query);
+            const pks = initialProducts.map(product => product.products_pk);
+            products = pks.length > 0 ? await this.productsService.findByPks(pks) : [];
+        }
+        else if (req.query.orderBy == 'Average Rating') {
+            initialProducts = await this.productsService.findHighestRated(req.query);
+            const pks = initialProducts.map(product => product.products_pk);
+            products = pks.length > 0 ? await this.productsService.findByPks(pks) : [];
+        }
+        else {
+            products = await this.productsService.findAll(req.query);
+        }
+
         // console.log('products', products[0]);
         // console.log('length', products[0].length);
-        if (products[1] > 0) {
+        if (products && products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
             const seller_pks = products[0].map(({ user }) => user && user.seller ? user.seller.pk : null);
@@ -125,19 +140,27 @@ export class ProductsController {
                 }
             });
 
+            // if the category is is best seller or average rating
+            // rearrange the array here
+            let newProducts = [];
+            if (initialProducts) {
+                initialProducts.forEach((product, i) => {
+                    products[0].forEach(newProduct => {
+                        if (newProduct.pk == product.products_pk) {
+                            newProducts[i] = newProduct;
+                        }
+                    })
+                });
+            }
+            else {
+                newProducts = products[0];
+            }
+
             return {
                 status: true,
-                data: products[0],
+                data: newProducts,
                 total: products[1]
             }
-            // products[0].forEach(async (product, i) => {
-            //     const documents = await this.productsService.getProductDocuments(product['pk'], req.query);
-            //     products[0][i]['document'] = documents;
-            //     newProducts.push(product);
-
-            //     products['data'] = newProducts;
-            //     return products;
-            // });
         }
         else {
             return {
