@@ -185,6 +185,30 @@ export class SlidersService {
     }
 
     @UsePipes(ValidationPipe)
+    async rearrange(pks: any, user: any) {
+        // console.log('rearranging... ', pks);
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    pks.forEach((pk, i) => {
+                        EntityManager.update(Slider, { pk }, { order: (i + 1) });
+                    });
+
+                    return { status: true, data: [] };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    @UsePipes(ValidationPipe)
     async delete(pk: any, user: any) {
         console.log('deleting banner', pk);
         const queryRunner = getConnection().createQueryRunner();

@@ -18,6 +18,19 @@ export class SlidersController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Post('rearrange')
+    async rearrange(@Request() req: any, @Body() body: any) {
+        console.log(body.pks);
+        const data = await this.slidersService.rearrange(body.pks, req.user);
+
+        if (data) {
+            console.log(data);
+        }
+
+        throw new InternalServerErrorException();
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Post()
     async save(@Request() req: any, @Body() body: any) {
         const data = await this.slidersService.save(body, req.user);
