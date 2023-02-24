@@ -43,8 +43,8 @@ export class ProductsController {
         }
 
         // console.log('products', products[0]);
-        // console.log('length', products[0].length);
-        if (products && products[1] > 0) {
+        // console.log('products', products);
+        if (products && products[0].length > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
             const seller_pks = products[0].map(({ user }) => user && user.seller ? user.seller.pk : null);
@@ -57,7 +57,8 @@ export class ProductsController {
             // console.log(seller_pks, sellerAddresses);
             // const addresses = await this.productsService.getSellerAddresses(seller_pks, req.query);
             const ratings = await this.productsService.getProductRatings(pks, req.query);
-            const totalRatings = await this.productsService.getProductTotalRatings(pks);
+
+            const totalRatings = pks.length > 0 ? await this.productsService.getProductTotalRatings(pks) : null;
             const userInterests = req.query.interest_user_pk ? await this.productsService.getProductInterest(pks, req.query.interest_user_pk) : [];
 
             products[0].forEach(product => {
@@ -94,7 +95,7 @@ export class ProductsController {
                     product['product_rating_count'] = 0;
                 }
                 // Append product rating total
-                if (totalRatings['raw']) {
+                if (totalRatings && totalRatings['raw']) {
                     totalRatings['raw'].forEach(rating => {
                         if (product.pk == rating.product_pk) {
                             product['product_rating_count'] = rating.count;
@@ -328,7 +329,7 @@ export class ProductsController {
             take: req.query.take,
         };
         const data = await this.productsService.getInterested(filters);
-        console.log(data);
+        // console.log(data);
 
         if (data) {
             return res.status(HttpStatus.OK).json({
