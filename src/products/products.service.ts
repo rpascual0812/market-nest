@@ -280,6 +280,7 @@ export class ProductsService {
 
             let types = [];
             let isFutureCrop = false;
+            let all = false;
             if (filters.hasOwnProperty('type') && filters.type) {
                 types = filters.type.split(',');
                 types.forEach((type, i) => {
@@ -287,9 +288,13 @@ export class ProductsService {
                         isFutureCrop = true;
                         types[i] = 'product';
                     }
+                    else if (type == 'all') {
+                        all = true;
+                    }
                 });
             }
-
+            // console.log('filter', filters);
+            // console.log('all', all);
             // console.log('types', types, isFutureCrop);
             return await getRepository(Product)
                 .createQueryBuilder('products')
@@ -301,7 +306,7 @@ export class ProductsService {
                 .andWhere(filters.hasOwnProperty('createdBy') ? "products.user_pk = :createdBy" : '1=1', { createdBy: filters.createdBy })
                 .andWhere(filters.hasOwnProperty('categoryFilter') && filters.categoryFilter != '0' ? "products.category_pk = :category_pk" : '1=1', { category_pk: filters.categoryFilter })
                 .andWhere(isFutureCrop ? "products.date_available > :date" : '1=1', { date: new Date() })
-                .andWhere(!isFutureCrop ? "products.date_available <= :date" : '1=1', { date: new Date() })
+                .andWhere(!all && !isFutureCrop ? "products.date_available <= :date" : '1=1', { date: new Date() })
 
                 .andWhere(filters.hasOwnProperty('filter') && filters.filter == 'Location' ? new Brackets(qb => {
                     qb.where("seller_addresses.address ILIKE :keyword", { keyword: `%${filters.keyword}%` })
@@ -329,8 +334,6 @@ export class ProductsService {
                         '1=1', { keyword: `%${filters.keyword}%` }
                 )
                 // Producer
-
-
                 .leftJoinAndSelect("products.user", "users")
                 .select('products')
                 .addSelect(['users.pk, users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
