@@ -580,5 +580,42 @@ export class UsersService {
 
     }
 
+    async delete(data: any) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const user = await EntityManager.findOne(User, data.pk);
+                    user.archived = true;
+                    await EntityManager.save(user);
+
+                    const account = await EntityManager.findOne(Account, data.account.pk);
+                    account.archived = true;
+                    const updatedAccount = await EntityManager.save(account);
+
+                    // LOGS
+                    const log = new Log();
+                    log.model = 'users';
+                    log.model_pk = user.pk;
+                    log.details = JSON.stringify({
+                        archived: true,
+                    });
+                    log.user_pk = user.pk;
+                    await EntityManager.save(log);
+
+                    return { status: true, data: updatedAccount };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            await queryRunner.release();
+        }
+
+    }
+
 
 }
