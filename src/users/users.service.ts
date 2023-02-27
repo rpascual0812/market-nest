@@ -131,6 +131,11 @@ export class UsersService {
                         "(users.first_name ILIKE :keyword or users.last_name ILIKE :keyword or users.middle_name ILIKE :keyword)" :
                         '1=1', { keyword: `%${filters.keyword}%` }
                 )
+                .andWhere(
+                    filters.hasOwnProperty('archived') && filters.archived != '' ?
+                        "users.archived = :archived" :
+                        '1=1', { archived: `${filters.archived}` }
+                )
                 .andWhere("role_pk != 1")
                 .skip(filters.skip)
                 .take(filters.take)
@@ -520,7 +525,7 @@ export class UsersService {
     // }
 
     async update(data: any) {
-        console.log('updating user', data);
+        // console.log('updating user', data);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -535,10 +540,14 @@ export class UsersService {
                     user.email_address = data.email;
                     user.mobile_number = data.mobile;
                     user.about = data.about;
+                    user.archived = data.archived;
                     const updatedUser = await EntityManager.save(user);
 
-                    const usera = await EntityManager.update(UserAddress, { user_pk: data.pk }, { province_code: data.province, city_code: data.city, area_pk: data.area });
-                    console.log(usera);
+                    const account = await EntityManager.findOne(Account, user.account_pk);
+                    account.archived = data.archived;
+                    await EntityManager.save(account);
+
+                    await EntityManager.update(UserAddress, { user_pk: data.pk }, { province_code: data.province, city_code: data.city, area_pk: data.area });
 
                     if (data.display_photo) {
                         let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
