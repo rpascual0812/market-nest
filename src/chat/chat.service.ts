@@ -103,6 +103,7 @@ export class ChatService {
                 )
 
                 .where('chats.archived=false')
+                .andWhere('chats.last_message is not null')
                 .andWhere(filters.role == 'end-user' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
                         .andWhere("chat_participants.user_pk = :user_pk", { user_pk: user.pk })
