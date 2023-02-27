@@ -45,7 +45,6 @@ export class AuthService {
         this.sessionsService.create(account);
 
         let user = await this.accountsService.findOne(account.pk);
-        console.log(user.user.role_pk, account.role_pk);
         if (user.user.role_pk != account.role_pk) {
             return {};
         }

@@ -58,6 +58,7 @@ export class AccountsService {
                 'user_documents.document_pk=documents.pk',
             )
             .where("accounts.pk = :pk", { pk })
+            .andWhere("accounts.archived = :archived", { archived: false })
             .getOne()
             ;
     }

@@ -224,6 +224,12 @@ export class UsersController {
         }
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Delete()
+    async delete(@Request() req: any) {
+        return await this.usersService.delete(req.user);
+    }
+
     // @Get(':id')
     // findOne(@Param('id') id: string) {
     //     return this.usersService.findOne(+id);
