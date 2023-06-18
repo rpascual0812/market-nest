@@ -359,7 +359,15 @@ export class ProductsService {
                 // .leftJoinAndSelect("user_addresses.city", "cities")
                 // .leftJoinAndSelect("user_addresses.area", "areas")
 
-                // user addresses
+                // seller user details
+                .leftJoinAndMapOne(
+                    'sellers.user',
+                    User,
+                    'users as seller_user',
+                    'sellers.user_pk=users.pk'
+                )
+
+                // seller addresses
                 .leftJoinAndMapMany(
                     'sellers.seller_address',
                     SellerAddress,
@@ -370,7 +378,7 @@ export class ProductsService {
                 .leftJoinAndSelect("seller_addresses.city", "cities")
                 .leftJoinAndSelect("seller_addresses.area", "areas")
 
-                // user documents
+                // seller documents
                 .leftJoinAndMapMany(
                     'products.user_document',
                     UserDocument,
