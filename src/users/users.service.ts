@@ -525,7 +525,7 @@ export class UsersService {
     // }
 
     async update(data: any) {
-        // console.log('updating user', data);
+        console.log('updating user', data);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -537,7 +537,7 @@ export class UsersService {
                     user.last_name = data.last_name;
                     user.gender_pk = data.gender;
                     user.birthdate = data.birthdate;
-                    user.email_address = data.email;
+                    user.email_address = data.email_address;
                     user.mobile_number = data.mobile;
                     user.about = data.about;
                     user.archived = data.archived;
@@ -547,7 +547,7 @@ export class UsersService {
                     account.archived = data.archived;
                     await EntityManager.save(account);
 
-                    await EntityManager.update(UserAddress, { user_pk: data.pk }, { province_code: data.province, city_code: data.city, area_pk: data.area });
+                    await EntityManager.update(UserAddress, { user_pk: data.pk }, { province_code: data.province, city_code: data.city, area_pk: data.area, address: data.address_details });
 
                     if (data.display_photo) {
                         let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
