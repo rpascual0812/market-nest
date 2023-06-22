@@ -3,47 +3,41 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Document } from 'src/documents/entities/document.entity';
 import { Log } from 'src/logs/entities/log.entity';
 import { Brackets, getConnection, getRepository, Repository } from 'typeorm';
-import { ArticleDocument } from './entities/article-document.entity';
-import { Article } from './entities/article.entity';
+import { OnboardingDocument } from './entities/onboarding-document.entity';
+import { Onboarding } from './entities/onboarding.entity';
 
 @Injectable()
-export class ArticlesService {
+export class OnboardingsService {
     constructor(
-        @InjectRepository(Article)
-        private articleRepository: Repository<Article>,
+        @InjectRepository(Onboarding)
+        private onboardingRepository: Repository<Onboarding>,
     ) { }
 
     async findAll(data: any, filters: any) {
         try {
-            const articles = await getRepository(Article)
-                .createQueryBuilder('articles')
-                .select('articles')
+            const onboardings = await getRepository(Onboarding)
+                .createQueryBuilder('onboardings')
+                .select('onboardings')
                 .leftJoinAndMapOne(
-                    'articles.article_document',
-                    ArticleDocument,
-                    'article_documents',
-                    'articles.pk=article_documents.article_pk'
+                    'onboardings.onboarding_document',
+                    OnboardingDocument,
+                    'onboarding_documents',
+                    'onboardings.pk=onboarding_documents.onboarding_pk'
                 )
                 .leftJoinAndMapOne(
-                    'article_documents.document',
+                    'onboarding_documents.document',
                     Document,
                     'documents',
-                    'article_documents.document_pk=documents.pk',
+                    'onboarding_documents.document_pk=documents.pk',
                 )
-                .where('articles.archived=false')
-                // .andWhere(
-                //     filters.hasOwnProperty('keyword') ?
-                //         "articles.title ILIKE :keyword" :
-                //         '1=1', { keyword: `%${filters.keyword}%` }
-                // )
+                .where('onboardings.archived=false')
                 .andWhere(filters.hasOwnProperty('keyword') ? new Brackets(qb => {
-                    qb.where("articles.title ILIKE :keyword", { keyword: `%${filters.keyword}%` })
-                        .orWhere("articles.url ILIKE :keyword", { keyword: `%${filters.keyword}%` })
-                        .orWhere("articles.description ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                    qb.where("onboardings.title ILIKE :keyword", { keyword: `%${filters.keyword}%` })
+                        .orWhere("onboardings.description ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                         .orWhere("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                         .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                 }) : '1=1')
-                .leftJoinAndSelect("articles.user", "users")
+                .leftJoinAndSelect("onboardings.user", "users")
                 .skip(filters.skip)
                 .take(filters.take)
                 .getManyAndCount()
@@ -51,8 +45,8 @@ export class ArticlesService {
 
             return {
                 status: true,
-                data: articles[0],
-                total: articles[1]
+                data: onboardings[0],
+                total: onboardings[1]
             }
         } catch (error) {
             console.log(error);
@@ -65,46 +59,53 @@ export class ArticlesService {
 
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
-        // console.log('creating/updating article', form);
+        console.log('creating/updating onboarding', form);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    let article = null;
-                    let articleObj = null;
+                    let onboarding = null;
+                    let onboardingObj = null;
                     if (form.pk) {
                         const filters = { 'pk': form.pk };
-                        articleObj = await EntityManager.update(Article, filters, { title: form.title, description: form.description, url: form.url });
+                        onboardingObj = await EntityManager.update(Onboarding, filters, { title: form.title, description: form.description });
                     }
                     else {
-                        article = new Article();
-                        article.title = form.title;
-                        article.description = form.description;
-                        article.url = form.url;
-                        article.user_pk = user.pk;
-                        articleObj = await EntityManager.save(article);
+                        const queue = await getRepository(Onboarding)
+                            .createQueryBuilder('onboarding')
+                            .select('onboarding')
+                            .orderBy('queue', 'DESC')
+                            .getOne()
+                            ;
+
+                        onboarding = new Onboarding();
+                        onboarding.title = form.title;
+                        onboarding.description = form.description;
+                        onboarding.user_pk = user.pk;
+                        onboarding.queue = queue ? queue['queue'] + 1 : 1;
+                        onboardingObj = await EntityManager.save(onboarding);
                     }
 
                     if (form.image) {
                         if (form.image.hasOwnProperty('pk')) {
-                            await EntityManager.update(ArticleDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
+                            await EntityManager.update(OnboardingDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
                         }
                         else {
-                            let articleDocument = new ArticleDocument();
-                            articleDocument.user_pk = user.pk;
-                            articleDocument.article_pk = articleObj.pk;
-                            articleDocument.type = 'background';
-                            articleDocument.document_pk = form.image.document.pk;
-                            await EntityManager.save(articleDocument);
+                            let onboardingDocument = new OnboardingDocument();
+                            onboardingDocument.user_pk = user.pk;
+                            onboardingDocument.onboarding_pk = onboardingObj.pk;
+                            onboardingDocument.type = 'background';
+                            onboardingDocument.document_pk = form.image.document.pk;
+                            await EntityManager.save(onboardingDocument);
                         }
                     }
 
                     // LOGS
                     const log = new Log();
-                    log.model = 'article';
-                    log.model_pk = form.pk ? form.pk : article.pk;
+                    log.model = 'onboarding';
+                    log.model_pk = form.pk ? form.pk : onboarding.pk;
                     log.details = JSON.stringify({
                         title: form.title,
                         details: form.description,
@@ -114,7 +115,7 @@ export class ArticlesService {
                     log.user_pk = user.pk;
                     await EntityManager.save(log);
 
-                    return { status: true, data: article };
+                    return { status: true, data: onboarding };
                 }
             );
         } catch (err) {
@@ -127,32 +128,31 @@ export class ArticlesService {
 
     @UsePipes(ValidationPipe)
     async delete(pk: any, user: any) {
-        console.log('deleting banner', pk);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    await EntityManager.update(Article, { pk }, { archived: true });
+                    await EntityManager.update(Onboarding, { pk }, { archived: true });
 
-                    const slider = await Article.findOne({
+                    const onboarding = await Onboarding.findOne({
                         pk
                     });
 
                     // LOGS
                     const log = new Log();
-                    log.model = 'article';
-                    log.model_pk = slider.pk;
+                    log.model = 'onboarding';
+                    log.model_pk = onboarding.pk;
                     log.details = JSON.stringify({
-                        title: slider.title,
-                        description: slider.description,
+                        title: onboarding.title,
+                        description: onboarding.description,
                         archived: true
                     });
                     log.user_pk = user.pk;
                     await EntityManager.save(log);
 
-                    return { status: true, data: slider };
+                    return { status: true, data: onboarding };
                 }
             );
         } catch (err) {

@@ -1,20 +1,19 @@
 import { Document } from 'src/documents/entities/document.entity';
-import { Slider } from 'src/sliders/entities/slider.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
-import { Article } from './article.entity';
+import { Onboarding } from './onboarding.entity';
 
-@Entity({ name: 'article_documents' })
-@Unique(['type', 'article_pk', 'document_pk'])
-export class ArticleDocument {
+@Entity({ name: 'onboarding_documents' })
+@Unique(['type', 'onboarding_pk', 'document_pk'])
+export class OnboardingDocument {
     @PrimaryGeneratedColumn()
     pk: number;
 
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 
-    @Column({ name: 'article_pk', nullable: false })
-    article_pk: number;
+    @Column({ name: 'onboarding_pk', nullable: false })
+    onboarding_pk: number;
 
     @Column({ type: 'text', nullable: false })
     type: string;
@@ -29,13 +28,13 @@ export class ArticleDocument {
      * Relationship
      */
 
-    @ManyToOne(type => User, user => user.article_document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne(type => User, user => user.onboarding_document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'user_pk' })
     user: User;
 
-    @ManyToOne(type => Article, article => article.article_document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'article_pk' })
-    article: Article;
+    @ManyToOne(type => Onboarding, onboarding => onboarding.onboarding_document, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'onboarding_pk' })
+    onboarding: Onboarding;
 
     @OneToOne(type => Document, document => document.product_document, { eager: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'document_pk' })

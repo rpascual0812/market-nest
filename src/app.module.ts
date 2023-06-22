@@ -37,6 +37,7 @@ import { FaqModule } from './faq/faq.module';
 import { ComplaintsModule } from './complaints/complaints.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ReportModule } from './report/report.module';
+import { OnboardingsModule } from './onboardings/onboardings.module';
 
 @Module({
     imports: [
@@ -72,6 +73,7 @@ import { ReportModule } from './report/report.module';
         ComplaintsModule,
         FeedbackModule,
         ReportModule,
+        OnboardingsModule,
         // SellersModule,
     ],
     controllers: [AppController],
