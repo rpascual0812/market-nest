@@ -16,6 +16,7 @@ import { UserAddress } from 'src/users/entities/user-address.entity';
 import { Email } from 'src/emails/entities/email.entity';
 import { SellerService } from 'src/seller/seller.service';
 import { Role } from 'src/roles/entities/role.entity';
+import { Configuration } from 'src/configuration/entities/configuration.entity';
 
 @Injectable()
 export class AuthService {
@@ -124,6 +125,7 @@ export class AuthService {
     }
 
     async register(data: any): Promise<any> {
+        console.log('register', data);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -131,6 +133,21 @@ export class AuthService {
             data.password = await this.accountsService.getHash(data.password);
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
+                    const welcome_email_body = await Configuration.findOne({
+                        group: 'email_templates',
+                        name: 'welcome_email'
+                    });
+
+                    const welcome_email_subject = await Configuration.findOne({
+                        group: 'email_templates',
+                        name: 'welcome_subject'
+                    });
+
+                    let registration_email = welcome_email_body['value'];
+                    registration_email = registration_email.replace(/{first_name}/g, data.first_name);
+                    registration_email = registration_email.replace(/{middle_name}/g, data.middle_name);
+                    registration_email = registration_email.replace(/{last_name}/g, data.last_name);
+
                     // create account                   
                     const account = new Account();
                     account.username = data.email;
@@ -147,7 +164,7 @@ export class AuthService {
                     user.uuid = uuid;
                     user.last_name = data.last_name;
                     user.first_name = data.first_name;
-                    user.first_name = data.first_name;
+                    user.middle_name = data.middle_name;
                     user.birthdate = data.birthday;
                     user.mobile_number = data.mobile;
                     user.email_address = data.email;
@@ -187,8 +204,8 @@ export class AuthService {
                     email.from_name = process.env.SENDER;
                     email.to = data.email;
                     email.to_name = newUser.first_name + ' ' + newUser.last_name;
-                    email.subject = 'Get Started with Samdhana Community Market';
-                    email.body = '<h1>Welcome to Samdhana Community Market</h1>'; // MODIFY: must be a template from the database
+                    email.subject = welcome_email_subject ? welcome_email_subject['value'] : 'Get Started with Lambo Mag-uuma';
+                    email.body = registration_email;
                     await EntityManager.save(email);
 
                     return { status: true, uuid: uuid };

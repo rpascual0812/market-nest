@@ -36,7 +36,6 @@ export class ConfigurationService {
 
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
-        console.log('creating configuration', form.data);
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
 
@@ -45,6 +44,22 @@ export class ConfigurationService {
                 async (EntityManager) => {
                     switch (form.group) {
                         case 'email_templates':
+                            let welcome_subject = await Configuration.findOne({
+                                group: form.group, name: 'welcome_subject'
+                            });
+
+                            if (welcome_subject) {
+                                await EntityManager.update(Configuration, { group: form.group, name: 'welcome_subject' }, { value: form.data.welcome_subject });
+                            }
+                            else {
+                                const _welcome_subject = new Configuration();
+                                _welcome_subject.group = form.group;
+                                _welcome_subject.name = 'welcome_subject';
+                                _welcome_subject.value = form.data.welcome_subject;
+                                _welcome_subject.user_pk = user.pk;
+                                welcome_subject = await EntityManager.save(_welcome_subject);
+                            }
+
                             let welcome_email = await Configuration.findOne({
                                 group: form.group, name: 'welcome_email'
                             });

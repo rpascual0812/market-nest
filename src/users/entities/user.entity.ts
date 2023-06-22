@@ -36,6 +36,9 @@ import { ComplaintMessage } from 'src/complaints/entities/complaint-message.enti
 import { Feedback } from 'src/feedback/entities/feedback.entity';
 import { ChatMessagesRead } from 'src/chat/entities/chat-messages-read.entity';
 import { ProductInterested } from 'src/products/entities/product-interested.entity';
+import { Onboarding } from 'src/onboardings/entities/onboarding.entity';
+import { ArticleDocument } from 'src/articles/entities/article-document.entity';
+import { OnboardingDocument } from 'src/onboardings/entities/onboarding-document.entity';
 
 @Entity({ name: 'users' })
 @Unique(['uuid'])
@@ -169,6 +172,10 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'pk' })
     article: Array<Article>;
 
+    @OneToMany('ArticleDocument', (article_document: ArticleDocument) => article_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'article_document_pk' })
+    article_document: ArticleDocument;
+
     @OneToMany('Notification', (notification: Notification) => notification.user)
     @JoinColumn({ name: 'pk' })
     notification_user: Array<Notification>;
@@ -256,4 +263,12 @@ export class User extends BaseEntity {
     @OneToMany('Feedback', (feedback: Feedback) => feedback.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'feedback_pk' })
     feedback: Feedback;
+
+    @OneToMany('Onboarding', (onboarding: Onboarding) => onboarding.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'onboarding_pk' })
+    onboarding: Onboarding;
+
+    @OneToMany('OnboardingDocument', (onboarding_document: OnboardingDocument) => onboarding_document.user, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'onboarding_document_pk' })
+    onboarding_document: OnboardingDocument;
 }

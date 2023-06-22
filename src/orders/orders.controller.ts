@@ -5,6 +5,8 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ProductsService } from 'src/products/products.service';
 import { UsersService } from 'src/users/users.service';
+import { getConnection } from 'typeorm';
+import { Order } from './entities/order.entity';
 
 @Controller('orders')
 export class OrdersController {
@@ -95,6 +97,28 @@ export class OrdersController {
                 data: [],
                 total: 0
             }
+        }
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('cart/:pk')
+    async remove(@Param('pk') pk: string) {
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    let data = await EntityManager.update(Order, { pk }, { archived: true });
+
+                    return { status: true, code: data ? 200 : 500 };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            await queryRunner.release();
         }
     }
 
