@@ -40,6 +40,7 @@ export class OnboardingsService {
                 .leftJoinAndSelect("onboardings.user", "users")
                 .skip(filters.skip)
                 .take(filters.take)
+                .orderBy('onboardings.queue', 'ASC')
                 .getManyAndCount()
                 ;
 
