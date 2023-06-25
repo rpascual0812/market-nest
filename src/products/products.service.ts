@@ -216,7 +216,6 @@ export class ProductsService {
     }
 
     async findAll(filters: any) {
-        // console.log(1, filters);
         let orderByColumn,
             orderByDirection;
         if (filters.hasOwnProperty('orderBy')) {

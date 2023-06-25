@@ -62,6 +62,9 @@ export class ProductsController {
             const userInterests = req.query.interest_user_pk ? await this.productsService.getProductInterest(pks, req.query.interest_user_pk) : [];
 
             products[0].forEach(product => {
+                let date_available = new Date(product['date_available']);
+                product['date_available_formatted'] = date_available.getMonth();
+
                 if (!product.hasOwnProperty('product_documents')) {
                     product['product_documents'] = [];
                 }
