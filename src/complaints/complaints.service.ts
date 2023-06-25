@@ -15,7 +15,7 @@ export class ComplaintsService {
                 .createQueryBuilder('complaints')
                 .select('complaints')
                 .leftJoinAndSelect("complaints.user", "users")
-                .leftJoinAndMapOne(
+                .leftJoinAndMapMany(
                     'complaints.complaint_document',
                     ComplaintDocument,
                     'complaint_documents',
@@ -153,10 +153,13 @@ export class ComplaintsService {
                     message.user_pk = user.pk;
                     await EntityManager.save(message);
 
-                    let document = new ComplaintDocument();
-                    document.complaint_pk = _complaint.pk;
-                    document.document_pk = form.product_photo;
-                    await EntityManager.save(document);
+                    let documents = form.product_photo != '' ? form.product_photo.split(',') : [];
+                    documents.forEach(pk => {
+                        let document = new ComplaintDocument();
+                        document.complaint_pk = _complaint.pk;
+                        document.document_pk = pk;
+                        EntityManager.save(document);
+                    });
 
                     // LOGS
                     const log = new Log();
