@@ -42,6 +42,7 @@ export class OrdersService {
                         .where("orders.user_pk = :user_pk", { user_pk: user.pk })
                         .andWhere("orders.product_pk = :product_pk", { product_pk: form.product_pk })
                         .andWhere("orders.status_pk = :status_pk", { status_pk: status.pk })
+                        .andWhere("orders.archived = false")
                         .orderBy('pk')
                         .limit(1)
                         .getOne()
