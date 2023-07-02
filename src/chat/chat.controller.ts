@@ -86,13 +86,13 @@ export class ChatController {
     @Get('user/:pk')
     async findByUser(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
         let chat = await this.chatService.findByUser(pk, req.user, req.query);
-        // console.log('1 chat', chat.length);
+        // console.log('chat', chat.length, req.query, pk);
         if (chat.length == 0) {
             const newChat = await this.chatService.create(pk, req.user, req.query);
-            console.log('2 chat', newChat);
+            // console.log('2 chat', newChat);
 
             chat = await this.chatService.findOne(newChat.data.pk);
-            console.log('3 chat', chat);
+            // console.log('3 chat', chat);
         }
 
         chat = chat[0];
