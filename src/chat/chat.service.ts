@@ -33,10 +33,13 @@ export class ChatService {
                         participant.user_pk = user.pk;
                         EntityManager.save(participant);
 
-                        const participant2 = new ChatParticipant();
-                        participant2.chat_pk = newchat.pk;
-                        participant2.user_pk = pk;
-                        EntityManager.save(participant2);
+                        // if type == support, this is chat with moderator
+                        if (params.type != 'support') {
+                            const participant2 = new ChatParticipant();
+                            participant2.chat_pk = newchat.pk;
+                            participant2.user_pk = pk;
+                            EntityManager.save(participant2);
+                        }
                     }
 
                     return { status: true, data: newchat };
@@ -51,7 +54,7 @@ export class ChatService {
     }
 
     async findAll(filters: any, user: any) {
-        // console.log(filters);
+        // console.log('filters', filters, user.pk);
         try {
             let chat_pks = [];
             if (filters.hasOwnProperty('keyword') && filters.keyword != '') {
@@ -65,6 +68,8 @@ export class ChatService {
                 // console.log('result', result);
                 chat_pks = result.map(({ pk }) => pk);
             }
+
+
             // console.log('chat pks ', chat_pks);
 
             const chats = await getRepository(Chat)
@@ -103,7 +108,10 @@ export class ChatService {
                 )
 
                 .where('chats.archived=false')
-                .andWhere('chats.last_message is not null')
+                // .andWhere('chats.last_message is not null')
+                .andWhere(filters.type != 'support' ? new Brackets(qb => {
+                    qb.where('chats.last_message is not null')
+                }) : '1=1')
                 .andWhere(filters.role == 'end-user' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
                         .andWhere("chat_participants.user_pk = :user_pk", { user_pk: user.pk })
@@ -114,9 +122,9 @@ export class ChatService {
                 .andWhere(filters.role == 'admin' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
                 }) : '1=1')
-                .andWhere(chat_pks.length > 0 ? new Brackets(qb => {
-                    qb.where('chats.pk IN (:...pk)', { pk: chat_pks })
-                }) : '1=1')
+                // .andWhere(chat_pks.length > 0 ? new Brackets(qb => {
+                //     qb.where('chats.pk IN (:...pk)', { pk: chat_pks })
+                // }) : '1=1')
 
                 .orderBy('chats.last_message_date', 'DESC')
                 .skip(filters.skip)
@@ -124,7 +132,7 @@ export class ChatService {
                 .getManyAndCount()
                 ;
 
-            // console.log(chats);
+            // console.log('chats', chats);
             return chats;
         } catch (error) {
             console.log(error);
