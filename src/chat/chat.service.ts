@@ -67,6 +67,7 @@ export class ChatService {
                 const result = await this.fetchUnread(filters, user);
                 // console.log('result', result);
                 chat_pks = result.map(({ pk }) => pk);
+                // console.log(chat_pks);
             }
 
 
@@ -122,9 +123,9 @@ export class ChatService {
                 .andWhere(filters.role == 'admin' ? new Brackets(qb => {
                     qb.where("chats.type = :type", { type: filters.type })
                 }) : '1=1')
-                // .andWhere(chat_pks.length > 0 ? new Brackets(qb => {
-                //     qb.where('chats.pk IN (:...pk)', { pk: chat_pks })
-                // }) : '1=1')
+                .andWhere(chat_pks.length > 0 ? new Brackets(qb => {
+                    qb.where('chats.pk IN (:...pk)', { pk: chat_pks })
+                }) : '1=1')
 
                 .orderBy('chats.last_message_date', 'DESC')
                 .skip(filters.skip)
@@ -192,7 +193,8 @@ export class ChatService {
             select
                 chats.*
             from chats
-            where chats.pk NOT IN (select chat_pk from chat_messages_read where user_pk = $1)
+            left join chat_messages on (chats.pk = chat_messages.chat_pk)
+            where chat_messages.pk NOT IN (select chat_message_pk from chat_messages_read where user_pk = $1)
             and chats.pk IN (select chat_pk from chat_participants where user_pk = $1)
             `, [user.pk]);
         } catch (error) {
