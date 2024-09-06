@@ -263,8 +263,7 @@ export class ProductsService {
         }
 
         try {
-            let months = filters.hasOwnProperty('months') ? JSON.parse(filters.months) : [];
-            const monthsArr = months.map((month) => month.name);
+            let monthsArr = filters.hasOwnProperty('months') ? filters.months.split(',') : [];
 
             let user_pk = null;
             if (filters.hasOwnProperty('user_pk')) {

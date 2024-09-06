@@ -28,7 +28,7 @@ export class AppController {
         account.role_pk = role.pk;
 
         const user = await this.authService.login(account);
-        // console.log(user);
+
         if (user) {
             return res.status(HttpStatus.OK).json({ status: 'success', user });
         }
@@ -125,6 +125,11 @@ export class AppController {
 
     @Get('assets/images/uploads/:customDir/:subDir/:imageName')
     product_images(@Request() req, @Response() res) {
+        return res.sendFile(req.path, { root: './' });
+    }
+
+    @Get('assets/images/defaults/:imageName')
+    defaults(@Request() req, @Response() res) {
         return res.sendFile(req.path, { root: './' });
     }
 

@@ -59,9 +59,16 @@ export class AuthService {
         // IMPROVE
         // websocket
         // send to all logged user that they are logged out
-
         const { pk, password, verified, active, date_created, archived, password_reset, ...others } = account;
-        return others;
+        const user_data = {
+            ...others,
+            first_name: user.user.first_name,
+            last_name: user.user.last_name,
+            middle_name: user.user.middle_name,
+            country_pk: user.user.country_pk,
+            user_document: user.user.user_document
+        }
+        return user_data;
     }
 
     async logout(user: any) {
