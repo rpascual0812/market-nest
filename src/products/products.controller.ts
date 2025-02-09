@@ -26,8 +26,9 @@ export class ProductsController {
 
     @Get()
     async findAll(@Request() req: any) {
-        let products;
-        let initialProducts;
+        let products,
+            initialProducts;
+
         if (req.query.orderBy == 'Best Seller') {
             initialProducts = await this.productsService.findBestSellers(req.query);
             const pks = initialProducts.map(product => product.products_pk);
@@ -65,7 +66,7 @@ export class ProductsController {
                 let date_available = new Date(product['date_available']);
                 product['date_available_formatted'] = date_available.getMonth();
 
-                if (!product.hasOwnProperty('product_documents')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'product_documents')) {
                     product['product_documents'] = [];
                 }
                 // Append product documents
@@ -79,7 +80,7 @@ export class ProductsController {
                     });
                 }
 
-                if (!product.hasOwnProperty('product_ratings')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'product_ratings')) {
                     product['product_ratings'] = [];
                 }
                 // Append product ratings
@@ -91,10 +92,10 @@ export class ProductsController {
                     });
                 }
 
-                if (!product.hasOwnProperty('product_rating_total')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'product_rating_total')) {
                     product['product_rating_total'] = 0;
                 }
-                if (!product.hasOwnProperty('product_rating_count')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'product_rating_count')) {
                     product['product_rating_count'] = 0;
                 }
                 // Append product rating total
@@ -107,7 +108,7 @@ export class ProductsController {
                     });
                 }
 
-                if (!product.hasOwnProperty('user_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'user_addresses')) {
                     product['user_addresses'] = [];
                 }
                 // Append user addresses
@@ -119,7 +120,7 @@ export class ProductsController {
                     });
                 }
 
-                if (!product.hasOwnProperty('seller_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'seller_addresses')) {
                     product['seller_addresses'] = [];
                 }
                 // Append seller addresses
@@ -131,7 +132,7 @@ export class ProductsController {
                     });
                 }
 
-                if (!product.hasOwnProperty('interested')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'interested')) {
                     product['interested'] = [];
                 }
 
@@ -190,7 +191,7 @@ export class ProductsController {
             const documents = await this.productsService.getProductDocuments(product_pks, req.query);
 
             data[0].forEach(seen => {
-                if (!seen['product'].hasOwnProperty('product_documents')) {
+                if (!Object.prototype.hasOwnProperty.call(seen['product'], 'product_documents')) {
                     seen['product']['product_documents'] = [];
                 }
                 if (documents) {
