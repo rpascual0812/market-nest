@@ -14,6 +14,7 @@ export class DocumentsService {
     ) { }
 
     create(file: any) {
+        console.log(2, file);
         const obj = {
             original_name: file.originalname,
             filename: file.filename,

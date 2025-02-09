@@ -89,7 +89,7 @@ export class AppController {
 
     @Post('upload')
     @UseInterceptors(
-        FileInterceptor('image', {
+        FileInterceptor('file', {
             storage: diskStorage({
                 destination: './assets/images',
                 filename: editFileName,

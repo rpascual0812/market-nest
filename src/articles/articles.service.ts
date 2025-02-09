@@ -32,11 +32,11 @@ export class ArticlesService {
                 )
                 .where('articles.archived=false')
                 // .andWhere(
-                //     filters.hasOwnProperty('keyword') ?
+                //     Object.prototype.hasOwnProperty.call(filters, 'keyword') ?
                 //         "articles.title ILIKE :keyword" :
                 //         '1=1', { keyword: `%${filters.keyword}%` }
                 // )
-                .andWhere(filters.hasOwnProperty('keyword') ? new Brackets(qb => {
+                .andWhere(Object.prototype.hasOwnProperty.call(filters, 'keyword') ? new Brackets(qb => {
                     qb.where("articles.title ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                         .orWhere("articles.url ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                         .orWhere("articles.description ILIKE :keyword", { keyword: `%${filters.keyword}%` })
@@ -88,7 +88,7 @@ export class ArticlesService {
                     }
 
                     if (form.image) {
-                        if (form.image.hasOwnProperty('pk')) {
+                        if (Object.prototype.hasOwnProperty.call(form.image, 'pk')) {
                             await EntityManager.update(ArticleDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
                         }
                         else {

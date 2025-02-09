@@ -330,7 +330,7 @@ export class ChatService {
                     const parent = await EntityManager.findOne(Chat, chat.pk);
                     parent.last_message = data.message;
                     parent.last_message_user_pk = user.pk;
-                    parent.last_message_date = DateTime.now();
+                    parent.last_message_date = DateTime.now().toJSDate();
                     const updatedChat = await EntityManager.save(parent);
 
                     const message_read = new ChatMessagesRead();

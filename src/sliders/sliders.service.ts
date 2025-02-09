@@ -34,7 +34,7 @@ export class SlidersService {
                 .leftJoinAndSelect("sliders.user", "users")
                 .where('sliders.archived=false')
                 .andWhere(
-                    filters.hasOwnProperty('keyword') ?
+                    Object.prototype.hasOwnProperty.call(filters, 'keyword') ?
                         "sliders.title ILIKE :keyword" :
                         '1=1', { keyword: `%${filters.keyword}%` }
                 )
@@ -133,7 +133,7 @@ export class SlidersService {
                     slider = await EntityManager.save(slider);
 
                     if (form.icon) {
-                        if (form.icon.hasOwnProperty('pk')) {
+                        if (Object.prototype.hasOwnProperty.call(form.icon, 'pk')) {
                             await EntityManager.update(SliderDocument, { pk: form.icon.pk }, { document_pk: form.icon.document.pk });
                         }
                         else {
@@ -147,7 +147,7 @@ export class SlidersService {
                     }
 
                     if (form.background) {
-                        if (form.background.hasOwnProperty('pk')) {
+                        if (Object.prototype.hasOwnProperty.call(form.background, 'pk')) {
                             await EntityManager.update(SliderDocument, { pk: form.background.pk }, { document_pk: form.background.document.pk });
                         }
                         else {

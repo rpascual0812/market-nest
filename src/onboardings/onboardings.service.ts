@@ -31,7 +31,7 @@ export class OnboardingsService {
                     'onboarding_documents.document_pk=documents.pk',
                 )
                 .where('onboardings.archived=false')
-                .andWhere(filters.hasOwnProperty('keyword') ? new Brackets(qb => {
+                .andWhere(Object.prototype.hasOwnProperty.call(filters, 'keyword') ? new Brackets(qb => {
                     qb.where("onboardings.title ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                         .orWhere("onboardings.description ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                         .orWhere("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
@@ -90,7 +90,7 @@ export class OnboardingsService {
                     }
 
                     if (form.image) {
-                        if (form.image.hasOwnProperty('pk')) {
+                        if (Object.prototype.hasOwnProperty.call(form.image, 'pk')) {
                             await EntityManager.update(OnboardingDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
                         }
                         else {
