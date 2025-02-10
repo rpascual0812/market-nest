@@ -47,7 +47,7 @@ export class FeedbackService {
                 .createQueryBuilder('feedbacks')
                 .select('feedbacks')
                 .andWhere(
-                    filters.hasOwnProperty('keyword') && filters.keyword != '' ?
+                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
                         "feedbacks.message ILIKE :keyword" : "1=1",
                     { keyword: `%${filters.keyword}%` }
                 )

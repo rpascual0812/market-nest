@@ -56,13 +56,14 @@ export class ChatService {
     async findAll(filters: any, user: any) {
         // console.log('filters', filters, user.pk);
         try {
+
             let chat_pks = [];
-            if (filters.hasOwnProperty('keyword') && filters.keyword != '') {
+            if (Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '') {
                 const result = await this.participantFirst(filters, user);
                 chat_pks = result[0].map(({ chat_pk }) => chat_pk);
             }
 
-            if (filters.hasOwnProperty('filter') && filters.filter == 'Show only unread') {
+            if (Object.prototype.hasOwnProperty.call(filters, 'filter') && filters.filter == 'Show only unread') {
                 // const result = await this.participantFirst(filters, user);
                 const result = await this.fetchUnread(filters, user);
                 // console.log('result', result);
@@ -168,10 +169,10 @@ export class ChatService {
                     'user_documents.document_pk=user_doc.pk',
                 )
                 // .where("chat_participants.user_pk IN (:...pk)", { pk: [user.pk] })
-                .andWhere(filters.hasOwnProperty('user_pk') && filters.user_pk != '' ? new Brackets(qb => {
+                .andWhere(Object.prototype.hasOwnProperty.call(filters, 'user_pk') && filters.user_pk != '' ? new Brackets(qb => {
                     qb.where("chat_participants.user_pk = :user_pk", { user_pk: filters.user_pk })
                 }) : '1=1')
-                .andWhere(filters.hasOwnProperty('keyword') && filters.keyword != '' ? new Brackets(qb => {
+                .andWhere(Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ? new Brackets(qb => {
                     qb.where("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                         .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                 }) : '1=1')

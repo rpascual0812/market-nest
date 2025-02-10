@@ -59,7 +59,7 @@ export class UsersService {
         try {
             let orderByColumn,
                 orderByDirection;
-            if (filters.hasOwnProperty('orderBy')) {
+            if (Object.prototype.hasOwnProperty.call(filters, 'orderBy')) {
                 switch (filters.orderBy) {
                     case 'Sort by Name':
                         orderByColumn = 'users.first_name';
@@ -127,12 +127,12 @@ export class UsersService {
                 //         .orWhere('users.last_name ILIKE :search', { search: `%${filters.search}%` });
                 // }))
                 .andWhere(
-                    filters.hasOwnProperty('keyword') && filters.keyword != '' ?
+                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
                         "(users.first_name ILIKE :keyword or users.last_name ILIKE :keyword or users.middle_name ILIKE :keyword)" :
                         '1=1', { keyword: `%${filters.keyword}%` }
                 )
                 .andWhere(
-                    filters.hasOwnProperty('archived') && filters.archived != '' ?
+                    Object.prototype.hasOwnProperty.call(filters, 'archived') && filters.archived != '' ?
                         "users.archived = :archived" :
                         '1=1', { archived: `${filters.archived}` }
                 )

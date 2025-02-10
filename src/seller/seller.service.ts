@@ -126,7 +126,7 @@ export class SellerService {
             .andWhere('users.is_seller=true')
             .andWhere('sellers.archived=false')
             .andWhere(
-                filters.hasOwnProperty('keyword') ?
+                Object.prototype.hasOwnProperty.call(filters, 'keyword') ?
                     "(users.first_name ILIKE :keyword or users.last_name ILIKE :keyword)" :
                     '1=1', { keyword: `%${filters.keyword}%` }
             )
@@ -182,7 +182,7 @@ export class SellerService {
     //             .createQueryBuilder('sellers')
     //             .select('sellers')
     //             .where('sellers.archived = false')
-    //             .andWhere(filters.hasOwnProperty('user_pk') ? "sellers.user_pk = :user_pk" : '1=1', { user_pk: filters.user_pk })
+    //             .andWhere(Object.prototype.hasOwnProperty.call(filters, 'user_pk') ? "sellers.user_pk = :user_pk" : '1=1', { user_pk: filters.user_pk })
     //             .getOneOrFail()
     //             ;
     //     } catch (error) {

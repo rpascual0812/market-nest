@@ -72,7 +72,7 @@ export class AccountsController {
             });
         }
 
-        if (!account.hasOwnProperty('user_ratings')) {
+        if (!Object.prototype.hasOwnProperty.call(account, 'user_ratings')) {
             account['user']['user_ratings'] = [];
         }
         // Append user ratings
@@ -84,10 +84,10 @@ export class AccountsController {
             });
         }
 
-        if (!account.hasOwnProperty('user_rating_total')) {
+        if (!Object.prototype.hasOwnProperty.call(account, 'user_rating_total')) {
             account['user']['user_rating_total'] = 0;
         }
-        if (!account.hasOwnProperty('user_rating_count')) {
+        if (!Object.prototype.hasOwnProperty.call(account, 'user_rating_count')) {
             account['user']['user_rating_count'] = 0;
         }
         // Append user rating total

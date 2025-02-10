@@ -20,7 +20,8 @@ export class ChatController {
             // console.log('unread', unread_messages);
             chats[0].forEach(chat => {
                 chat.read = false;
-                if (!chat.hasOwnProperty('chat_participants')) {
+
+                if (!Object.prototype.hasOwnProperty.call(chat, 'chat_participants')) {
                     chat['chat_participants'] = [];
                 }
                 // Append chat documents
@@ -105,7 +106,7 @@ export class ChatController {
 
         const participants = await this.chatService.getParticipants([chat ? chat['pk'] : null], req.query);
         // console.log('participants', participants);
-        if (chat && !chat.hasOwnProperty('chat_participants')) {
+        if (chat && !Object.prototype.hasOwnProperty.call(chat, 'chat_participants')) {
             chat['chat_participants'] = [];
         }
         // Append chat documents

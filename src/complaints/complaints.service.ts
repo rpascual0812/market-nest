@@ -28,17 +28,17 @@ export class ComplaintsService {
                     'complaint_documents.document_pk=documents.pk',
                 )
                 .andWhere(
-                    filters.hasOwnProperty('keyword') && filters.keyword != '' ?
+                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
                         "complaints.subject ILIKE :keyword" : "1=1",
                     { keyword: `%${filters.keyword}%` }
                 )
-                .andWhere(filters.hasOwnProperty('status') && filters.status ? new Brackets(qb => {
+                .andWhere(Object.prototype.hasOwnProperty.call(filters, 'status') && filters.status ? new Brackets(qb => {
                     qb.where("complaints.status = :status", { status: filters.status })
                 }) : '1=1')
-                .andWhere(filters.hasOwnProperty('type') && filters.type ? new Brackets(qb => {
+                .andWhere(Object.prototype.hasOwnProperty.call(filters, 'type') && filters.type ? new Brackets(qb => {
                     qb.where("complaints.type = :type", { type: filters.type })
                 }) : '1=1')
-                .andWhere(filters.hasOwnProperty('user') && filters.user ? new Brackets(qb => {
+                .andWhere(Object.prototype.hasOwnProperty.call(filters, 'user') && filters.user ? new Brackets(qb => {
                     qb.where("complaints.user_pk = :user_pk", { user_pk: user.pk })
                 }) : '1=1')
                 .orderBy('complaints.date_created', 'DESC')
@@ -132,7 +132,7 @@ export class ComplaintsService {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
                     let complaint = null;
-                    if (form.hasOwnProperty('pk')) {
+                    if (Object.prototype.hasOwnProperty.call(form, 'pk')) {
                         complaint = await complaint.findOne({
                             pk: form.pk
                         });
