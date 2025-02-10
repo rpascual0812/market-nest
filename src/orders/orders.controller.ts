@@ -47,7 +47,8 @@ export class OrdersController {
             // console.log(userAddresses);
             // console.log(sellerAddresses);
             data[0].forEach(order => {
-                if (!order['product'].hasOwnProperty('product_documents')) {
+
+                if (!Object.prototype.hasOwnProperty.call(order['product'], 'product_documents')) {
                     order['product']['product_documents'] = [];
                 }
                 // Append product documents
@@ -59,7 +60,7 @@ export class OrdersController {
                     });
                 }
 
-                if (!order['product'].hasOwnProperty('user_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(order['product'], 'user_addresses')) {
                     order['product']['user_addresses'] = [];
                 }
                 // Append user addresses
@@ -71,7 +72,7 @@ export class OrdersController {
                     });
                 }
 
-                if (!order['seller'].hasOwnProperty('seller_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(order['seller'], 'seller_addresses')) {
                     order['seller']['seller_addresses'] = [];
                 }
                 // Append seller addresses
@@ -136,7 +137,7 @@ export class OrdersController {
             const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
             // console.log(seller_pks, sellerAddresses);
             orders[0].forEach(order => {
-                if (!order['product'].hasOwnProperty('product_documents')) {
+                if (!Object.prototype.hasOwnProperty.call(order['product'], 'product_documents')) {
                     order['product']['product_documents'] = [];
                 }
                 // Append product documents
@@ -148,7 +149,7 @@ export class OrdersController {
                     });
                 }
 
-                if (!order.hasOwnProperty('user_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(order, 'user_addresses')) {
                     order['user_addresses'] = [];
                 }
                 // console.log(user_pks, userAddresses);
@@ -161,7 +162,7 @@ export class OrdersController {
                     });
                 }
 
-                if (!order.hasOwnProperty('seller_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(order, 'seller_addresses')) {
                     order['seller_addresses'] = [];
                 }
                 // Append seller addresses
@@ -200,7 +201,7 @@ export class OrdersController {
             const documents = await this.productsService.getProductDocuments(product_pks, req.query);
 
             orders[0].forEach(order => {
-                if (!order.hasOwnProperty('product_documents')) {
+                if (!Object.prototype.hasOwnProperty.call(order, 'product_documents')) {
                     order['product_documents'] = [];
                 }
                 // Append product documents
@@ -241,7 +242,7 @@ export class OrdersController {
             const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
 
             orders[0].forEach(order => {
-                if (!order.hasOwnProperty('product_documents')) {
+                if (!Object.prototype.hasOwnProperty.call(order, 'product_documents')) {
                     order['product_documents'] = [];
                 }
                 // Append product documents
@@ -253,7 +254,7 @@ export class OrdersController {
                     });
                 }
 
-                if (!order.hasOwnProperty('seller_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(order, 'seller_addresses')) {
                     order['seller_addresses'] = [];
                 }
                 // Append seller addresses

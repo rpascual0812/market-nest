@@ -164,7 +164,7 @@ export class OrdersService {
         // console.log(filters, user);
         let type = [];
         let hasFutureCrops = false;
-        if (filters.hasOwnProperty('type') && filters.type) {
+        if (Object.prototype.hasOwnProperty.call(filters, 'type') && filters.type) {
             type = filters.type.split(',');
             hasFutureCrops = type.includes("future_crops") ? true : false;
         }
@@ -194,10 +194,10 @@ export class OrdersService {
 
             .where('orders.archived=false')
             // .andWhere('orders.seller_pk = :pk', { pk: user.pk })
-            .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type })
-            .andWhere(filters.hasOwnProperty('status') && status ? "orders.status_pk = :status_pk" : '1=1', { status_pk: status_pk })
-            .andWhere(filters.hasOwnProperty('user_pk') && !filters.hasOwnProperty('seller') ? "orders.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
-            .andWhere(filters.hasOwnProperty('seller') ? "products.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'type') ? "products.type IN (:...type)" : '1=1', { type })
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'status') && status ? "orders.status_pk = :status_pk" : '1=1', { status_pk: status_pk })
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'user_pk') && !Object.prototype.hasOwnProperty.call(filters, 'seller') ? "orders.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'seller') ? "products.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
             .andWhere(!hasFutureCrops ? "products.date_available <= :date" : '1=1', { date: new Date() })
 
             .skip(filters.skip)
@@ -209,7 +209,7 @@ export class OrdersService {
     async findSoldOrders(filters: any, user: any) {
         return await getRepository(Order)
             .createQueryBuilder('orders')
-            // .andWhere(filters.hasOwnProperty('year') ? "date_part('year', orders.date_created) = :year" : '1=1', { year: filters.year })
+            // .andWhere(Object.prototype.hasOwnProperty.call(filters, 'year') ? "date_part('year', orders.date_created) = :year" : '1=1', { year: filters.year })
             .select('orders')
             .leftJoinAndSelect("orders.user", "users")
             .leftJoinAndSelect("orders.status", "statuses")
@@ -233,7 +233,7 @@ export class OrdersService {
         // console.log(filters, user);
         return await getRepository(Order)
             .createQueryBuilder('orders')
-            // .andWhere(filters.hasOwnProperty('year') ? "date_part('year', orders.date_created) = :year" : '1=1', { year: filters.year })
+            // .andWhere(Object.prototype.hasOwnProperty.call(filters, 'year') ? "date_part('year', orders.date_created) = :year" : '1=1', { year: filters.year })
             .select('orders')
             .leftJoinAndSelect("orders.seller", "users")
             .leftJoinAndSelect("users.seller", "sellers")

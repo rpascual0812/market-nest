@@ -13,11 +13,11 @@ export class ProvincesService {
             const users = await getRepository(Province)
                 .createQueryBuilder('provinces')
                 .andWhere(
-                    filters.hasOwnProperty('keyword') && filters.keyword != '' ?
+                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
                         "(name ILIKE :keyword or province_code::text ILIKE :keyword)" :
                         '1=1', { keyword: `%${filters.keyword}%` }
                 )
-                .andWhere("archived = :archived", { archived: `${filters && filters.hasOwnProperty('archived') ? filters.archived : false}` })
+                .andWhere("archived = :archived", { archived: `${filters && Object.prototype.hasOwnProperty.call(filters, 'archived') ? filters.archived : false}` })
                 .skip(filters.skip)
                 .take(filters.take)
                 .orderBy('provinces.name')

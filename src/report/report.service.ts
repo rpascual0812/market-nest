@@ -15,7 +15,7 @@ export class ReportService {
         // console.log(filters, user);
         let type = [];
         let hasFutureCrops = false;
-        if (filters.hasOwnProperty('type') && filters.type) {
+        if (Object.prototype.hasOwnProperty.call(filters, 'type') && filters.type) {
             type = filters.type.split(',');
             hasFutureCrops = type.includes("future_crops") ? true : false;
         }
@@ -45,16 +45,16 @@ export class ReportService {
 
             .where('orders.archived=false')
             // .andWhere('orders.seller_pk = :pk', { pk: user.pk })
-            .andWhere(filters.hasOwnProperty('type') ? "products.type IN (:...type)" : '1=1', { type })
-            .andWhere(filters.hasOwnProperty('status') && status ? "orders.status_pk = :status_pk" : '1=1', { status_pk: status_pk })
-            .andWhere(filters.hasOwnProperty('user_pk') && !filters.hasOwnProperty('seller') ? "orders.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
-            .andWhere(filters.hasOwnProperty('seller') ? "products.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'type') ? "products.type IN (:...type)" : '1=1', { type })
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'status') && status ? "orders.status_pk = :status_pk" : '1=1', { status_pk: status_pk })
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'user_pk') && !Object.prototype.hasOwnProperty.call(filters, 'seller') ? "orders.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'seller') ? "products.user_pk = :user_pk" : '1=1', { user_pk: user.pk })
             // .andWhere(
-            //     filters.hasOwnProperty('keyword') ?
+            //     Object.prototype.hasOwnProperty.call(filters, 'keyword') ?
             //         "products.name ILIKE :keyword" :
             //         '1=1', { keyword: `%${filters.keyword}%` }
             // )
-            .andWhere(filters.hasOwnProperty('keyword') ? new Brackets(qb => {
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'keyword') ? new Brackets(qb => {
                 qb.where("products.name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                     .orWhere("users.first_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
                     .orWhere("users.last_name ILIKE :keyword", { keyword: `%${filters.keyword}%` })
@@ -74,8 +74,8 @@ export class ReportService {
             .createQueryBuilder('orders')
             .select('orders')
             .where('orders.archived=false')
-            .andWhere(filters.hasOwnProperty('type') && filters.type == 'closed' ? "orders.status_pk=9" : '1=1')
-            .andWhere(filters.hasOwnProperty('type') && filters.type == 'cancelled' ? "orders.status_pk=3" : '1=1')
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'type') && filters.type == 'closed' ? "orders.status_pk=9" : '1=1')
+            .andWhere(Object.prototype.hasOwnProperty.call(filters, 'type') && filters.type == 'cancelled' ? "orders.status_pk=3" : '1=1')
             .getManyAndCount()
             ;
     }

@@ -30,7 +30,8 @@ export class SellerController {
             const sellerAddresses = await this.usersService.getSellerAddresses(seller_pks, req.query);
 
             data[0].forEach(seller => {
-                if (!seller.user.seller.hasOwnProperty('seller_addresses')) {
+
+                if (!Object.prototype.hasOwnProperty.call(seller.user.seller, 'seller_addresses')) {
                     seller.user.seller['seller_addresses'] = [];
                 }
                 // Append seller addresses
@@ -77,7 +78,8 @@ export class SellerController {
             const totalRatings = await this.productsService.getProductTotalRatings(pks);
 
             products[0].forEach(product => {
-                if (!product.hasOwnProperty('product_documents')) {
+
+                if (!Object.prototype.hasOwnProperty.call(product, 'product_documents')) {
                     product['product_documents'] = [];
                 }
                 // Append product documents
@@ -89,7 +91,7 @@ export class SellerController {
                     });
                 }
 
-                if (!product.hasOwnProperty('product_ratings')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'product_ratings')) {
                     product['product_ratings'] = [];
                 }
                 // Append product ratings
@@ -101,10 +103,10 @@ export class SellerController {
                     });
                 }
 
-                if (!product.hasOwnProperty('product_rating_total')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'product_rating_total')) {
                     product['product_rating_total'] = 0;
                 }
-                if (!product.hasOwnProperty('product_rating_count')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'product_rating_count')) {
                     product['product_rating_count'] = 0;
                 }
                 // Append product rating total
@@ -117,7 +119,7 @@ export class SellerController {
                     });
                 }
 
-                if (!product.hasOwnProperty('user_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'user_addresses')) {
                     product['user_addresses'] = [];
                 }
                 // Append user addresses
@@ -129,7 +131,7 @@ export class SellerController {
                     });
                 }
 
-                if (!product.hasOwnProperty('seller_addresses')) {
+                if (!Object.prototype.hasOwnProperty.call(product, 'seller_addresses')) {
                     product['seller_addresses'] = [];
                 }
                 // Append seller addresses
@@ -214,7 +216,7 @@ export class SellerController {
             });
         }
 
-        if (!account.hasOwnProperty('user_ratings')) {
+        if (!Object.prototype.hasOwnProperty.call(account, 'user_ratings')) {
             account['user']['user_ratings'] = [];
         }
         // Append user ratings
@@ -226,10 +228,10 @@ export class SellerController {
             });
         }
 
-        if (!account.hasOwnProperty('user_rating_total')) {
+        if (!Object.prototype.hasOwnProperty.call(account, 'user_rating_total')) {
             account['user']['user_rating_total'] = 0;
         }
-        if (!account.hasOwnProperty('user_rating_count')) {
+        if (!Object.prototype.hasOwnProperty.call(account, 'user_rating_count')) {
             account['user']['user_rating_count'] = 0;
         }
         // Append user rating total

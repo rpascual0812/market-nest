@@ -12,7 +12,7 @@ export class FaqService {
                 .createQueryBuilder('faq')
                 .select('faq')
                 .andWhere(
-                    filters.hasOwnProperty('keyword') && filters.keyword != '' ?
+                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
                         "faq.question = :keyword" : "1=1",
                     { keyword: `${filters.keyword}` }
                 )
