@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
-import { DatabaseModule } from 'src/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
@@ -17,7 +16,6 @@ import { UserDocument } from 'src/users/entities/user-document.entity';
 
 @Module({
     imports: [
-        DatabaseModule,
         TypeOrmModule.forFeature([Order, Product, User, Account, UserDocument]),
     ],
     controllers: [OrdersController, ProductsController, UsersController, AccountsController],

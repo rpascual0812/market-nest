@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Role } from './entities/role.entity';
 
 @Injectable()
@@ -7,7 +8,7 @@ export class RolesService {
     async findAll(filters: any) {
         // console.log(filters);
         try {
-            const roles = await getRepository(Role)
+            const roles = await dataSource.getRepository(Role)
                 .createQueryBuilder('roles')
                 .select('roles')
                 .where('roles.archived=false')

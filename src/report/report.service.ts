@@ -1,5 +1,6 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
-import { Brackets, getConnection, getManager, getRepository, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Order } from 'src/orders/entities/order.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,13 +23,15 @@ export class ReportService {
 
         let status_pk = null;
         let status = await Status.findOne({
-            name: filters.status
+            where: {
+                name: filters.status
+            }
         });
         if (status) {
             status_pk = status.pk;
         }
 
-        return await getRepository(Order)
+        return await dataSource.getRepository(Order)
             .createQueryBuilder('orders')
             .select('orders')
             .leftJoinAndSelect("orders.user", "users")
@@ -70,7 +73,7 @@ export class ReportService {
     }
 
     async countOrders(filters: any, user: any) {
-        return await getRepository(Order)
+        return await dataSource.getRepository(Order)
             .createQueryBuilder('orders')
             .select('orders')
             .where('orders.archived=false')
@@ -82,8 +85,7 @@ export class ReportService {
 
     async countOrdersByCategories(filters: any, user: any) {
         try {
-            const entityManager = getManager();
-            return await entityManager.query(`
+            return await dataSource.query(`
             select
                 products.category_pk, categories.name
             from orders

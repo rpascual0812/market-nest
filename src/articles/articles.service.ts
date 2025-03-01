@@ -2,7 +2,8 @@ import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Document } from 'src/documents/entities/document.entity';
 import { Log } from 'src/logs/entities/log.entity';
-import { Brackets, getConnection, getRepository, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { ArticleDocument } from './entities/article-document.entity';
 import { Article } from './entities/article.entity';
 
@@ -15,7 +16,7 @@ export class ArticlesService {
 
     async findAll(data: any, filters: any) {
         try {
-            const articles = await getRepository(Article)
+            const articles = await dataSource.getRepository(Article)
                 .createQueryBuilder('articles')
                 .select('articles')
                 .leftJoinAndMapOne(
@@ -66,7 +67,7 @@ export class ArticlesService {
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
         // console.log('creating/updating article', form);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -128,7 +129,7 @@ export class ArticlesService {
     @UsePipes(ValidationPipe)
     async delete(pk: any, user: any) {
         console.log('deleting banner', pk);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -137,7 +138,9 @@ export class ArticlesService {
                     await EntityManager.update(Article, { pk }, { archived: true });
 
                     const slider = await Article.findOne({
-                        pk
+                        where: {
+                            pk
+                        }
                     });
 
                     // LOGS

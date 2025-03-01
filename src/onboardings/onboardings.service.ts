@@ -2,7 +2,8 @@ import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Document } from 'src/documents/entities/document.entity';
 import { Log } from 'src/logs/entities/log.entity';
-import { Brackets, getConnection, getRepository, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { OnboardingDocument } from './entities/onboarding-document.entity';
 import { Onboarding } from './entities/onboarding.entity';
 
@@ -15,7 +16,7 @@ export class OnboardingsService {
 
     async findAll(data: any, filters: any) {
         try {
-            const onboardings = await getRepository(Onboarding)
+            const onboardings = await dataSource.getRepository(Onboarding)
                 .createQueryBuilder('onboardings')
                 .select('onboardings')
                 .leftJoinAndMapOne(
@@ -61,7 +62,7 @@ export class OnboardingsService {
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
         console.log('creating/updating onboarding', form);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -74,7 +75,7 @@ export class OnboardingsService {
                         onboardingObj = await EntityManager.update(Onboarding, filters, { title: form.title, description: form.description });
                     }
                     else {
-                        const queue = await getRepository(Onboarding)
+                        const queue = await dataSource.getRepository(Onboarding)
                             .createQueryBuilder('onboarding')
                             .select('onboarding')
                             .orderBy('queue', 'DESC')
@@ -129,7 +130,7 @@ export class OnboardingsService {
 
     @UsePipes(ValidationPipe)
     async delete(pk: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -138,7 +139,9 @@ export class OnboardingsService {
                     await EntityManager.update(Onboarding, { pk }, { archived: true });
 
                     const onboarding = await Onboarding.findOne({
-                        pk
+                        where: {
+                            pk
+                        }
                     });
 
                     // LOGS

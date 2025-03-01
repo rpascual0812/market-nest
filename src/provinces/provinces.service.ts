@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Log } from 'src/logs/entities/log.entity';
-import { getConnection, getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Province } from './entities/province.entity';
 import { DateTime } from "luxon";
 
@@ -10,7 +11,7 @@ export class ProvincesService {
     async findAll(filters: any) {
         console.log('filters', filters);
         try {
-            const users = await getRepository(Province)
+            const users = await dataSource.getRepository(Province)
                 .createQueryBuilder('provinces')
                 .andWhere(
                     Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
@@ -40,7 +41,7 @@ export class ProvincesService {
 
     async update(data: any, user: any) {
         // console.log('updating user', data);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -77,7 +78,7 @@ export class ProvincesService {
     }
 
     async delete(code: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {

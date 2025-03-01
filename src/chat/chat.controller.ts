@@ -125,8 +125,9 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Post('messages')
     async saveMessage(@Param('pk') pk: string, @Body() body: any, @Request() req: any, @Response() res: any) {
+        // console.log('message', body);
         const message = await this.chatService.createMessage(body, req.user);
-        // console.log('message', message['data'].pk);
+        // console.log('message 2', message['data'].pk);
 
         const newMessage = await this.chatService.findMessage(message['data'].pk);
 

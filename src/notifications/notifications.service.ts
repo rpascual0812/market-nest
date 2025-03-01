@@ -1,7 +1,8 @@
 import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Log } from 'src/logs/entities/log.entity';
 import { UserDocument } from 'src/users/entities/user-document.entity';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Notification } from './entities/notification.entity';
 import { Document } from 'src/documents/entities/document.entity';
 
@@ -9,7 +10,7 @@ import { Document } from 'src/documents/entities/document.entity';
 export class NotificationsService {
     async findAll(user: any) {
         try {
-            const notifications = await getRepository(Notification)
+            const notifications = await dataSource.getRepository(Notification)
                 .createQueryBuilder('notifications')
                 .select('notifications')
 

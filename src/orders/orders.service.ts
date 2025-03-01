@@ -1,5 +1,6 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { v4 as uuidv4 } from 'uuid';
 import { Order } from './entities/order.entity';
 import { Log } from 'src/logs/entities/log.entity';
@@ -21,23 +22,29 @@ export class OrdersService {
 
     @UsePipes(ValidationPipe)
     async create(form: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
             const status = await Status.findOne({
-                name: form.status
+                where: {
+                    name: form.status
+                }
             });
             const product = await Product.findOne({
-                pk: form.product_pk
+                where: {
+                    pk: form.product_pk
+                }
             });
             const seller = await Seller.findOne({
-                user_pk: product.user_pk
+                where: {
+                    user_pk: product.user_pk
+                }
             });
             // console.log(form, seller, user);
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    const existing = await getRepository(Order)
+                    const existing = await dataSource.getRepository(Order)
                         .createQueryBuilder('orders')
                         .where("orders.user_pk = :user_pk", { user_pk: user.pk })
                         .andWhere("orders.product_pk = :product_pk", { product_pk: form.product_pk })
@@ -61,7 +68,7 @@ export class OrdersService {
                         const res = await EntityManager.update(Order, filters, fields);
                         // console.log(res);
                         if (res.affected > 0) {
-                            return await EntityManager.findOne(Order, { 'user_pk': user.pk, 'product_pk': form.product_pk });
+                            return await EntityManager.findOne(Order, { where: { 'user_pk': user.pk, 'product_pk': form.product_pk } });
                         }
                         return null;
                     }
@@ -109,12 +116,14 @@ export class OrdersService {
 
     async update(body: any, user: any) {
         // console.log('update', body);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
             const status = await Status.findOne({
-                name: body.status
+                where: {
+                    name: body.status
+                }
             });
             let pks = body.order_pks.split(',');
             let orderPks = [];
@@ -137,7 +146,7 @@ export class OrdersService {
     }
 
     async findCartOrders(filters: any, user: any) {
-        return await getRepository(Order)
+        return await dataSource.getRepository(Order)
             .createQueryBuilder('orders')
             .select('orders')
             // .leftJoinAndSelect("orders.user", "users")
@@ -171,13 +180,15 @@ export class OrdersService {
 
         let status_pk = null;
         let status = await Status.findOne({
-            name: filters.status
+            where: {
+                name: filters.status
+            }
         });
         if (status) {
             status_pk = status.pk;
         }
 
-        return await getRepository(Order)
+        return await dataSource.getRepository(Order)
             .createQueryBuilder('orders')
             .select('orders')
             .leftJoinAndSelect("orders.user", "users")
@@ -207,7 +218,7 @@ export class OrdersService {
     }
 
     async findSoldOrders(filters: any, user: any) {
-        return await getRepository(Order)
+        return await dataSource.getRepository(Order)
             .createQueryBuilder('orders')
             // .andWhere(Object.prototype.hasOwnProperty.call(filters, 'year') ? "date_part('year', orders.date_created) = :year" : '1=1', { year: filters.year })
             .select('orders')
@@ -231,7 +242,7 @@ export class OrdersService {
 
     async findBoughtOrders(filters: any, user: any) {
         // console.log(filters, user);
-        return await getRepository(Order)
+        return await dataSource.getRepository(Order)
             .createQueryBuilder('orders')
             // .andWhere(Object.prototype.hasOwnProperty.call(filters, 'year') ? "date_part('year', orders.date_created) = :year" : '1=1', { year: filters.year })
             .select('orders')

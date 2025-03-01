@@ -6,7 +6,8 @@ import { AccountsService } from 'src/accounts/accounts.service';
 import { EmailsService } from 'src/emails/emails.service';
 import { SessionsService } from 'src/sessions/sessions.service';
 import { UsersService } from 'src/users/users.service';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Account } from 'src/accounts/entities/account.entity';
 import { DateTime } from "luxon";
 import { resolveObjectURL } from 'buffer';
@@ -133,7 +134,7 @@ export class AuthService {
 
     async register(data: any): Promise<any> {
         console.log('register', data);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -141,13 +142,17 @@ export class AuthService {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
                     const welcome_email_body = await Configuration.findOne({
-                        group: 'email_templates',
-                        name: 'welcome_email'
+                        where: {
+                            group: 'email_templates',
+                            name: 'welcome_email'
+                        }
                     });
 
                     const welcome_email_subject = await Configuration.findOne({
-                        group: 'email_templates',
-                        name: 'welcome_subject'
+                        where: {
+                            group: 'email_templates',
+                            name: 'welcome_subject'
+                        }
                     });
 
                     let registration_email = welcome_email_body['value'];
@@ -162,7 +167,9 @@ export class AuthService {
                     const newAccount = await EntityManager.save(account);
 
                     const role = await Role.findOne({
-                        name: 'end-user'
+                        where: {
+                            name: 'end-user'
+                        }
                     });
 
                     // create user

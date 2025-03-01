@@ -2,7 +2,8 @@ import { Body, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Document } from 'src/documents/entities/document.entity';
 import { Log } from 'src/logs/entities/log.entity';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { SliderDocument } from './entities/slider-document.entity';
 import { Slider } from './entities/slider.entity';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,7 +17,7 @@ export class SlidersService {
 
     async findAll(data: any, filters: any) {
         try {
-            const sliders = await getRepository(Slider)
+            const sliders = await dataSource.getRepository(Slider)
                 .createQueryBuilder('sliders')
                 .select('sliders')
                 .leftJoinAndMapMany(
@@ -61,7 +62,7 @@ export class SlidersService {
 
     async find(filters: any) {
         try {
-            const slider = await getRepository(Slider)
+            const slider = await dataSource.getRepository(Slider)
                 .createQueryBuilder('sliders')
                 .select('sliders')
                 .leftJoinAndMapMany(
@@ -101,7 +102,7 @@ export class SlidersService {
 
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -110,7 +111,9 @@ export class SlidersService {
                     let slider = null;
                     if (form.pk) {
                         slider = await Slider.findOne({
-                            pk: form.pk
+                            where: {
+                                pk: form.pk
+                            }
                         });
                     }
                     else {
@@ -118,7 +121,7 @@ export class SlidersService {
                     }
 
                     // get the last slider's order
-                    const lastSlider = await getRepository(Slider)
+                    const lastSlider = await dataSource.getRepository(Slider)
                         .createQueryBuilder('sliders')
                         .select('sliders')
                         .orderBy('sliders.order', 'DESC')
@@ -187,7 +190,7 @@ export class SlidersService {
     @UsePipes(ValidationPipe)
     async rearrange(pks: any, user: any) {
         // console.log('rearranging... ', pks);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -211,7 +214,7 @@ export class SlidersService {
     @UsePipes(ValidationPipe)
     async delete(pk: any, user: any) {
         console.log('deleting banner', pk);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -220,7 +223,9 @@ export class SlidersService {
                     await EntityManager.update(Slider, { pk }, { archived: true });
 
                     const slider = await Slider.findOne({
-                        pk
+                        where: {
+                            pk
+                        }
                     });
 
                     // LOGS

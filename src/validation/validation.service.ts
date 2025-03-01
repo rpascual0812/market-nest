@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { CreateValidationDto } from './dto/create-validation.dto';
 import { UpdateValidationDto } from './dto/update-validation.dto';
 import { Validation } from './entities/validation.entity';
@@ -28,7 +29,7 @@ export class ValidationService {
     }
 
     async findOne(value: string): Promise<any> {
-        return await getRepository(Validation)
+        return await dataSource.getRepository(Validation)
             .createQueryBuilder('validations')
             .where("value = :value", { value: value })
             .andWhere("archived = false")

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getRepository, getConnection, Any, Brackets } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -75,7 +76,7 @@ export class UsersService {
                 orderByDirection = 'ASC';
             }
 
-            const users = await getRepository(User)
+            const users = await dataSource.getRepository(User)
                 .createQueryBuilder('users')
                 .select('users')
                 .leftJoinAndSelect("users.account", "accounts")
@@ -158,7 +159,7 @@ export class UsersService {
     }
 
     async findOne(data: any) {
-        return await getRepository(User)
+        return await dataSource.getRepository(User)
             .createQueryBuilder('users')
             .select('users')
             .leftJoinAndSelect("users.seller", "sellers")
@@ -182,7 +183,7 @@ export class UsersService {
     }
 
     async find(user: any) {
-        return await getRepository(User)
+        return await dataSource.getRepository(User)
             .createQueryBuilder('users')
             .select('users')
             .leftJoinAndSelect("users.account", "accounts")
@@ -206,7 +207,7 @@ export class UsersService {
     }
 
     async findByEmail(email_address: String): Promise<User | undefined> {
-        return await getRepository(User)
+        return await dataSource.getRepository(User)
             .createQueryBuilder('users')
             .where("email_address = :email_address", { email_address })
             .orderBy('pk', 'DESC')
@@ -228,7 +229,7 @@ export class UsersService {
     }
 
     async findLast(user: any) {
-        return await getRepository(User)
+        return await dataSource.getRepository(User)
             .createQueryBuilder('users')
             .leftJoinAndSelect("users.account", "accounts")
             .select('users')
@@ -240,7 +241,7 @@ export class UsersService {
 
     async getUserAddresses(pks: any, filters: any) {
         try {
-            return await getRepository(UserAddress)
+            return await dataSource.getRepository(UserAddress)
                 .createQueryBuilder('user_addresses')
                 .select('user_addresses')
                 .leftJoinAndSelect("user_addresses.province", "provinces")
@@ -262,7 +263,7 @@ export class UsersService {
 
     async getSellerAddresses(pks: any, filters: any) {
         try {
-            return await getRepository(SellerAddress)
+            return await dataSource.getRepository(SellerAddress)
                 .createQueryBuilder('seller_addresses')
                 .select('seller_addresses')
                 .leftJoinAndSelect("seller_addresses.province", "provinces")
@@ -284,7 +285,7 @@ export class UsersService {
 
     async getUserFollowing(pks: any, filters: any) {
         try {
-            return await getRepository(UserFollow)
+            return await dataSource.getRepository(UserFollow)
                 .createQueryBuilder('user_follow')
                 .select('user_follow')
                 .leftJoinAndSelect("user_follow.user", "users")
@@ -312,7 +313,7 @@ export class UsersService {
 
     async getUserFollower(pks: any, filters: any) {
         try {
-            return await getRepository(UserFollow)
+            return await dataSource.getRepository(UserFollow)
                 .createQueryBuilder('user_follow')
                 .select('user_follow')
                 .leftJoinAndSelect("user_follow.createdBy", "users")
@@ -340,7 +341,7 @@ export class UsersService {
 
     async followedByUser(createdBys: any, userPks: any) {
         try {
-            return await getRepository(UserFollow)
+            return await dataSource.getRepository(UserFollow)
                 .createQueryBuilder('user_follow')
                 .select('user_follow')
                 .leftJoinAndSelect("user_follow.user", "users")
@@ -361,7 +362,7 @@ export class UsersService {
     async getUserRatings(pks: any, filters: any) {
         try {
             // console.log(pks);
-            return await getRepository(UserRating)
+            return await dataSource.getRepository(UserRating)
                 .createQueryBuilder('user_ratings')
                 .select('user_ratings')
                 .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
@@ -389,7 +390,7 @@ export class UsersService {
 
     async getUserTotalRatings(pks: any) {
         try {
-            return await getRepository(UserRating)
+            return await dataSource.getRepository(UserRating)
                 .createQueryBuilder('user_ratings')
                 .select('user_pk')
                 .addSelect('sum(rating) as total')
@@ -447,7 +448,7 @@ export class UsersService {
 
     async follow(user: any, data: any) {
         // console.log('follow', data, user);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -491,7 +492,7 @@ export class UsersService {
     async unfollow(user: any, data: any) {
         // console.log('unfollow', data, user);
         try {
-            return await getConnection()
+            return await dataSource
                 .createQueryBuilder()
                 .delete()
                 .from(UserFollow)
@@ -526,7 +527,7 @@ export class UsersService {
 
     async update(data: any) {
         console.log('updating user', data);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -543,14 +544,14 @@ export class UsersService {
                     user.archived = data.archived;
                     const updatedUser = await EntityManager.save(user);
 
-                    const account = await EntityManager.findOne(Account, user.account_pk);
+                    const account = await EntityManager.findOne(Account, { where: { pk: user.account_pk } });
                     account.archived = data.archived;
                     await EntityManager.save(account);
 
                     await EntityManager.update(UserAddress, { user_pk: data.pk }, { province_code: data.province, city_code: data.city, area_pk: data.area, address: data.address_details });
 
                     if (data.display_photo) {
-                        let displayPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'profile_photo' });
+                        let displayPhoto = await EntityManager.findOne(UserDocument, { where: { user_pk: data.pk, type: 'profile_photo' } });
                         if (displayPhoto) {
                             await EntityManager.update(UserDocument, { pk: displayPhoto.pk }, { document_pk: data.display_photo });
                         }
@@ -564,7 +565,7 @@ export class UsersService {
                     }
 
                     if (data.id_photo) {
-                        let idPhoto = await EntityManager.findOne(UserDocument, { user_pk: data.pk, type: 'id_photo' });
+                        let idPhoto = await EntityManager.findOne(UserDocument, { where: { user_pk: data.pk, type: 'id_photo' } });
                         if (idPhoto) {
                             await EntityManager.update(UserDocument, { pk: idPhoto.pk }, { document_pk: data.id_photo });
                         }
@@ -590,7 +591,7 @@ export class UsersService {
     }
 
     async delete(data: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {

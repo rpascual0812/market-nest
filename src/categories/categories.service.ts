@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
+import dataSource from 'db/data-source';
 
 @Injectable()
 export class CategoriesService {
@@ -12,7 +13,7 @@ export class CategoriesService {
 
     async findAll(filters: any) {
         try {
-            return await getRepository(Category)
+            return await dataSource.getRepository(Category)
                 .createQueryBuilder('categories')
                 .where('categories.archived=false')
                 .orderBy('name', 'ASC')

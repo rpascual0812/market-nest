@@ -1,6 +1,7 @@
 import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Log } from 'src/logs/entities/log.entity';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Configuration } from './entities/configuration.entity';
 
 @Injectable()
@@ -9,7 +10,7 @@ export class ConfigurationService {
     async findAll(filters: any) {
         try {
             // console.log(filters);
-            const configuration = await getRepository(Configuration)
+            const configuration = await dataSource.getRepository(Configuration)
                 .createQueryBuilder('configuration')
                 .select('configuration')
                 .andWhere(
@@ -36,7 +37,7 @@ export class ConfigurationService {
 
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -45,7 +46,9 @@ export class ConfigurationService {
                     switch (form.group) {
                         case 'email_templates':
                             let welcome_subject = await Configuration.findOne({
-                                group: form.group, name: 'welcome_subject'
+                                where: {
+                                    group: form.group, name: 'welcome_subject'
+                                }
                             });
 
                             if (welcome_subject) {
@@ -61,7 +64,9 @@ export class ConfigurationService {
                             }
 
                             let welcome_email = await Configuration.findOne({
-                                group: form.group, name: 'welcome_email'
+                                where: {
+                                    group: form.group, name: 'welcome_email'
+                                }
                             });
 
                             if (welcome_email) {
@@ -80,15 +85,21 @@ export class ConfigurationService {
 
                         case 'agreement':
                             let disclaimer = await Configuration.findOne({
-                                group: form.group, name: 'disclaimer'
+                                where: {
+                                    group: form.group, name: 'disclaimer'
+                                }
                             });
 
                             let legal = await Configuration.findOne({
-                                group: form.group, name: 'legal'
+                                where: {
+                                    group: form.group, name: 'legal'
+                                }
                             });
 
                             let terms = await Configuration.findOne({
-                                group: form.group, name: 'terms'
+                                where: {
+                                    group: form.group, name: 'terms'
+                                }
                             });
 
                             if (disclaimer) {

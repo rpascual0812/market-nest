@@ -1,6 +1,7 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository, getConnection, Collection, Brackets, getManager } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Product } from './entities/product.entity';
 import { Log } from 'src/logs/entities/log.entity';
 
@@ -32,7 +33,7 @@ export class ProductsService {
     @UsePipes(ValidationPipe)
     async create(form: any, user: any) {
         // console.log('creating rpoduct', form);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -116,7 +117,7 @@ export class ProductsService {
 
     @UsePipes(ValidationPipe)
     async update(form: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -133,7 +134,7 @@ export class ProductsService {
                     const updatedProduct = await EntityManager.save(product);
 
                     // document
-                    await getConnection()
+                    await dataSource
                         .createQueryBuilder()
                         .delete()
                         .from(ProductDocument)
@@ -177,7 +178,7 @@ export class ProductsService {
 
     async findOne(data: any) {
         try {
-            return await getRepository(Product)
+            return await dataSource.getRepository(Product)
                 .createQueryBuilder('products')
                 .select('products')
                 .leftJoinAndSelect("products.user", "users")
@@ -271,7 +272,9 @@ export class ProductsService {
             }
             else if (Object.prototype.hasOwnProperty.call(filters, 'account_pk')) {
                 const user = await User.findOne({
-                    account_pk: filters.account_pk
+                    where: {
+                        account_pk: filters.account_pk
+                    }
                 });
                 user_pk = user.pk;
             }
@@ -293,7 +296,7 @@ export class ProductsService {
                 });
             }
 
-            return await getRepository(Product)
+            return await dataSource.getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
                 .andWhere(user_pk != null ? "products.user_pk = :user_pk" : '1=1', { user_pk: user_pk })
@@ -417,7 +420,7 @@ export class ProductsService {
                 });
             }
 
-            return await getRepository(Product)
+            return await dataSource.getRepository(Product)
                 .createQueryBuilder('products')
                 .select('products')
                 .addSelect(
@@ -470,7 +473,7 @@ export class ProductsService {
 
     async findByPks(pks: any) {
         try {
-            return await getRepository(Product)
+            return await dataSource.getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
                 .where('products.pk in (:...pks)', { pks })
@@ -526,7 +529,7 @@ export class ProductsService {
 
     async getProductDocuments(pks: any, filters: any) {
         try {
-            return await getRepository(ProductDocument)
+            return await dataSource.getRepository(ProductDocument)
                 .createQueryBuilder('product_documents')
                 .select('product_documents')
                 .leftJoinAndMapOne(
@@ -552,7 +555,7 @@ export class ProductsService {
 
     async getProductRatings(pks: any, filters: any) {
         try {
-            return await getRepository(ProductRating)
+            return await dataSource.getRepository(ProductRating)
                 .createQueryBuilder('product_ratings')
                 .select('product_ratings')
                 .addSelect(['users.uuid', 'users.last_name', 'users.first_name', 'users.middle_name', 'users.email_address'])
@@ -580,7 +583,7 @@ export class ProductsService {
 
     async getProductTotalRatings(pks: any) {
         try {
-            return await getRepository(ProductRating)
+            return await dataSource.getRepository(ProductRating)
                 .createQueryBuilder('product_ratings')
                 .select('product_pk')
                 .addSelect('sum(rating) as total')
@@ -600,7 +603,7 @@ export class ProductsService {
 
     async getProductInterest(pks: any, user_pk: any) {
         try {
-            return await getRepository(ProductInterested)
+            return await dataSource.getRepository(ProductInterested)
                 .createQueryBuilder('product_interested')
                 .where("product_interested.product_pk IN (:...pk)", { pk: pks })
                 .andWhere("product_interested.user_pk IN (:...user_pk)", { user_pk: [user_pk] })
@@ -618,8 +621,10 @@ export class ProductsService {
     async findOneRatingPerUser(data: any, filters: any) {
         try {
             return await ProductRating.findOne({
-                user_pk: parseInt(filters.pk),
-                product_pk: parseInt(data.product_pk)
+                where: {
+                    user_pk: parseInt(filters.pk),
+                    product_pk: parseInt(data.product_pk)
+                }
             });
         } catch (error) {
             console.log(error);
@@ -631,19 +636,19 @@ export class ProductsService {
     }
 
     async createRating(body: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    const existing = await EntityManager.findOne(ProductRating, { 'user_pk': user.pk, 'product_pk': body.product_pk });
+                    const existing = await EntityManager.findOne(ProductRating, { where: { 'user_pk': user.pk, 'product_pk': body.product_pk } });
                     // await EntityManager.remove(existing);
                     if (existing) {
                         const fields = { 'rating': body.rating, 'message': body.message, anonymous: body.anonymous == 'true' ? true : false };
                         const filters = { 'user_pk': user.pk, 'product_pk': body.product_pk };
                         const res = await EntityManager.update(ProductRating, filters, fields);
                         if (res.affected > 0) {
-                            return await EntityManager.findOne(ProductRating, { 'user_pk': user.pk, 'product_pk': body.product_pk });
+                            return await EntityManager.findOne(ProductRating, { where: { 'user_pk': user.pk, 'product_pk': body.product_pk } });
                         }
                         return null;
                     }
@@ -667,7 +672,7 @@ export class ProductsService {
     }
 
     async delete(pk: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -687,13 +692,13 @@ export class ProductsService {
 
     @UsePipes(ValidationPipe)
     async seen(form: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
-                    const existing = await EntityManager.findOne(ProductSeen, { 'user_pk': user.pk, 'product_pk': form.product_pk });
+                    const existing = await EntityManager.findOne(ProductSeen, { where: { 'user_pk': user.pk, 'product_pk': form.product_pk } });
 
                     let productSeen = {};
                     if (!existing) {
@@ -704,7 +709,7 @@ export class ProductsService {
                     }
                     else {
                         EntityManager.update(ProductSeen, { pk: existing.pk }, { date_created: DateTime.now() });
-                        productSeen = await EntityManager.findOne(ProductSeen, { 'pk': existing.pk });
+                        productSeen = await EntityManager.findOne(ProductSeen, { where: { 'pk': existing.pk } });
                     }
 
                     return { status: true, data: productSeen };
@@ -720,7 +725,7 @@ export class ProductsService {
 
     async findAllSeen(filters: any, user: any) {
         try {
-            return await getRepository(ProductSeen)
+            return await dataSource.getRepository(ProductSeen)
                 .createQueryBuilder('product_seen')
                 .andWhere("product_seen.user_pk = :user_pk", { user_pk: user.pk })
                 .select('product_seen')
@@ -751,7 +756,7 @@ export class ProductsService {
     }
 
     async getInterested(filters: any) {
-        return await getRepository(ProductInterested)
+        return await dataSource.getRepository(ProductInterested)
             .createQueryBuilder('product_interested')
             .andWhere("product_interested.product_pk = :product_pk", { product_pk: filters.product_pk })
             .select('product_interested')
@@ -771,17 +776,17 @@ export class ProductsService {
     }
 
     async setInterest(filters: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
 
-                    let interest = await EntityManager.findOne(ProductInterested, { 'user_pk': user.pk, 'product_pk': filters.product_pk });
+                    let interest = await EntityManager.findOne(ProductInterested, { where: { 'user_pk': user.pk, 'product_pk': filters.product_pk } });
 
                     if (interest) {
-                        await getConnection()
+                        await dataSource
                             .createQueryBuilder()
                             .delete()
                             .from(ProductInterested)
