@@ -1,14 +1,14 @@
 import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Log } from 'src/logs/entities/log.entity';
-import { getConnection, getRepository, Repository } from 'typeorm';
-
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Faq } from './entities/faq.entity';
 
 @Injectable()
 export class FaqService {
     async findAll(filters: any) {
         try {
-            const faqs = await getRepository(Faq)
+            const faqs = await dataSource.getRepository(Faq)
                 .createQueryBuilder('faq')
                 .select('faq')
                 .andWhere(
@@ -39,7 +39,7 @@ export class FaqService {
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
         // console.log('creating faq', form);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -48,14 +48,16 @@ export class FaqService {
                     let faq = null;
                     if (form.pk) {
                         faq = await Faq.findOne({
-                            pk: form.pk
+                            where: {
+                                pk: form.pk
+                            }
                         });
                     }
                     else {
                         faq = new Faq();
                     }
 
-                    const lastOrder = await getRepository(Faq)
+                    const lastOrder = await dataSource.getRepository(Faq)
                         .createQueryBuilder('faq')
                         .orderBy('"order"', "DESC")
                         .getOne();
@@ -92,7 +94,7 @@ export class FaqService {
 
     @UsePipes(ValidationPipe)
     async update(body: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {

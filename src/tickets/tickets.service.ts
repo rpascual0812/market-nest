@@ -1,6 +1,7 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository, getConnection, Collection } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { Ticket } from './entities/ticket.entity';
@@ -23,7 +24,7 @@ export class TicketsService {
 
     @UsePipes(ValidationPipe)
     async create(form: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -82,7 +83,7 @@ export class TicketsService {
     }
 
     async findAll(filter: any) {
-        return await getRepository(Ticket)
+        return await dataSource.getRepository(Ticket)
             .createQueryBuilder('tickets')
             .select(
                 [
@@ -105,7 +106,7 @@ export class TicketsService {
     }
 
     findOne(uuid: string) {
-        return getRepository(Ticket)
+        return dataSource.getRepository(Ticket)
             .createQueryBuilder('tickets')
             .where("tickets.uuid = :uuid", { uuid })
             .getOne()
@@ -113,7 +114,7 @@ export class TicketsService {
     }
 
     async update(pk: number, user: object, body: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
         // console.log(body, user);
         try {

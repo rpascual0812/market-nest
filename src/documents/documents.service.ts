@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getConnection, getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { Document } from './entities/document.entity';
@@ -28,7 +29,7 @@ export class DocumentsService {
 
     async findAll(pagination: any) {
         // return this.documentRepository.find();
-        return await getRepository(Document)
+        return await dataSource.getRepository(Document)
             .createQueryBuilder()
             .orderBy('pk', 'DESC')
             .skip(pagination.skip)

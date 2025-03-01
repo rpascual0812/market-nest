@@ -4487,7 +4487,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 2568	Guesang	173	155	15526	1	f
 2569	Guiguilonen	173	155	15526	1	f
 2570	Guilig	173	155	15526	1	f
-2571	Inlambo	173	155	15526	1	f
+2571	Insamdhana	173	155	15526	1	f
 2572	Lanas	173	155	15526	1	f
 2573	Landas	173	155	15526	1	f
 2574	Maasin	173	155	15526	1	f
@@ -11635,7 +11635,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 9716	San Isidro	173	410	41032	1	f
 9717	San Marcelino	173	410	41032	1	f
 9718	Santo Niño	173	410	41032	1	f
-9719	Tilambo	173	410	41032	1	f
+9719	Tisamdhana	173	410	41032	1	f
 9720	Corona	173	410	41033	1	f
 9721	Gamao	173	410	41033	1	f
 9722	Makawayan	173	410	41033	1	f
@@ -18806,7 +18806,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 16887	Cantorna	173	541	54114	1	f
 16888	Famosa	173	541	54114	1	f
 16889	Macarthur	173	541	54114	1	f
-16890	Maglambong	173	541	54114	1	f
+16890	Magsamdhanang	173	541	54114	1	f
 16891	Morocborocan	173	541	54114	1	f
 16892	Poblacion	173	541	54114	1	f
 16893	Guinhadap	173	541	54114	1	f
@@ -19272,7 +19272,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 17353	Gabao	173	562	56209	1	f
 17354	Gulang-Gulang	173	562	56209	1	f
 17355	Gumapia	173	562	56209	1	f
-17356	Santo Domingo (Lamboon)	173	562	56209	1	f
+17356	Santo Domingo (samdhanaon)	173	562	56209	1	f
 17357	Liang	173	562	56209	1	f
 17358	Macawayan	173	562	56209	1	f
 17359	Mapaso	173	562	56209	1	f
@@ -20990,7 +20990,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 19071	Lico	173	630	63002	1	f
 19072	Luan-luan	173	630	63002	1	f
 19073	Malamhay	173	630	63002	1	f
-19074	Malamboy-Bondolan	173	630	63002	1	f
+19074	Masamdhanay-Bondolan	173	630	63002	1	f
 19075	Mambawi	173	630	63002	1	f
 19076	Manasa	173	630	63002	1	f
 19077	Manduyog	173	630	63002	1	f
@@ -23976,7 +23976,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 22057	Cambacol	173	712	71220	1	f
 22058	Cambayaon	173	712	71220	1	f
 22059	Canhayupon	173	712	71220	1	f
-22060	Canlambong	173	712	71220	1	f
+22060	Cansamdhanang	173	712	71220	1	f
 22061	Casingan	173	712	71220	1	f
 22062	Catugasan	173	712	71220	1	f
 22063	Datag	173	712	71220	1	f
@@ -26482,7 +26482,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 24563	Cang-apa	173	761	76102	1	f
 24564	Cangbagsa	173	761	76102	1	f
 24565	Cangmalalag	173	761	76102	1	f
-24566	Canlambo	173	761	76102	1	f
+24566	Cansamdhana	173	761	76102	1	f
 24567	Canlasog	173	761	76102	1	f
 24568	Catamboan	173	761	76102	1	f
 24569	Helen (Datag)	173	761	76102	1	f
@@ -26570,7 +26570,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 24651	Caticugan	173	761	76106	1	f
 24652	Dumanhog	173	761	76106	1	f
 24653	Ibabao	173	761	76106	1	f
-24654	Lambojon	173	761	76106	1	f
+24654	samdhanajon	173	761	76106	1	f
 24655	Luyang	173	761	76106	1	f
 24656	Luzong	173	761	76106	1	f
 24657	Olo	173	761	76106	1	f
@@ -30609,7 +30609,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 28690	Concepcion	173	864	86409	1	f
 28691	Guinabonan	173	864	86409	1	f
 28692	Iba	173	864	86409	1	f
-28693	Lambonao	173	864	86409	1	f
+28693	samdhananao	173	864	86409	1	f
 28694	Maningning	173	864	86409	1	f
 28695	Maujo	173	864	86409	1	f
 28696	Pasil (Pob.)	173	864	86409	1	f
@@ -33673,7 +33673,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 31754	Rarab	173	1035	103511	1	f
 31755	Somiorang	173	1035	103511	1	f
 31756	Upper Caningag (Taguitingan)	173	1035	103511	1	f
-31757	Talambo	173	1035	103511	1	f
+31757	Tasamdhana	173	1035	103511	1	f
 31758	Tambacon	173	1035	103511	1	f
 31759	Tawinian	173	1035	103511	1	f
 31760	Tipaan	173	1035	103511	1	f
@@ -35673,7 +35673,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 33754	San Isidro	173	1125	112508	1	f
 33755	New Taokanga	173	1125	112508	1	f
 33756	Zaragosa	173	1125	112508	1	f
-33757	Lambog	173	1125	112508	1	f
+33757	samdhanag	173	1125	112508	1	f
 33758	Badas	173	1125	112509	1	f
 33759	Bobon	173	1125	112509	1	f
 33760	Buso	173	1125	112509	1	f
@@ -36457,7 +36457,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 34538	Kabasalan	173	1247	124712	1	f
 34539	Kalacacan	173	1247	124712	1	f
 34540	Katilacan	173	1247	124712	1	f
-34541	Kolambog	173	1247	124712	1	f
+34541	Kosamdhanag	173	1247	124712	1	f
 34542	Ladtingan	173	1247	124712	1	f
 34543	Lagunde	173	1247	124712	1	f
 34544	Langayen	173	1247	124712	1	f
@@ -36729,7 +36729,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 34810	Dajay	173	1263	126313	1	f
 34811	Duengas	173	1263	126313	1	f
 34812	Canahay (Godwino)	173	1263	126313	1	f
-34813	Lambontong	173	1263	126313	1	f
+34813	samdhanantong	173	1263	126313	1	f
 34814	Lamian	173	1263	126313	1	f
 34815	Lamsugod	173	1263	126313	1	f
 34816	Libertad (Pob.)	173	1263	126313	1	f
@@ -36900,7 +36900,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 34981	Kalawag III (Pob.)	173	1265	126504	1	f
 34982	Kenram	173	1265	126504	1	f
 34983	Kudanding	173	1265	126504	1	f
-34984	Kolambog	173	1265	126504	1	f
+34984	Kosamdhanag	173	1265	126504	1	f
 34985	Lagandang	173	1265	126504	1	f
 34986	Laguilayan	173	1265	126504	1	f
 34987	Mapantig	173	1265	126504	1	f
@@ -41722,7 +41722,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 39803	Bulod	173	1538	153813	1	f
 39804	Darampua	173	1538	153813	1	f
 39805	Gadungan	173	1538	153813	1	f
-39806	Kulambog	173	1538	153813	1	f
+39806	Kusamdhanag	173	1538	153813	1	f
 39807	Langgapanan	173	1538	153813	1	f
 39808	Masulot	173	1538	153813	1	f
 39809	Papakan	173	1538	153813	1	f
@@ -42315,7 +42315,7 @@ COPY public.areas (pk, name, country_pk, province_code, city_code, user_pk, arch
 40396	Kanlibot	173	1566	156613	1	f
 40397	Kiutaan	173	1566	156613	1	f
 40398	Kuhaw	173	1566	156613	1	f
-40399	Kulamboh	173	1566	156613	1	f
+40399	Kusamdhanah	173	1566	156613	1	f
 40400	Kuttong	173	1566	156613	1	f
 40401	Lagtoh	173	1566	156613	1	f
 40402	Lambanah	173	1566	156613	1	f
@@ -45960,7 +45960,7 @@ COPY public.documents (pk, original_name, filename, path, mime_type, size, date_
 --
 
 COPY public.emails (pk, uuid, "from", from_name, "to", to_name, cc, bcc, subject, body, user_pk, date_created, sent, archived) FROM stdin;
-1	2e836d9e-35ef-411e-be03-ab35f36ec0da	rpascual0812@gmail.com	Samdhana Admin	freya@gmail.com	Freya Pascual	\N	\N	Get Started with Samdhana Community Market	<h1>Welcome to Samdhana Community Market</h1>	2	2022-11-23 14:45:48.310356+08	true	f
+1	2e836d9e-35ef-411e-be03-ab35f36ec0da	rpascual0812@gmail.com	samdhana Admin	freya@gmail.com	Freya Pascual	\N	\N	Get Started with samdhana Community Market	<h1>Welcome to samdhana Community Market</h1>	2	2022-11-23 14:45:48.310356+08	true	f
 \.
 
 

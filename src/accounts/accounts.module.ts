@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { AccountsController } from './accounts.controller';
-import { DatabaseModule } from 'src/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Account } from './entities/account.entity';
@@ -13,7 +12,6 @@ import { UserDocument } from 'src/users/entities/user-document.entity';
 
 @Module({
     imports: [
-        DatabaseModule,
         TypeOrmModule.forFeature([Account, Session, User, UserDocument]),
     ],
     providers: [AccountsService, SessionsService, UsersService],

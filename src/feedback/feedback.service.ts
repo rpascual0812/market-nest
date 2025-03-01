@@ -1,14 +1,15 @@
 import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Log } from 'src/logs/entities/log.entity';
 import { UserDocument } from 'src/users/entities/user-document.entity';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Feedback } from './entities/feedback.entity';
 import { Document } from 'src/documents/entities/document.entity';
 
 @Injectable()
 export class FeedbackService {
     async save(body: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -43,7 +44,7 @@ export class FeedbackService {
 
     async findAll(filters: any) {
         try {
-            const feedbacks = await getRepository(Feedback)
+            const feedbacks = await dataSource.getRepository(Feedback)
                 .createQueryBuilder('feedbacks')
                 .select('feedbacks')
                 .andWhere(

@@ -3,7 +3,8 @@ import { CreateEmailDto } from './dto/create-email.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Email } from './entities/email.entity';
 // const axios = require('axios');
 
@@ -52,7 +53,7 @@ export class EmailsService {
     }
 
     async findAll(pagination) {
-        return await getRepository(Email)
+        return await dataSource.getRepository(Email)
             .createQueryBuilder()
             .where("sent = :sent", { sent: false })
             .orderBy('pk', 'DESC')
@@ -67,7 +68,7 @@ export class EmailsService {
     }
 
     async update(pk: number, data: any) {
-        return await getRepository(Email)
+        return await dataSource.getRepository(Email)
             .createQueryBuilder()
             .update(Email)
             .set(data)

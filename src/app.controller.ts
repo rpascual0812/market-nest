@@ -21,7 +21,9 @@ export class AppController {
     @Post('login')
     async login(@Response() res: any, @Request() req) {
         const role = await Role.findOne({
-            name: req.body.role
+            where: {
+                name: req.body.role
+            }
         });
 
         let account = req.user;

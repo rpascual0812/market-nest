@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { CreateCityDto } from './dto/create-city.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
 import { City } from './entities/city.entity';
@@ -9,7 +10,7 @@ export class CitiesService {
     async findAll(filters: any) {
         // console.log(filters);
         try {
-            const cities = await getRepository(City)
+            const cities = await dataSource.getRepository(City)
                 .createQueryBuilder('cities')
                 .select('cities')
                 .leftJoinAndSelect("cities.country", "countries")

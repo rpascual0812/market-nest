@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import { AuthService } from 'src/auth/auth.service';
-import { createQueryBuilder, getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { Account } from './entities/account.entity';
@@ -38,7 +39,7 @@ export class AccountsService {
 
     findOne(pk: number) {
         // return this.accountRepository.findOne({ where: { pk } });
-        return getRepository(Account)
+        return dataSource.getRepository(Account)
             .createQueryBuilder('accounts')
             .select(['accounts.username', 'accounts.verified'])
             .leftJoinAndSelect("accounts.user", "users")
@@ -64,18 +65,18 @@ export class AccountsService {
     }
 
     async findToken(token: string) {
-        return await getRepository(Account)
+        return await dataSource.getRepository(Account)
             .createQueryBuilder('accounts')
             .where(`accounts.password_reset::JSONB @> '{"token": "${token}" }'`)
             .getOne();
     }
 
-    async findByUserName(username: String): Promise<Account | undefined> {
+    async findByUserName(username: string): Promise<Account | undefined> {
         return this.accountRepository.findOne({ where: { username } });
     }
 
     async update(pk: number, fields: object): Promise<any> {
-        return await getRepository(Account)
+        return await dataSource.getRepository(Account)
             .createQueryBuilder()
             .update(Account)
             .set(fields)
