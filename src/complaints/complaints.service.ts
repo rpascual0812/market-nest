@@ -1,6 +1,7 @@
 import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Log } from 'src/logs/entities/log.entity';
-import { Brackets, getConnection, getRepository, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { ComplaintMessage } from './entities/complaint-message.entity';
 import { Complaint } from './entities/complaint.entity';
 import { Document } from 'src/documents/entities/document.entity';
@@ -11,7 +12,7 @@ import { ComplaintDocument } from './entities/complaint-document.entity';
 export class ComplaintsService {
     async findAll(filters: any, user: any) {
         try {
-            const complaints = await getRepository(Complaint)
+            const complaints = await dataSource.getRepository(Complaint)
                 .createQueryBuilder('complaints')
                 .select('complaints')
                 .leftJoinAndSelect("complaints.user", "users")
@@ -63,7 +64,7 @@ export class ComplaintsService {
 
     async findMessages(pk: any) {
         try {
-            return await getRepository(ComplaintMessage)
+            return await dataSource.getRepository(ComplaintMessage)
                 .createQueryBuilder('complaint_messages')
                 .select('complaint_messages')
                 .andWhere("complaint_messages.complaint_pk = :pk", { pk: parseInt(pk) })
@@ -94,7 +95,7 @@ export class ComplaintsService {
 
     async findMessage(pk: any) {
         try {
-            return await getRepository(ComplaintMessage)
+            return await dataSource.getRepository(ComplaintMessage)
                 .createQueryBuilder('complaint_messages')
                 .select('complaint_messages')
                 .andWhere("complaint_messages.pk = :pk", { pk: parseInt(pk) })
@@ -125,7 +126,7 @@ export class ComplaintsService {
 
     @UsePipes(ValidationPipe)
     async save(form: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
         // console.log('complaint', form);
         try {
@@ -188,7 +189,7 @@ export class ComplaintsService {
 
     @UsePipes(ValidationPipe)
     async sendMessage(pk: any, form: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -225,7 +226,7 @@ export class ComplaintsService {
 
     @UsePipes(ValidationPipe)
     async update(pk: any, body: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {

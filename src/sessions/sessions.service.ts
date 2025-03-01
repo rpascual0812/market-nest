@@ -1,6 +1,7 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getConnection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { Session } from './entities/session.entity';
@@ -45,7 +46,7 @@ export class SessionsService {
 
     async removeByAccount(pk: number): Promise<any> {
         // console.log('delete', pk);
-        return await getConnection()
+        return await dataSource
             .createQueryBuilder()
             .delete()
             .from('sessions')

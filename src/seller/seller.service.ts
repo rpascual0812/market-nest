@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from 'src/accounts/entities/account.entity';
 import { Log } from 'src/logs/entities/log.entity';
 import { UserDocument } from 'src/users/entities/user-document.entity';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { v4 as uuidv4 } from 'uuid';
 import { SellerAddress } from './entities/seller-address.entity';
 import { SellerDocument } from './entities/seller-document.entity';
@@ -18,7 +19,7 @@ export class SellerService {
     ) { }
 
     async create(data, user) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         let documents = data.documents != '' ? data.documents.split(',') : [];
@@ -90,7 +91,7 @@ export class SellerService {
     }
 
     findAll(filters: any) {
-        return getRepository(Account)
+        return dataSource.getRepository(Account)
             .createQueryBuilder('accounts')
             .leftJoinAndSelect("accounts.user", "users")
             .leftJoinAndSelect("users.seller", "sellers")
@@ -138,7 +139,7 @@ export class SellerService {
 
     findOne(pk: number) {
         // return this.accountRepository.findOne({ where: { pk } });
-        return getRepository(Account)
+        return dataSource.getRepository(Account)
             .createQueryBuilder('accounts')
             .select(['accounts.username', 'accounts.verified'])
             .leftJoinAndSelect("accounts.user", "users")

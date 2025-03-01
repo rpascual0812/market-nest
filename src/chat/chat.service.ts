@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UserDocument } from 'src/users/entities/user-document.entity';
 import { User } from 'src/users/entities/user.entity';
-import { EntityManager, getConnection, getRepository, getManager, Brackets } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
+import dataSource from 'db/data-source';
 import { ChatParticipant } from './entities/chat-participants.entity';
 import { Chat } from './entities/chat.entity';
 import { Document } from 'src/documents/entities/document.entity';
@@ -13,7 +14,7 @@ import { ChatMessagesRead } from './entities/chat-messages-read.entity';
 @Injectable()
 export class ChatService {
     async create(pk: any, user: any, params: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
@@ -74,7 +75,7 @@ export class ChatService {
 
             // console.log('chat pks ', chat_pks);
 
-            const chats = await getRepository(Chat)
+            const chats = await dataSource.getRepository(Chat)
                 .createQueryBuilder('chats')
                 .select('chats')
 
@@ -147,7 +148,7 @@ export class ChatService {
 
     async participantFirst(filters: any, user: any) {
         try {
-            return await getRepository(ChatParticipant)
+            return await dataSource.getRepository(ChatParticipant)
                 .createQueryBuilder('chat_participants')
                 .select('chat_participants')
                 .leftJoinAndMapOne(
@@ -189,8 +190,7 @@ export class ChatService {
 
     async fetchUnread(filters: any, user: any) {
         try {
-            const entityManager = getManager();
-            return await entityManager.query(`
+            return await dataSource.query(`
             select
                 chats.*
             from chats
@@ -209,8 +209,7 @@ export class ChatService {
 
     async findOne(pk: any) {
         try {
-            const entityManager = getManager();
-            return await entityManager.query(`
+            return await dataSource.query(`
             select
                 chats.*
             from chats
@@ -230,8 +229,7 @@ export class ChatService {
 
     async findByUser(pk: any, user: any, query: any) {
         try {
-            const entityManager = getManager();
-            return await entityManager.query(`
+            return await dataSource.query(`
             select
                 chats.*
             from chats
@@ -275,7 +273,7 @@ export class ChatService {
 
     async getParticipants(pks: any, filters: any) {
         try {
-            return await getRepository(ChatParticipant)
+            return await dataSource.getRepository(ChatParticipant)
                 .createQueryBuilder('chat_participants')
                 .select('chat_participants')
                 .leftJoinAndMapOne(
@@ -311,12 +309,14 @@ export class ChatService {
 
     async createMessage(data: any, user: any) {
         // console.log(data, user);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
         try {
             const chat = await Chat.findOne({
-                uuid: data.uuid
+                where: {
+                    uuid: data.uuid
+                }
             });
 
             return await queryRunner.manager.transaction(
@@ -328,7 +328,7 @@ export class ChatService {
                     message.message = data.message;
                     const newMessage = await EntityManager.save(message);
 
-                    const parent = await EntityManager.findOne(Chat, chat.pk);
+                    const parent = await EntityManager.findOne(Chat, { where: { pk: chat.pk } });
                     parent.last_message = data.message;
                     parent.last_message_user_pk = user.pk;
                     parent.last_message_date = DateTime.now().toJSDate();
@@ -356,7 +356,7 @@ export class ChatService {
 
     async findMessage(pk: any) {
         try {
-            return await getRepository(ChatMessage)
+            return await dataSource.getRepository(ChatMessage)
                 .createQueryBuilder('chat_messages')
                 .select('chat_messages')
                 .leftJoinAndSelect("chat_messages.user", "users")
@@ -388,7 +388,7 @@ export class ChatService {
     async findMessages(pks: any, filters: any, user: any) {
         // console.log('findMessages', filters);
         try {
-            return await getRepository(ChatMessage)
+            return await dataSource.getRepository(ChatMessage)
                 .createQueryBuilder('chat_messages')
                 .select('chat_messages')
                 .leftJoinAndSelect("chat_messages.user", "users")
@@ -423,10 +423,10 @@ export class ChatService {
 
     async getMessages(pk: any, user: any) {
         // console.log('get unread messages', pks, user.pk);
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
         try {
-            return await getRepository(ChatMessage)
+            return await dataSource.getRepository(ChatMessage)
                 .createQueryBuilder('chat_messages')
                 .select('chat_messages')
                 .andWhere("chat_messages.chat_pk IN (:...pk)", { pk: [pk] })
@@ -441,10 +441,10 @@ export class ChatService {
     }
 
     async getMessageRead(pk: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
         try {
-            return await getRepository(ChatMessagesRead)
+            return await dataSource.getRepository(ChatMessagesRead)
                 .createQueryBuilder('chat_messages_read')
                 .select('chat_messages_read')
                 .andWhere("chat_messages_read.chat_message_pk = :pk", { pk })
@@ -460,7 +460,7 @@ export class ChatService {
     }
 
     async setReadMessage(pk: any, message_pk: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
         try {
             return await queryRunner.manager.transaction(
@@ -484,7 +484,7 @@ export class ChatService {
     }
 
     async readAllMessages(messages: any, user: any) {
-        const queryRunner = getConnection().createQueryRunner();
+        const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
         try {
             return await queryRunner.manager.transaction(

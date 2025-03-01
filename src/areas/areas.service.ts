@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
+import dataSource from 'db/data-source';
 import { Area } from './entities/area.entity';
 
 @Injectable()
 export class AreasService {
     async findAll(filters: any) {
         try {
-            const users = await getRepository(Area)
+            const users = await dataSource.getRepository(Area)
                 .createQueryBuilder('areas')
                 .select('areas')
                 .leftJoinAndSelect("areas.country", "countries")

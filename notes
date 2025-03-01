@@ -105,3 +105,8 @@ flutter pub get
 
 #change icon
 flutter pub pub run flutter_launcher_icons:main
+
+
+# RDS Postgres
+CREATE USER samdhana PASSWORD 'krXKK9DbD2P7HPFZvkaVXxYaLEuP7pcPj2bHjL5svBNXWV3bY579PpmkcQy9';
+grant rds_superuser to samdhana;
