@@ -71,7 +71,13 @@ npm run build
 # forever start must be inside the project root directory
 # cd market && forever start dist/main.js
 # FOREVER is currently being used in the server
-forever restart market/dist/main.js
+forever restart marpm2 restart src/main.jsket/dist/main.js
+
+or
+
+scp -r dist ubuntu@47.129.2.142:/home/ubuntu/api
+cd api
+
 
 cloc $(git ls-files)
 
