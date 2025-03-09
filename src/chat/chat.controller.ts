@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Response, HttpStatus } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ChatService } from './chat.service';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('chats')
 export class ChatController {
@@ -11,13 +12,12 @@ export class ChatController {
     async findAll(@Body() body: any, @Request() req: any) {
         // console.log(req.query);
         const chats = await this.chatService.findAll(req.query, req.user);
-        // console.log(req.user);
-        // console.log('chats', chats);
+
         if (chats[1] > 0) {
             const chat_pks = chats[0].map(({ pk }) => pk);
             const participants = await this.chatService.getParticipants(chat_pks, req.query);
             // const unread_messages = await this.chatService.getUnreadMessages(chat_pks, req.user);
-            // console.log('unread', unread_messages);
+            // console.log('participants', participants);
             chats[0].forEach(chat => {
                 chat.read = false;
 
@@ -26,8 +26,16 @@ export class ChatController {
                 }
                 // Append chat documents
 
+                generatePath(chat.chat_participant.user.user_document.document['path'], (path: string) => {
+                    chat.chat_participant.user.user_document.document['path'] = path;
+                });
+
                 if (participants) {
                     participants[0].forEach(participant => {
+                        generatePath(participant.user.user_document.document['path'], (path: string) => {
+                            participant.user.user_document.document['path'] = path;
+                        });
+
                         if (chat.pk == participant.chat_pk && participant.user_pk != req.user.pk) {
                             chat['chat_participants'].push(participant);
                         }
@@ -147,6 +155,12 @@ export class ChatController {
         // console.log(body, req);
         let messages = await this.chatService.findMessages([pk], req.query, req.user);
         if (messages[1] > 0) {
+            messages[0].forEach(message => {
+                generatePath(message.user.user_document.document['path'], (path: string) => {
+                    message.user.user_document.document['path'] = path;
+                });
+            });
+
             return {
                 status: true,
                 data: messages[0].reverse(),

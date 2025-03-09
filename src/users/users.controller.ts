@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile, Response, HttpStatus, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile, Response, HttpStatus, UnauthorizedException, InternalServerErrorException, ParseFilePipeBuilder } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { editFileName, imageFileFilter } from '../utilities/upload.utils';
+import { editFileName } from '../utilities/upload.utils';
 import e from 'express';
 import { AccountsService } from 'src/accounts/accounts.service';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
+import { Throttle } from '@nestjs/throttler';
 // import { response } from 'express';
 
 @Controller('users')
@@ -31,7 +33,11 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Get('profile')
     async find(@Request() req: any) {
-        return await this.usersService.find(req.user);
+        let user = await this.usersService.find(req.user);
+        generatePath(user.user_document.document['path'], (path: string) => {
+            user.user_document.document['path'] = path;
+        });
+        return user;
     }
 
     @Get(':pk')
@@ -82,6 +88,10 @@ export class UsersController {
             });
         }
 
+        generatePath(user['user_document'].document['path'], (path: string) => {
+            user.user_document.document['path'] = path;
+        });
+
         if (user) {
             return user;
         }
@@ -92,8 +102,12 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any) {
-        console.log(req.user, req.query);
         const users = await this.usersService.findAll(req.user, req.query);
+        users.data.map(user => {
+            generatePath(user.user_document.document['path'], (path: string) => {
+                user.user_document.document['path'] = path;
+            });
+        });
         if (users.data) {
             return users;
         }
@@ -101,28 +115,29 @@ export class UsersController {
         throw new InternalServerErrorException();
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Post('photo')
-    @UseInterceptors(
-        FileInterceptor('image', {
-            storage: diskStorage({
-                destination: (req, file, callback) => {
-                    callback(null, process.env.UPLOAD_DIR + '/profile');
-                },
-                filename: editFileName,
-            }),
-            fileFilter: imageFileFilter,
-        }),
-    )
-    async create(@UploadedFile() file: Express.Multer.File, @Request() req: any, @Response() res: any) {
-        const result = await this.usersService.uploadPhoto(req.user, file);
-        // console.log("🚀 ~ file: users.controller.ts ~ line 46 ~ UsersController ~ create ~ result", result.affected)
+    // @UseGuards(JwtAuthGuard)
+    // @Throttle({ default: { limit: 3, ttl: 60000 } })
+    // @Post('photo')
+    // @UseInterceptors(FileInterceptor('image'))
+    // async create(@UploadedFile(
+    //     new ParseFilePipeBuilder()
+    //         .addFileTypeValidator({
+    //             fileType: /(mp4|jpe?g|gif|png|pdf|doc|docx|xls|xlsx|txt|zip|msword|vnd.openxmlformats-officedocument.wordprocessingml.document|vnd.openxmlformats-officedocument.spreadsheetml.sheet)$/,
+    //         })
+    //         .addMaxSizeValidator({ maxSize: 5000000 }) // 5MB
+    //         .build({
+    //             errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+    //         }),
+    // )
+    // file: Express.Multer.File) {
+    //     const result = await this.usersService.uploadPhoto(req.user, file);
+    //     // console.log("🚀 ~ file: users.controller.ts ~ line 46 ~ UsersController ~ create ~ result", result.affected)
 
-        return res.status(result.affected == 1 ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json({
-            status: result.affected == 1 ? true : false,
-            file: file,
-        });
-    }
+    //     return res.status(result.affected == 1 ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json({
+    //         status: result.affected == 1 ? true : false,
+    //         file: file,
+    //     });
+    // }
 
     @UseGuards(JwtAuthGuard)
     @Get('last')

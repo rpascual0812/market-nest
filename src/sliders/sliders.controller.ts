@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile, Response, HttpStatus, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { SlidersService } from './sliders.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('sliders')
 export class SlidersController {
@@ -9,9 +10,18 @@ export class SlidersController {
     // @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any) {
-        const data = await this.slidersService.findAll(req.user, req.query);
-        if (data) {
-            return data;
+        const sliders: any = await this.slidersService.findAll(req.user, req.query);
+        if (sliders) {
+            sliders.data.forEach(slider => {
+                const slider_documents: any = slider.slider_document;
+                slider_documents.forEach(slider_document => {
+                    generatePath(slider_document.document['path'], (path: string) => {
+                        slider_document.document['path'] = path;
+                    });
+                });
+            });
+
+            return sliders;
         }
 
         throw new InternalServerErrorException();

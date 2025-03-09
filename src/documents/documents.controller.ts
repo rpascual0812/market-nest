@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Response, UploadedFile, HttpStatus, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Response, UploadedFile, HttpStatus, UseGuards, UseInterceptors, ParseFilePipeBuilder } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { editFileName, imageFileFilter } from '../utilities/upload.utils';
+import { editFileName } from '../utilities/upload.utils';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('documents')
 export class DocumentsController {
@@ -17,20 +18,27 @@ export class DocumentsController {
     // }
 
     @UseGuards(JwtAuthGuard)
+    @Throttle({ default: { limit: 3, ttl: 60000 } })
     @Post('upload')
-    @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination: (req, file, callback) => {
-                    callback(null, process.env.UPLOAD_DIR + '/documents');
-                },
-                filename: editFileName,
-            }),
-            fileFilter: imageFileFilter,
-        }),
-    )
-    async uploadedFile(@UploadedFile() file: Express.Multer.File, @Request() req) {
-        return await this.documentsService.create(file);
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadedFile(
+        @UploadedFile(
+            new ParseFilePipeBuilder()
+                .addFileTypeValidator({
+                    fileType: /(mp4|jpe?g|gif|png|pdf|doc|docx|xls|xlsx|txt|zip|msword|vnd.openxmlformats-officedocument.wordprocessingml.document|vnd.openxmlformats-officedocument.spreadsheetml.sheet)$/,
+                })
+                .addMaxSizeValidator({ maxSize: 5000000 }) // 5MB
+                .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                }),
+        )
+        file: Express.Multer.File
+    ) {
+        let fileName = '';
+        editFileName(file, (name) => {
+            fileName = name;
+        });
+        return await this.documentsService.uploadFile(fileName, file);
     }
 
     @UseGuards(JwtAuthGuard)

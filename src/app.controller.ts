@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, Response, UseGuards, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, Response, UseGuards, HttpStatus, UseInterceptors, UploadedFile, ParseFilePipeBuilder } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { AuthenticatedGuard } from './auth/authenticated.guard';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -6,9 +6,10 @@ import { LocalAuthGuard } from './auth/local-auth.guard';
 import { DateTime } from "luxon";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { editFileName, imageFileFilter } from './utilities/upload.utils';
+import { editFileName } from './utilities/upload.utils';
 import { DocumentsService } from './documents/documents.service';
 import { Role } from './roles/entities/role.entity';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller()
 export class AppController {
@@ -89,29 +90,27 @@ export class AppController {
         return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
 
+    @Throttle({ default: { limit: 3, ttl: 60000 } })
     @Post('upload')
-    @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination: './assets/images',
-                filename: editFileName,
-            }),
-            fileFilter: imageFileFilter,
-        }),
-    )
-    async upload(@UploadedFile() file: any, @Request() req, @Response() res: any): Promise<string> {
-        const document = await this.documentsService.create(file);
-        if (document) {
-            // console.log(document);
-            return res.status(HttpStatus.OK).json({ status: 'success', document });
-        }
-        return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
-        // if (file) {
-        //     return res.status(HttpStatus.OK).json(file.path);
-        // }
-        // else {
-        //     return res.status(HttpStatus.NOT_FOUND).json('');
-        // }
+    @UseInterceptors(FileInterceptor('file'))
+    async upload(
+        @UploadedFile(
+            new ParseFilePipeBuilder()
+                .addFileTypeValidator({
+                    fileType: /(mp4|jpe?g|gif|png|pdf|doc|docx|xls|xlsx|txt|zip|msword|vnd.openxmlformats-officedocument.wordprocessingml.document|vnd.openxmlformats-officedocument.spreadsheetml.sheet)$/,
+                })
+                .addMaxSizeValidator({ maxSize: 5000000 }) // 5MB
+                .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                }),
+        )
+        file: Express.Multer.File
+    ) {
+        let fileName = '';
+        editFileName(file, (name) => {
+            fileName = name;
+        });
+        return await this.documentsService.uploadFile(fileName, file);
     }
 
     @UseGuards(JwtAuthGuard)

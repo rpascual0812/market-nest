@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile, Response, HttpStatus, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('articles')
 export class ArticlesController {
@@ -8,10 +9,14 @@ export class ArticlesController {
 
     @Get()
     async findAll(@Request() req: any) {
-        const data = await this.articlesService.findAll(req.user, req.query);
-        // console.log('articles', data);
-        if (data) {
-            return data;
+        const articles = await this.articlesService.findAll(req.user, req.query);
+        if (articles) {
+            articles.data.map(article => {
+                generatePath(article.article_document.document['path'], (path: string) => {
+                    article.article_document.document['path'] = path;
+                });
+            });
+            return articles;
         }
 
         throw new InternalServerErrorException();
