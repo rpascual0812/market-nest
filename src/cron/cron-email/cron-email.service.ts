@@ -41,10 +41,13 @@ export class CronEmailService {
     }
 
     mailjet(email: any) {
-        const mailjet = require('node-mailjet')
-            .connect(process.env.API_KEY, process.env.SECRET_KEY)
+        const mailjet = require('node-mailjet').apiConnect(
+            process.env.API_KEY,
+            process.env.SECRET_KEY,
+        );
+
         const request = mailjet
-            .post("send", { 'version': 'v3.1' })
+            .post('send', { version: 'v3.1' })
             .request(this.buildEmail(email));
 
         console.log('Sending email to: ' + email.to + ' - ' + email.subject);

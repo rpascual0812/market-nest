@@ -7,6 +7,7 @@ export class CitiesController {
 
     @Get()
     findAll(@Request() req: any) {
-        return this.citiesService.findAll(req.query);
+        const query = JSON.parse(JSON.stringify(req.query));
+        return this.citiesService.findAll(query);
     }
 }

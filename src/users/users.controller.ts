@@ -34,9 +34,12 @@ export class UsersController {
     @Get('profile')
     async find(@Request() req: any) {
         let user = await this.usersService.find(req.user);
-        generatePath(user.user_document.document['path'], (path: string) => {
-            user.user_document.document['path'] = path;
-        });
+        if (user.user_document) {
+                generatePath(user.user_document.document['path'], (path: string) => {
+                user.user_document.document['path'] = path;
+            });    
+        }
+
         return user;
     }
 
