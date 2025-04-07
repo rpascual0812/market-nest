@@ -15,6 +15,7 @@ export class ArticlesService {
     ) { }
 
     async findAll(data: any, filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             const articles = await dataSource.getRepository(Article)
                 .createQueryBuilder('articles')

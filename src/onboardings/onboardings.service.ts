@@ -15,6 +15,7 @@ export class OnboardingsService {
     ) { }
 
     async findAll(data: any, filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             const onboardings = await dataSource.getRepository(Onboarding)
                 .createQueryBuilder('onboardings')

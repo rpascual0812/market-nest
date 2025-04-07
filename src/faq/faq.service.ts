@@ -3,25 +3,27 @@ import { Log } from 'src/logs/entities/log.entity';
 import { Repository } from 'typeorm';
 import dataSource from 'db/data-source';
 import { Faq } from './entities/faq.entity';
+import { json } from 'stream/consumers';
 
 @Injectable()
 export class FaqService {
     async findAll(filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             const faqs = await dataSource.getRepository(Faq)
                 .createQueryBuilder('faq')
                 .select('faq')
-                .andWhere(
-                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
-                        "faq.question = :keyword" : "1=1",
-                    { keyword: `${filters.keyword}` }
-                )
                 .leftJoinAndSelect("faq.user", "users")
                 .where('faq.archived=false')
+                .andWhere(
+                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
+                        "faq.question ILIKE :keyword" : "1=1",
+                    { keyword: `%${filters.keyword.toLowerCase()}%` }
+                )
                 .orderBy('faq.order')
                 .getManyAndCount()
                 ;
-
+            
             return {
                 status: true,
                 data: faqs[0],

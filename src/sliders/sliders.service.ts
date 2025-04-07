@@ -16,6 +16,7 @@ export class SlidersService {
     ) { }
 
     async findAll(data: any, filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             const sliders = await dataSource.getRepository(Slider)
                 .createQueryBuilder('sliders')

@@ -13,7 +13,7 @@ export class ReportService {
     ) { }
 
     async findOrders(filters: any, user: any) {
-        // console.log(filters, user);
+        filters = JSON.parse(JSON.stringify(filters));
         let type = [];
         let hasFutureCrops = false;
         if (Object.prototype.hasOwnProperty.call(filters, 'type') && filters.type) {

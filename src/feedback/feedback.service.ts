@@ -43,6 +43,7 @@ export class FeedbackService {
     }
 
     async findAll(filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             const feedbacks = await dataSource.getRepository(Feedback)
                 .createQueryBuilder('feedbacks')

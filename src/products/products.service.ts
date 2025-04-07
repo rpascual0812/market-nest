@@ -217,6 +217,7 @@ export class ProductsService {
     }
 
     async findAll(filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         let orderByColumn,
             orderByDirection;
         if (Object.prototype.hasOwnProperty.call(filters, 'orderBy')) {
@@ -407,6 +408,7 @@ export class ProductsService {
     }
 
     async findBestSellers(filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             let types = [];
             let isFutureCrop = false;

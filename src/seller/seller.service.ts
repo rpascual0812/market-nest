@@ -91,6 +91,7 @@ export class SellerService {
     }
 
     findAll(filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         return dataSource.getRepository(Account)
             .createQueryBuilder('accounts')
             .leftJoinAndSelect("accounts.user", "users")

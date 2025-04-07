@@ -57,6 +57,7 @@ export class UsersService {
     }
 
     async findAll(data: any, filters: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             let orderByColumn,
                 orderByDirection;

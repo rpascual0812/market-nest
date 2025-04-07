@@ -9,7 +9,7 @@ import { DateTime } from "luxon";
 export class ProvincesService {
 
     async findAll(filters: any) {
-        console.log('filters', filters);
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             const users = await dataSource.getRepository(Province)
                 .createQueryBuilder('provinces')

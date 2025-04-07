@@ -11,6 +11,7 @@ import { ComplaintDocument } from './entities/complaint-document.entity';
 @Injectable()
 export class ComplaintsService {
     async findAll(filters: any, user: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             const complaints = await dataSource.getRepository(Complaint)
                 .createQueryBuilder('complaints')

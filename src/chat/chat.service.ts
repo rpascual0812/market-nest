@@ -55,6 +55,7 @@ export class ChatService {
     }
 
     async findAll(filters: any, user: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         // console.log('filters', filters, user.pk);
         try {
 
@@ -147,6 +148,7 @@ export class ChatService {
     }
 
     async participantFirst(filters: any, user: any) {
+        filters = JSON.parse(JSON.stringify(filters));
         try {
             return await dataSource.getRepository(ChatParticipant)
                 .createQueryBuilder('chat_participants')
