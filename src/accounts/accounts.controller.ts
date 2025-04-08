@@ -4,6 +4,7 @@ import { UsersService } from 'src/users/users.service';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('accounts')
 export class AccountsController {
@@ -23,6 +24,7 @@ export class AccountsController {
     @Get(':pk')
     async findOne(@Param('pk') pk: number, @Request() req: any) {
         const account = await this.accountsService.findOne(pk);
+        const userDocuments = await this.usersService.getUserDocuments([account['user']['pk']], req.query);
         const userAddresses = await this.usersService.getUserAddresses([account['user']['pk']], req.query);
         const sellerAddresses = account && account['user']['seller'] ? await this.usersService.getSellerAddresses([account['user']['seller']['pk']], req.query) : [];
         const userFollowing = await this.usersService.getUserFollowing([account['user']['pk']], req.query);
@@ -98,6 +100,16 @@ export class AccountsController {
                     account['user']['user_rating_total'] = rating.total / rating.count;
                 }
             });
+        }
+
+        if (userDocuments[0]) {
+            userDocuments[0].forEach(userDocument => {
+                generatePath(userDocument.document.path, (path: string) => {
+                    userDocument.document.path = path;
+                });
+            });
+            
+            account['user']['user_document'] = userDocuments[0];
         }
 
         // console.log(account['user']);

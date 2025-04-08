@@ -240,6 +240,31 @@ export class UsersService {
             ;
     }
 
+    async getUserDocuments(pks: any, filters: any) {
+        try {
+            return await dataSource.getRepository(UserDocument)
+                .createQueryBuilder('user_documents')
+                .select('user_documents')
+                .leftJoinAndMapOne(
+                    'user_documents.document',
+                    Document,
+                    'documents',
+                    'user_documents.document_pk=documents.pk',
+                )
+                .where("user_documents.user_pk IN (:...user_pk)", { user_pk: pks })
+                // .skip(filters.skip)
+                // .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
     async getUserAddresses(pks: any, filters: any) {
         try {
             return await dataSource.getRepository(UserAddress)

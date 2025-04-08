@@ -18,7 +18,7 @@ export class FaqService {
                 .andWhere(
                     Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
                         "faq.question ILIKE :keyword" : "1=1",
-                    { keyword: `%${filters.keyword.toLowerCase()}%` }
+                    { keyword: `%${filters.keyword ? filters.keyword.toLowerCase() : ''}%` }
                 )
                 .orderBy('faq.order')
                 .getManyAndCount()
