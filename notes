@@ -2,13 +2,13 @@
 npm run typeorm schema:sync
 
 #create new migration
-npm run typeorm migration:create -- -n InsertAccountsMainAdmin
+npm run migration:create -name=InsertProvinces
 
 #run migration
-npm run typeorm migration:run
+npm run migration:run
 
 #rollback migration
-npm run typeorm migration:revert
+npm run migration:revert
 
 
 
