@@ -47,6 +47,12 @@ export class SlidersController {
 
         if (data) {
             const slider = await this.slidersService.find({ pk: data.data.pk });
+            const slider_documents: any = slider.data.slider_document;
+            slider_documents.forEach(slider_document => {
+                generatePath(slider_document.document['path'], (path: string) => {
+                    slider_document.document['path'] = path;
+                });
+            });
             return slider;
         }
 
