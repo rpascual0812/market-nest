@@ -20,6 +20,11 @@ export class FaqService {
                         "faq.question ILIKE :keyword" : "1=1",
                     { keyword: `%${filters.keyword ? filters.keyword.toLowerCase() : ''}%` }
                 )
+                .orWhere(
+                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
+                        "faq.answer ILIKE :keyword" : "1=1",
+                    { keyword: `%${filters.keyword ? filters.keyword.toLowerCase() : ''}%` }
+                )
                 .orderBy('faq.order')
                 .getManyAndCount()
                 ;

@@ -349,17 +349,6 @@ export class ProductsService {
                 .leftJoinAndSelect("products.country", "countries")
                 .leftJoinAndSelect("products.category", "categories")
 
-                // user addresses
-                // .leftJoinAndMapMany(
-                //     'users.user_address',
-                //     UserAddress,
-                //     'user_addresses',
-                //     'users.pk=user_addresses.user_pk'
-                // )
-                // .leftJoinAndSelect("user_addresses.province", "provinces")
-                // .leftJoinAndSelect("user_addresses.city", "cities")
-                // .leftJoinAndSelect("user_addresses.area", "areas")
-
                 // seller user details
                 .leftJoinAndMapOne(
                     'sellers.user',

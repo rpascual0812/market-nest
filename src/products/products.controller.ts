@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Response, U
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('products')
 export class ProductsController {
@@ -46,11 +47,17 @@ export class ProductsController {
         // console.log('products', products[0]);
         // console.log('products', products);
         if (products && products[0].length > 0) {
+            
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
             const seller_pks = products[0].map(({ user }) => user && user.seller ? user.seller.pk : null);
 
             const documents = await this.productsService.getProductDocuments(pks, req.query);
+            documents[0].forEach(productDocument => {
+                generatePath(productDocument.document.path, (path: string) => {
+                    productDocument.document.path = path;
+                });
+            });
             // console.log('documents', documents);
             const userAddresses = await this.usersService.getUserAddresses(user_pks, req.query);
 
@@ -143,6 +150,12 @@ export class ProductsController {
                         }
                     });
                 }
+
+                product.user_document.forEach(userDocument => {
+                    generatePath(userDocument.document.path, (path: string) => {
+                        userDocument.document.path = path;
+                    });
+                });
             });
 
             // if the category is is best seller or average rating
@@ -232,9 +245,12 @@ export class ProductsController {
             product['product_documents'] = [];
             // Append product documents
             if (documents) {
-                documents[0].forEach(document => {
-                    if (product['pk'] == document.product_pk) {
-                        product['product_documents'].push(document);
+                documents[0].forEach(productDocument => {
+                    if (product['pk'] == productDocument.product_pk) {
+                        generatePath(productDocument.document.path, (path: string) => {
+                            productDocument.document.path = path;
+                        });
+                        product['product_documents'].push(productDocument);
                     }
                 });
             }
@@ -280,6 +296,12 @@ export class ProductsController {
                     }
                 });
             }
+
+            product['user_document'].forEach(userDocument => {
+                generatePath(userDocument.document.path, (path: string) => {
+                    userDocument.document.path = path;
+                });
+            });
 
             return res.status(HttpStatus.OK).json({ status: 'success', data: product });
         }
