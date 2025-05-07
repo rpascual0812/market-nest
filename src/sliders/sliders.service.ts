@@ -128,12 +128,14 @@ export class SlidersService {
                         .orderBy('sliders.order', 'DESC')
                         .getOne()
                         ;
+                    
+                    const lastSliderOrder = lastSlider ? lastSlider.order : 0;
 
                     slider.type = 'home'; // default type of sliders for now.
                     slider.title = form.title;
                     slider.details = form.details;
                     slider.user_pk = user.pk;
-                    slider.order = lastSlider.order + 1
+                    slider.order = lastSliderOrder + 1
                     slider = await EntityManager.save(slider);
 
                     if (form.icon) {
