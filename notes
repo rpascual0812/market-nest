@@ -1,5 +1,5 @@
 #create tables based on entities
-npm run typeorm schema:sync
+npm run schema:sync
 
 #create new migration
 npm run migration:create -name=InsertProvinces

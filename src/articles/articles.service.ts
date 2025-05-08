@@ -48,6 +48,8 @@ export class ArticlesService {
                 .leftJoinAndSelect("articles.user", "users")
                 .skip(filters.skip)
                 .take(filters.take)
+                .orderBy('articles.sort_order', 'ASC')
+                .addOrderBy('articles.pk', 'ASC')
                 .getManyAndCount()
                 ;
 
@@ -81,11 +83,21 @@ export class ArticlesService {
                         articleObj = await EntityManager.update(Article, filters, { title: form.title, description: form.description, url: form.url });
                     }
                     else {
+                        // Get last sort order
+                        const lastArticle = await EntityManager.findOne(Article, {
+                            order: { sort_order: 'DESC' },
+                            where: {
+                                archived: false
+                            }
+                        });
+                        const lastSortOrder = lastArticle ? lastArticle.sort_order : 0;
+
                         article = new Article();
                         article.title = form.title;
                         article.description = form.description;
                         article.url = form.url;
                         article.user_pk = user.pk;
+                        article.sort_order = lastSortOrder + 1;
                         articleObj = await EntityManager.save(article);
                     }
 
@@ -157,6 +169,41 @@ export class ArticlesService {
                     await EntityManager.save(log);
 
                     return { status: true, data: slider };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    @UsePipes(ValidationPipe)
+    async sort(pk: number, direction: string) {
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const article = await EntityManager.findOne(Article, { where: { pk } });
+                    switch (direction) {
+                        case 'up':
+                            const prevArticle = await EntityManager.findOne(Article, { where: { sort_order: article.sort_order - 1 } });
+                            if (prevArticle) {
+                                await EntityManager.update(Article, { pk: prevArticle.pk }, { sort_order: article.sort_order });
+                            }
+                            return await EntityManager.update(Article, { pk }, { sort_order: article.sort_order - 1 });
+                        case 'down':
+                            const nextArticle = await EntityManager.findOne(Article, { where: { sort_order: article.sort_order + 1 } });
+                            if (nextArticle) {
+                                await EntityManager.update(Article, { pk: nextArticle.pk }, { sort_order: article.sort_order });
+                            }
+                            return await EntityManager.update(Article, { pk }, { sort_order: article.sort_order + 1 });
+                        default:
+                            break;
+                    }                        
                 }
             );
         } catch (err) {

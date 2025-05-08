@@ -20,6 +20,9 @@ export class Article extends BaseEntity {
     @Column({ name: 'user_pk', nullable: false })
     user_pk: number;
 
+    @Column({ name: 'sort_order', default: 1 })
+    sort_order: number;
+
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
 

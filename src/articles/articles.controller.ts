@@ -45,4 +45,16 @@ export class ArticlesController {
 
         throw new InternalServerErrorException();
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':pk/sort')
+    async sort(@Param('pk') pk: any, @Body() body: any) {
+        const data = await this.articlesService.sort(pk, body.direction);
+
+        if (data) {
+            return data;
+        }
+
+        throw new InternalServerErrorException();
+    }
 }
