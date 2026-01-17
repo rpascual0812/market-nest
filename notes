@@ -62,16 +62,18 @@ cd /home/rafael/Documents/Market && ./market
 
 cd market
 git pull origin master
-npm run typeorm schema:sync
-npm run typeorm migration:run
+npm run schema:sync
+npm run migration:run
 npm run build
-# pm2 restart main
+pm2 stop all
+pm2 start dist/src/main.js --name market --watch
 
 #!/bin/bash
 # forever start must be inside the project root directory
 # cd market && forever start dist/main.js
 # FOREVER is currently being used in the server
-forever restart marpm2 restart src/main.jsket/dist/main.js
+forever restart market
+pm2 restart src/main.js
 
 or
 
