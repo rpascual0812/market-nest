@@ -62,9 +62,9 @@ cd /home/rafael/Documents/Market && ./market
 
 cd market
 git pull origin master
+npm run build
 npm run schema:sync
 npm run migration:run
-npm run build
 pm2 stop all
 pm2 start dist/src/main.js --name market --watch
 
