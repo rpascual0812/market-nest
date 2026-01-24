@@ -12,9 +12,11 @@ export class ArticlesController {
         const articles = await this.articlesService.findAll(req.user, req.query);
         if (articles) {
             articles.data.map(article => {
-                generatePath(article.article_document.document['path'], (path: string) => {
-                    article.article_document.document['path'] = path;
-                });
+                if (article['article_document'] !== null) {
+                    generatePath(article.article_document.document['path'], (path: string) => {
+                        article.article_document.document['path'] = path;
+                    });
+                }
             });
             return articles;
         }
