@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, InternalServerErrorException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ComplaintsService } from './complaints.service';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('complaints')
 export class ComplaintsController {
@@ -21,7 +22,16 @@ export class ComplaintsController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@Request() req: any, @Body() body: any) {
-        return await this.complaintsService.findAll(req.query, req.user);
+        let complaints = await this.complaintsService.findAll(req.query, req.user);
+        if (complaints.total > 0) {
+            complaints.data.forEach(complaint => {
+                generatePath(complaint['complaint_document'][0]['document']['path'], (path: string) => {
+                    complaint['complaint_document'][0]['document']['path'] = path;
+                });
+            });
+        }
+
+        return complaints;
     }
 
     @UseGuards(JwtAuthGuard)
@@ -30,6 +40,10 @@ export class ComplaintsController {
         let messages = await this.complaintsService.findMessages(pk);
 
         messages[0].forEach((message) => {
+            generatePath(message.user['user_document']['document']['path'], (path: string) => {
+                message.user['user_document']['document']['path'] = path;
+            });
+
             message.self = false;
             if (message.user.pk == req.user.pk) {
                 message.self = true;
