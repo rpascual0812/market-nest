@@ -3,6 +3,7 @@ import { SellerService } from './seller.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ProductsService } from 'src/products/products.service';
 import { UsersService } from 'src/users/users.service';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('sellers')
 export class SellerController {
@@ -63,7 +64,7 @@ export class SellerController {
     async sellerProducts(@Param('pk') pk: number, @Request() req: any) {
         // console.log(req.params);
         const products = await this.productsService.findAll({ user_pk: pk, type: req.query.type, orderBy: req.query.orderBy });
-        console.log(products);
+
         if (products[1] > 0) {
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
@@ -78,6 +79,11 @@ export class SellerController {
             const totalRatings = await this.productsService.getProductTotalRatings(pks);
 
             products[0].forEach(product => {
+                product['user_document'].forEach(userDocument => {
+                    generatePath(userDocument.document['path'], (path: string) => {
+                        userDocument.document['path'] = path;
+                    });
+                });
 
                 if (!Object.prototype.hasOwnProperty.call(product, 'product_documents')) {
                     product['product_documents'] = [];
@@ -86,6 +92,9 @@ export class SellerController {
                 if (documents) {
                     documents[0].forEach(document => {
                         if (product.pk == document.product_pk) {
+                            generatePath(document.document['path'], (path: string) => {
+                                document.document['path'] = path;
+                            });
                             product['product_documents'].push(document);
                         }
                     });

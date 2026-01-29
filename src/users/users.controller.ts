@@ -37,7 +37,7 @@ export class UsersController {
         if (user && user.user_document) {
             generatePath(user.user_document.document['path'], (path: string) => {
                 user.user_document.document['path'] = path;
-            });    
+            });
         }
 
         return user;
@@ -46,6 +46,7 @@ export class UsersController {
     @Get(':pk')
     async findOne(@Request() req: any) {
         const user = await this.usersService.findOne(req.params);
+        const userDocuments = await this.usersService.getUserDocuments([user['pk']], req.query);
         const userAddresses = await this.usersService.getUserAddresses([user['pk']], req.query);
         const sellerAddresses = user && user['seller'] ? await this.usersService.getSellerAddresses([user['seller']['pk']], req.query) : [];
         const userFollowing = await this.usersService.getUserFollowing([user['pk']], req.query);
@@ -91,9 +92,15 @@ export class UsersController {
             });
         }
 
-        generatePath(user['user_document'].document['path'], (path: string) => {
-            user.user_document.document['path'] = path;
-        });
+        if (userDocuments[0]) {
+            userDocuments[0].forEach(userDocument => {
+                generatePath(userDocument.document.path, (path: string) => {
+                    userDocument.document.path = path;
+                });
+            });
+
+            user['user_document'] = userDocuments[0];
+        }
 
         if (user) {
             return user;

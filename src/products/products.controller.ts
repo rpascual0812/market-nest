@@ -47,7 +47,7 @@ export class ProductsController {
         // console.log('products', products[0]);
         // console.log('products', products);
         if (products && products[0].length > 0) {
-            
+
             const pks = products[0].map(({ pk }) => pk);
             const user_pks = products[0].map(({ user_pk }) => user_pk);
             const seller_pks = products[0].map(({ user }) => user && user.seller ? user.seller.pk : null);
@@ -82,6 +82,9 @@ export class ProductsController {
                     documents[0].forEach(document => {
                         // console.log(product.pk, document.product_pk);
                         if (product.pk == document.product_pk) {
+                            generatePath(document.path, (path: string) => {
+                                document.path = path;
+                            });
                             product['product_documents'].push(document);
                         }
                     });
