@@ -172,6 +172,7 @@ export class SellerController {
     @Get(':pk')
     async findOne(@Param('pk') pk: number, @Request() req: any) {
         const account = await this.sellerService.findOne(pk);
+        const userDocuments = await this.usersService.getUserDocuments([account['user']['pk']], req.query);
         const userAddresses = await this.usersService.getUserAddresses([account['user']['pk']], req.query);
         const sellerAddresses = account && account['user']['seller'] ? await this.usersService.getSellerAddresses([account['user']['seller']['pk']], req.query) : [];
         const userFollowing = await this.usersService.getUserFollowing([account['user']['pk']], req.query);
@@ -185,6 +186,17 @@ export class SellerController {
         const totalRatings = await this.usersService.getUserTotalRatings([account['user']['pk']]);
         // console.log(ratings, totalRatings);
         // console.log(userAddresses);
+
+
+        if (userDocuments[0]) {
+            userDocuments[0].forEach(userDocument => {
+                generatePath(userDocument.document.path, (path: string) => {
+                    userDocument.document.path = path;
+                });
+            });
+
+            account['user']['user_document'] = userDocuments[0];
+        }
 
         account['user']['user_addresses'] = [];
         // Append user addresses
@@ -212,6 +224,14 @@ export class SellerController {
                 if (account['user']['pk'] == following.created_by) {
                     account['user']['following'].push(following);
                 }
+
+                if (following['user']['user_document'][0]) {
+                    following['user']['user_document'].forEach(userDocument => {
+                        generatePath(userDocument.document.path, (path: string) => {
+                            userDocument.document.path = path;
+                        });
+                    });
+                }
             });
         }
 
@@ -221,6 +241,14 @@ export class SellerController {
             userFollower[0].forEach(follower => {
                 if (account['user']['pk'] == follower.user_pk) {
                     account['user']['follower'].push(follower);
+                }
+
+                if (follower['createdBy']['user_document'][0]) {
+                    follower['createdBy']['user_document'].forEach(userDocument => {
+                        generatePath(userDocument.document.path, (path: string) => {
+                            userDocument.document.path = path;
+                        });
+                    });
                 }
             });
         }
