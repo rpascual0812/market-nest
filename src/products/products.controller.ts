@@ -213,6 +213,9 @@ export class ProductsController {
                 if (documents) {
                     documents[0].forEach(document => {
                         if (seen['product'].pk == document.product_pk) {
+                            generatePath(document.document['path'], (path: string) => {
+                                document.document['path'] = path;
+                            });
                             seen['product']['product_documents'].push(document);
                         }
                     });

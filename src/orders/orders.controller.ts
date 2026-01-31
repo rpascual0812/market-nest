@@ -7,6 +7,7 @@ import { ProductsService } from 'src/products/products.service';
 import { UsersService } from 'src/users/users.service';
 import { getConnection } from 'typeorm';
 import { Order } from './entities/order.entity';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('orders')
 export class OrdersController {
@@ -55,6 +56,9 @@ export class OrdersController {
                 if (documents) {
                     documents[0].forEach(document => {
                         if (order.product.pk == document.product_pk) {
+                            generatePath(document.document['path'], (path: string) => {
+                                document.document['path'] = path;
+                            });
                             order['product']['product_documents'].push(document);
                         }
                     });
@@ -144,6 +148,9 @@ export class OrdersController {
                 if (documents) {
                     documents[0].forEach(document => {
                         if (order.product.pk == document.product_pk) {
+                            generatePath(document.document['path'], (path: string) => {
+                                document.document['path'] = path;
+                            });
                             order['product']['product_documents'].push(document);
                         }
                     });
@@ -208,6 +215,9 @@ export class OrdersController {
                 if (documents) {
                     documents[0].forEach(document => {
                         if (order.product.pk == document.product_pk) {
+                            generatePath(document.document['path'], (path: string) => {
+                                document.document['path'] = path;
+                            });
                             order['product_documents'].push(document);
                         }
                     });
@@ -249,6 +259,9 @@ export class OrdersController {
                 if (documents) {
                     documents[0].forEach(document => {
                         if (order.product.pk == document.product_pk) {
+                            generatePath(document.document['path'], (path: string) => {
+                                document.document['path'] = path;
+                            });
                             order['product_documents'].push(document);
                         }
                     });
