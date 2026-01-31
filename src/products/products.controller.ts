@@ -357,14 +357,28 @@ export class ProductsController {
             skip: req.query.skip,
             take: req.query.take,
         };
-        const data = await this.productsService.getInterested(filters);
-        // console.log(data);
+        const [products, total] = await this.productsService.getInterested(filters);
+        const user_pks = products.map(({ user_pk }) => user_pk);
 
-        if (data) {
+        const userDocuments = await this.usersService.getUserDocuments(user_pks, req.query);
+
+        userDocuments[0].forEach(document => {
+            generatePath(document.document.path, (path: string) => {
+                document.document.path = path;
+            });
+        })
+
+        products.forEach(product => {
+            if (userDocuments[0].length > 0 && product.user['pk'] == userDocuments[0][0]['user_pk']) {
+                product.user.user_document = userDocuments[0];
+            }
+        })
+
+        if (products) {
             return res.status(HttpStatus.OK).json({
                 status: true,
-                data: data[0],
-                total: data[1]
+                data: products,
+                total: total
             });
         }
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ status: 'failed' });
