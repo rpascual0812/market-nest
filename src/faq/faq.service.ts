@@ -1,6 +1,6 @@
 import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Log } from 'src/logs/entities/log.entity';
-import { Repository } from 'typeorm';
+import { Brackets } from 'typeorm';
 import dataSource from 'db/data-source';
 import { Faq } from './entities/faq.entity';
 import { json } from 'stream/consumers';
@@ -15,20 +15,23 @@ export class FaqService {
                 .select('faq')
                 .leftJoinAndSelect("faq.user", "users")
                 .where('faq.archived=false')
-                .andWhere(
-                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
-                        "faq.question ILIKE :keyword" : "1=1",
-                    { keyword: `%${filters.keyword ? filters.keyword.toLowerCase() : ''}%` }
-                )
-                .orWhere(
-                    Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
-                        "faq.answer ILIKE :keyword" : "1=1",
-                    { keyword: `%${filters.keyword ? filters.keyword.toLowerCase() : ''}%` }
-                )
+                .andWhere(new Brackets(
+                    qb => {
+                        qb.where(
+                            Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
+                                "faq.question ILIKE :keyword" : "1=1",
+                            { keyword: `%${filters.keyword ? filters.keyword.toLowerCase() : ''}%` }
+                        )
+                            .orWhere(
+                                Object.prototype.hasOwnProperty.call(filters, 'keyword') && filters.keyword != '' ?
+                                    "faq.answer ILIKE :keyword" : "1=1",
+                                { keyword: `%${filters.keyword ? filters.keyword.toLowerCase() : ''}%` }
+                            );
+                    }))
                 .orderBy('faq.order')
                 .getManyAndCount()
                 ;
-            
+
             return {
                 status: true,
                 data: faqs[0],
