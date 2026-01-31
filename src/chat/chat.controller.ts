@@ -122,6 +122,10 @@ export class ChatController {
         if (participants) {
             participants[0].forEach(participant => {
                 if (chat['pk'] == participant.chat_pk) {
+                    generatePath(participant.user.user_document.document['path'], (path: string) => {
+                        participant.user.user_document.document['path'] = path;
+                    });
+
                     chat['chat_participants'].push(participant);
                 }
             });
