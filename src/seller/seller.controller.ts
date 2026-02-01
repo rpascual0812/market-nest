@@ -107,6 +107,12 @@ export class SellerController {
                 if (ratings) {
                     ratings[0].forEach(rating => {
                         if (product.pk == rating.product_pk) {
+                            rating.user.user_document.forEach(document => {
+                                generatePath(document.document.path, (path: string) => {
+                                    document.document.path = path;
+                                });
+                            })
+
                             product['product_ratings'].push(rating);
                         }
                     });

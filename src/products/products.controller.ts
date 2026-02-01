@@ -97,6 +97,11 @@ export class ProductsController {
                 if (ratings) {
                     ratings[0].forEach(rating => {
                         if (product.pk == rating.product_pk) {
+                            rating.user.user_document.forEach(document => {
+                                generatePath(document.document.path, (path: string) => {
+                                    document.document.path = path;
+                                });
+                            })
                             product['product_ratings'].push(rating);
                         }
                     });
@@ -248,6 +253,8 @@ export class ProductsController {
             const ratings = await this.productsService.getProductRatings([product['pk']], req.query);
             const totalRatings = await this.productsService.getProductTotalRatings([product['pk']]);
 
+            // const userDocuments = await this.usersService.getUserDocuments([product['user_pk']], req.query);
+            // console.log(userDocuments);
             product['product_documents'] = [];
             // Append product documents
             if (documents) {
@@ -266,6 +273,12 @@ export class ProductsController {
             if (ratings) {
                 ratings[0].forEach(rating => {
                     if (product['pk'] == rating.product_pk) {
+                        rating.user.user_document.forEach(document => {
+                            generatePath(document.document.path, (path: string) => {
+                                document.document.path = path;
+                            });
+                        })
+
                         product['product_ratings'].push(rating);
                     }
                 });

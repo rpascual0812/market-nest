@@ -559,8 +559,8 @@ export class ProductsService {
                     'user_documents.document_pk=user_doc.pk',
                 )
                 .where("product_ratings.product_pk IN (:...pk)", { pk: pks })
-                .skip(filters.skip)
-                .take(filters.take)
+                // .skip(filters.skip)
+                // .take(filters.take)
                 .getManyAndCount()
                 ;
         } catch (error) {
