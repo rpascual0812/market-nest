@@ -163,8 +163,8 @@ export class OrdersService {
             .where('orders.archived=false')
             .andWhere('orders.status_pk = :pk', { pk: '1' })
 
-            .skip(filters.skip)
-            .take(filters.take)
+            .skip(filters ? filters.skip : 0)
+            .take(filters ? filters.take : 50)
             .getManyAndCount()
             ;
     }
