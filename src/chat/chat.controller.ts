@@ -150,7 +150,13 @@ export class ChatController {
     @Get(':uuid/messages/:pk')
     async findMessage(@Param('uuid') uuid: string, @Param('pk') pk: string, @Body() body: any, @Request() req: any) {
         // console.log(uuid, pk);
-        return await this.chatService.findMessage(pk);
+        let message = await this.chatService.findMessage(pk);
+
+        generatePath(message['user'].user_document.document.path, (path: string) => {
+            message['user'].user_document.document.path = path;
+        });
+
+        return message;
     }
 
     @UseGuards(JwtAuthGuard)
@@ -160,9 +166,13 @@ export class ChatController {
         let messages = await this.chatService.findMessages([pk], req.query, req.user);
         if (messages[1] > 0) {
             messages[0].forEach(message => {
-                generatePath(message.user.user_document.document['path'], (path: string) => {
-                    message.user.user_document.document['path'] = path;
-                });
+                console.log(message.user);
+                // '${dotenv.get('S3')}/images/user.png'
+                if (message.user.user_document && message.user.user_document.document) {
+                    generatePath(message.user.user_document.document['path'], (path: string) => {
+                        message.user.user_document.document['path'] = path;
+                    });
+                }
             });
 
             return {
