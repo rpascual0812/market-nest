@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { generatePath } from 'src/utilities/generate-s3-path.utils';
 
 @Controller('notifications')
 export class NotificationsController {
@@ -11,7 +10,15 @@ export class NotificationsController {
     @UseGuards(JwtAuthGuard)
     @Get()
     findAll(@Request() req: any) {
-        return this.notificationsService.findAll(req.user);
+        let notications = this.notificationsService.findAll(req.user)['data'];
+
+        notications.forEach(notification => {
+            generatePath(notification.user.article_document.document['path'], (path: string) => {
+                notification.user.article_document.document['path'] = path;
+            });
+        });
+
+        return notications;
     }
 
 }
