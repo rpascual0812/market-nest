@@ -25,9 +25,11 @@ export class ComplaintsController {
         let complaints = await this.complaintsService.findAll(req.query, req.user);
         if (complaints.total > 0) {
             complaints.data.forEach(complaint => {
-                generatePath(complaint['complaint_document'][0]['document']['path'], (path: string) => {
-                    complaint['complaint_document'][0]['document']['path'] = path;
-                });
+                complaint['complaint_document'].forEach(document => {
+                    generatePath(document['document']['path'], (path: string) => {
+                        document['document']['path'] = path;
+                    });
+                })
             });
         }
 
