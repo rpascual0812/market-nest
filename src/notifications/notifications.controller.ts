@@ -9,13 +9,12 @@ export class NotificationsController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    findAll(@Request() req: any) {
-        let notifications = this.notificationsService.findAll(req.user);
-
+    async findAll(@Request() req: any) {
+        let notifications = await this.notificationsService.findAll(req.user);
         if (notifications && notifications['data']) {
             notifications['data'].forEach(notification => {
-                generatePath(notification.user.article_document.document['path'], (path: string) => {
-                    notification.user.article_document.document['path'] = path;
+                generatePath(notification.user.user_document.document['path'], (path: string) => {
+                    notification.user.user_document.document['path'] = path;
                 });
             });
         }
