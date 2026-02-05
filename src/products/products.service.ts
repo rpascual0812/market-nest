@@ -296,7 +296,7 @@ export class ProductsService {
                     }
                 });
             }
-            console.log(monthsArr);
+
             return await dataSource.getRepository(Product)
                 .createQueryBuilder('products')
                 .where('products.archived=false')
