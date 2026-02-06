@@ -43,7 +43,8 @@ export class AuthService {
         account.access_token = this.jwtService.sign(payload);
         account.expiration = DateTime.now().plus({ seconds: Number.parseInt(process.env.EXPIRES) }).toFormat('y-LL-dd HH:mm:ss');
 
-        this.sessionsService.create(account);
+        await this.sessionsService.removeByAccount(account.pk);
+        await this.sessionsService.create(account);
 
         let user = await this.accountsService.findOne(account.pk);
         if (user.user.role_pk != account.role_pk) {

@@ -20,8 +20,6 @@ export class SessionsService {
     // }
     @UsePipes(ValidationPipe)
     async create(account: any): Promise<any> {
-        this.removeByAccount(account.pk);
-
         const obj: any = {
             token: account.access_token,
             expiration: account.expiration,
