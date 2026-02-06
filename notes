@@ -66,7 +66,7 @@ npm run build
 npm run schema:sync
 npm run migration:run
 pm2 stop all
-pm2 start dist/src/main.js --name market --watch
+pm2 start dist/src/main.js --name market --exp-backoff-restart-delay=100
 
 #!/bin/bash
 # forever start must be inside the project root directory
