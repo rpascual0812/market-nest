@@ -17,7 +17,7 @@ export class FeedbackController {
     @Get()
     async findAll(@Request() req: any, @Body() body: any) {
         const feedbacks: any = await this.feedbackService.findAll(req.query);
-        console.log(feedbacks);
+        // console.log(feedbacks);
         feedbacks.data.forEach(feedback => {
             generatePath(feedback.user.user_document.document['path'], (path: string) => {
                 feedback.user.user_document.document['path'] = path;

@@ -166,7 +166,6 @@ export class ChatController {
         let messages = await this.chatService.findMessages([pk], req.query, req.user);
         if (messages[1] > 0) {
             messages[0].forEach(message => {
-                console.log(message.user);
                 // '${dotenv.get('S3')}/images/user.png'
                 if (message.user.user_document && message.user.user_document.document) {
                     generatePath(message.user.user_document.document['path'], (path: string) => {
