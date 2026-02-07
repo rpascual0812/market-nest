@@ -2,8 +2,8 @@ import { DataSource, DataSourceOptions } from "typeorm";
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
-const envPath = path.resolve(__dirname, '../../.env');
-const env: any = dotenv.parse(fs.readFileSync(envPath));
+// const envPath = path.resolve(__dirname, '../../.env');
+const env: any = dotenv.parse(fs.readFileSync(`.env`));
 
 export const dataSourceOptions: DataSourceOptions = {
     type: 'postgres',
