@@ -1,7 +1,7 @@
-import { Area } from 'src/areas/entities/area.entity';
-import { City } from 'src/cities/entities/city.entity';
-import { Province } from 'src/provinces/entities/province.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Area } from '../../areas/entities/area.entity';
+import { City } from '../../cities/entities/city.entity';
+import { Province } from '../../provinces/entities/province.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity({ name: 'user_addresses' })

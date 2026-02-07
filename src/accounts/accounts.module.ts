@@ -5,10 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Account } from './entities/account.entity';
 import { Session } from '../sessions/entities/session.entity';
-import { SessionsService } from 'src/sessions/sessions.service';
-import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
-import { UserDocument } from 'src/users/entities/user-document.entity';
+import { SessionsService } from '../sessions/sessions.service';
+import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { UserDocument } from '../users/entities/user-document.entity';
 
 @Module({
     imports: [

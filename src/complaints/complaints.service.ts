@@ -1,11 +1,11 @@
 import { ConsoleLogger, Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
-import { Log } from 'src/logs/entities/log.entity';
+import { Log } from '../logs/entities/log.entity';
 import { Brackets, Repository } from 'typeorm';
 import dataSource from 'db/data-source';
 import { ComplaintMessage } from './entities/complaint-message.entity';
 import { Complaint } from './entities/complaint.entity';
-import { Document } from 'src/documents/entities/document.entity';
-import { UserDocument } from 'src/users/entities/user-document.entity';
+import { Document } from '../documents/entities/document.entity';
+import { UserDocument } from '../users/entities/user-document.entity';
 import { ComplaintDocument } from './entities/complaint-document.entity';
 
 @Injectable()

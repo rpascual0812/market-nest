@@ -1,5 +1,5 @@
-import { UserPermission } from 'src/users/entities/user-permission.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserPermission } from '../../users/entities/user-permission.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'permissions' })

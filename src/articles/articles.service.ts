@@ -1,7 +1,7 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Document } from 'src/documents/entities/document.entity';
-import { Log } from 'src/logs/entities/log.entity';
+import { Document } from '../documents/entities/document.entity';
+import { Log } from '../logs/entities/log.entity';
 import { Brackets, Repository } from 'typeorm';
 import dataSource from 'db/data-source';
 import { ArticleDocument } from './entities/article-document.entity';
@@ -203,7 +203,7 @@ export class ArticlesService {
                             return await EntityManager.update(Article, { pk }, { sort_order: article.sort_order + 1 });
                         default:
                             break;
-                    }                        
+                    }
                 }
             );
         } catch (err) {

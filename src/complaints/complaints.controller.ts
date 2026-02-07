@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, InternalServerErrorException } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ComplaintsService } from './complaints.service';
-import { generatePath } from 'src/utilities/generate-s3-path.utils';
+import { generatePath } from '../utilities/generate-s3-path.utils';
 
 @Controller('complaints')
 export class ComplaintsController {

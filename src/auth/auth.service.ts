@@ -2,22 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { v4 as uuidv4 } from 'uuid';
-import { AccountsService } from 'src/accounts/accounts.service';
-import { EmailsService } from 'src/emails/emails.service';
-import { SessionsService } from 'src/sessions/sessions.service';
-import { UsersService } from 'src/users/users.service';
+import { AccountsService } from '../accounts/accounts.service';
+import { EmailsService } from '../emails/emails.service';
+import { SessionsService } from '../sessions/sessions.service';
+import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import dataSource from 'db/data-source';
-import { Account } from 'src/accounts/entities/account.entity';
+import { Account } from '../accounts/entities/account.entity';
 import { DateTime } from "luxon";
 import { resolveObjectURL } from 'buffer';
-import { User } from 'src/users/entities/user.entity';
-import { UserDocument } from 'src/users/entities/user-document.entity';
-import { UserAddress } from 'src/users/entities/user-address.entity';
-import { Email } from 'src/emails/entities/email.entity';
-import { SellerService } from 'src/seller/seller.service';
-import { Role } from 'src/roles/entities/role.entity';
-import { Configuration } from 'src/configuration/entities/configuration.entity';
+import { User } from '../users/entities/user.entity';
+import { UserDocument } from '../users/entities/user-document.entity';
+import { UserAddress } from '../users/entities/user-address.entity';
+import { Email } from '../emails/entities/email.entity';
+import { SellerService } from '../seller/seller.service';
+import { Role } from '../roles/entities/role.entity';
+import { Configuration } from '../configuration/entities/configuration.entity';
 
 @Injectable()
 export class AuthService {

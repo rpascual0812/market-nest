@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, InternalServerErrorException } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { UsersService } from 'src/users/users.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UsersService } from '../users/users.service';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
-import { generatePath } from 'src/utilities/generate-s3-path.utils';
+import { generatePath } from '../utilities/generate-s3-path.utils';
 
 @Controller('accounts')
 export class AccountsController {
@@ -108,7 +108,7 @@ export class AccountsController {
                     userDocument.document.path = path;
                 });
             });
-            
+
             account['user']['user_document'] = userDocuments[0];
         }
 

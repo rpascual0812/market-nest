@@ -1,9 +1,9 @@
-import { Category } from 'src/categories/entities/category.entity';
-import { Country } from 'src/countries/entities/country.entity';
-import { Measurement } from 'src/measurements/entities/measurement.entity';
-import { Order } from 'src/orders/entities/order.entity';
-import { UserCart } from 'src/users/entities/user-cart.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { Country } from '../../countries/entities/country.entity';
+import { Measurement } from '../../measurements/entities/measurement.entity';
+import { Order } from '../../orders/entities/order.entity';
+import { UserCart } from '../../users/entities/user-cart.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double, ManyToMany, BaseEntity } from 'typeorm';
 import { ProductDocument } from './product-document.entity';
 import { ProductInterested } from './product-interested.entity';

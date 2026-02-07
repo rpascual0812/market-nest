@@ -1,5 +1,5 @@
-import { Product } from 'src/products/entities/product.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Product } from '../../products/entities/product.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'product_ratings' })

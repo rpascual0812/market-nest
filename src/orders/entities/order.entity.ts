@@ -1,8 +1,8 @@
-import { Measurement } from 'src/measurements/entities/measurement.entity';
-import { Product } from 'src/products/entities/product.entity';
-import { Seller } from 'src/seller/entities/seller.entity';
-import { Status } from 'src/statuses/entities/status.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Measurement } from '../../measurements/entities/measurement.entity';
+import { Product } from '../../products/entities/product.entity';
+import { Seller } from '../../seller/entities/seller.entity';
+import { Status } from '../../statuses/entities/status.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, Double, ManyToMany, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'orders' })

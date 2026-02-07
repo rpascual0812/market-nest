@@ -1,6 +1,6 @@
-import { Account } from 'src/accounts/entities/account.entity';
-import { Ticket } from 'src/tickets/entities/ticket.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Account } from '../../accounts/entities/account.entity';
+import { Ticket } from '../../tickets/entities/ticket.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'ticket_messages' })

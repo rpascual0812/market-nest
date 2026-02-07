@@ -6,6 +6,7 @@ import { join, resolve } from "path";
 // Then fallback to the relative path from the file
 config({ path: resolve(process.cwd(), '.env') });
 
+console.log('Connecting to host:', process.env.DATABASE_HOST);
 export const dataSourceOptions: DataSourceOptions = {
     type: 'postgres',
     host: process.env.DATABASE_HOST, // This is likely undefined right now, hence 127.0.0.1

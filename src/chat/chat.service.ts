@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { UserDocument } from 'src/users/entities/user-document.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserDocument } from '../users/entities/user-document.entity';
+import { User } from '../users/entities/user.entity';
 import { Repository, Brackets } from 'typeorm';
 import dataSource from 'db/data-source';
 import { ChatParticipant } from './entities/chat-participants.entity';
 import { Chat } from './entities/chat.entity';
-import { Document } from 'src/documents/entities/document.entity';
+import { Document } from '../documents/entities/document.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from './entities/chat-messages.entity';
 import { DateTime } from "luxon";

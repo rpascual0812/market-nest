@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UseInterceptors, UploadedFile, Response, HttpStatus, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
-import { generatePath } from 'src/utilities/generate-s3-path.utils';
+import { generatePath } from '../utilities/generate-s3-path.utils';
 
 @Controller('articles')
 export class ArticlesController {

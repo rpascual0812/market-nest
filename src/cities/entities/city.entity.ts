@@ -1,9 +1,9 @@
-import { Area } from 'src/areas/entities/area.entity';
-import { Country } from 'src/countries/entities/country.entity';
-import { Province } from 'src/provinces/entities/province.entity';
-import { SellerAddress } from 'src/seller/entities/seller-address.entity';
-import { UserAddress } from 'src/users/entities/user-address.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Area } from '../../areas/entities/area.entity';
+import { Country } from '../../countries/entities/country.entity';
+import { Province } from '../../provinces/entities/province.entity';
+import { SellerAddress } from '../../seller/entities/seller-address.entity';
+import { UserAddress } from '../../users/entities/user-address.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, BaseEntity, AfterLoad, OneToMany, ManyToMany, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'cities' })

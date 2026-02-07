@@ -1,13 +1,13 @@
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, ManyToMany, OneToOne } from 'typeorm';
-import { Account } from 'src/accounts/entities/account.entity';
-import { User } from 'src/users/entities/user.entity';
-import { UserDocument } from 'src/users/entities/user-document.entity';
-import { ProductDocument } from 'src/products/entities/product-document.entity';
-import { Slider } from 'src/sliders/entities/slider.entity';
-import { SliderDocument } from 'src/sliders/entities/slider-document.entity';
-import { SellerDocument } from 'src/seller/entities/seller-document.entity';
-import { ArticleDocument } from 'src/articles/entities/article-document.entity';
-import { OnboardingDocument } from 'src/onboardings/entities/onboarding-document.entity';
+import { Account } from '../../accounts/entities/account.entity';
+import { User } from '../../users/entities/user.entity';
+import { UserDocument } from '../../users/entities/user-document.entity';
+import { ProductDocument } from '../../products/entities/product-document.entity';
+import { Slider } from '../../sliders/entities/slider.entity';
+import { SliderDocument } from '../../sliders/entities/slider-document.entity';
+import { SellerDocument } from '../../seller/entities/seller-document.entity';
+import { ArticleDocument } from '../../articles/entities/article-document.entity';
+import { OnboardingDocument } from '../../onboardings/entities/onboarding-document.entity';
 
 @Entity({ name: 'documents' })
 @Unique(['filename'])

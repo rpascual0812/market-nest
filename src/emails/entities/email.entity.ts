@@ -1,5 +1,5 @@
-import { Account } from 'src/accounts/entities/account.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Account } from '../../accounts/entities/account.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity({ name: 'emails' })

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Response, HttpStatus } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ChatService } from './chat.service';
-import { generatePath } from 'src/utilities/generate-s3-path.utils';
+import { generatePath } from '../utilities/generate-s3-path.utils';
 
 @Controller('chats')
 export class ChatController {

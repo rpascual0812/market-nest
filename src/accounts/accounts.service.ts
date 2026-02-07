@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-// import { AuthService } from 'src/auth/auth.service';
+// import { AuthService } from '../auth/auth.service';
 import { Repository } from 'typeorm';
 import dataSource from 'db/data-source';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { Account } from './entities/account.entity';
 import * as bcrypt from 'bcrypt';
-import { UserDocument } from 'src/users/entities/user-document.entity';
-import { Document } from 'src/documents/entities/document.entity';
+import { UserDocument } from '../users/entities/user-document.entity';
+import { Document } from '../documents/entities/document.entity';
 
 @Injectable()
 export class AccountsService {

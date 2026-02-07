@@ -1,6 +1,6 @@
-import { Document } from 'src/documents/entities/document.entity';
-import { Slider } from 'src/sliders/entities/slider.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Document } from '../../documents/entities/document.entity';
+import { Slider } from '../../sliders/entities/slider.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'slider_documents' })

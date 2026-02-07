@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Seller } from './seller.entity';
-import { Document } from 'src/documents/entities/document.entity';
+import { Document } from '../../documents/entities/document.entity';
 
 @Entity({ name: 'seller_documents' })
 @Unique(['type', 'document_pk', 'seller_pk'])

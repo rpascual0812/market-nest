@@ -1,5 +1,5 @@
-import { Document } from 'src/documents/entities/document.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Document } from '../../documents/entities/document.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity({ name: 'user_documents' })
