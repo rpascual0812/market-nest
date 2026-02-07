@@ -7,7 +7,7 @@ import { DataSource, DataSourceOptions } from "typeorm";
 // import * as path from 'path';
 // const envPath = path.resolve(__dirname, '../../.env');
 // const env: any = dotenv.parse(fs.readFileSync(envPath));
-
+console.log('Database configuration from environment variables:', process.env.DATABASE_HOST, process.env.DATABASE_PORT, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, process.env.DATABASE_NAME);
 export const dataSourceOptions: DataSourceOptions = {
     type: 'postgres',
     host: process.env.DATABASE_HOST,
