@@ -2,8 +2,6 @@ import { DataSource, DataSourceOptions } from "typeorm";
 import { config } from 'dotenv';
 import { join, resolve } from "path";
 
-// Try loading from the current working directory first (common for CLI)
-// Then fallback to the relative path from the file
 config({ path: resolve(process.cwd(), '.env') });
 
 console.log('Connecting to host:', process.env.DATABASE_HOST);
@@ -14,14 +12,14 @@ export const dataSourceOptions: DataSourceOptions = {
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
-    entities: [join(__dirname, '/../**/*.entity{.ts,.js}')],
-    migrations: [join(__dirname, '/migrations/*{.ts,.js}')],
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    migrations: [__dirname + '/migrations/*{.ts,.js}'],
     ssl: {
         rejectUnauthorized: false
     }
 };
 
-const dataSource = new DataSource(dataSourceOptions);
+const dataSource = new DataSource(dataSourceOptions as DataSourceOptions);
 
 dataSource.initialize()
     .then(() => {
