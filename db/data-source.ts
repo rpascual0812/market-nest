@@ -1,19 +1,20 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { config } from 'dotenv';
-import { join } from "path";
+import { join, resolve } from "path";
 
-// This loads the variables into process.env
-config({ path: join(__dirname, '../../.env') });
+// Try loading from the current working directory first (common for CLI)
+// Then fallback to the relative path from the file
+config({ path: resolve(process.cwd(), '.env') });
 
 export const dataSourceOptions: DataSourceOptions = {
     type: 'postgres',
-    host: process.env.DATABASE_HOST,
+    host: process.env.DATABASE_HOST, // This is likely undefined right now, hence 127.0.0.1
     port: parseInt(process.env.DATABASE_PORT || '5432'),
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
     entities: [join(__dirname, '/../**/*.entity{.ts,.js}')],
-    migrations: ['dist/db/migrations/*.js'],
+    migrations: [join(__dirname, '/migrations/*{.ts,.js}')],
     ssl: {
         rejectUnauthorized: false
     }
