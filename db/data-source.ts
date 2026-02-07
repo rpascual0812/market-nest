@@ -1,7 +1,11 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
+import { config } from 'dotenv';
 import * as path from 'path';
+import { join } from "path";
+
+config({ path: join(__dirname, '../.env') });
 // const envPath = path.resolve(__dirname, '../../.env');
 const env: any = dotenv.parse(fs.readFileSync(`.env`));
 
