@@ -55,10 +55,7 @@ import configuration from './config/configuration';
         ValidationModule,
         LogsModule,
         GenderModule,
-        ConfigModule.forRoot({
-            isGlobal: true,     // makes config available everywhere
-            load: [configuration] // optional (default is .env)
-        }),
+        ConfigModule.forRoot(),
         ProductsModule,
         MeasurementsModule,
         CountriesModule,
