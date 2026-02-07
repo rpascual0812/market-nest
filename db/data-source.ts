@@ -1,12 +1,14 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import * as dotenv from 'dotenv';
-import * as fs from 'fs';
-const env: any = dotenv.parse(fs.readFileSync(`.env`));
+// import * as fs from 'fs';
+import { env } from "process";
+// const env: any = dotenv.parse(fs.readFileSync(`.env`));
+dotenv.config();
 
 export const dataSourceOptions: DataSourceOptions = {
     type: 'postgres',
     host: env.DATABASE_HOST,
-    port: env.DATABASE_PORT,
+    port: parseInt(env.DATABASE_PORT),
     username: env.DATABASE_USERNAME,
     password: env.DATABASE_PASSWORD,
     database: env.DATABASE_NAME,
