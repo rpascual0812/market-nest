@@ -1,21 +1,17 @@
 import { DataSource, DataSourceOptions } from "typeorm";
-import * as dotenv from 'dotenv';
-import * as fs from 'fs';
 import { config } from 'dotenv';
-import * as path from 'path';
 import { join } from "path";
 
-config({ path: join(__dirname, '../.env') });
-// const envPath = path.resolve(__dirname, '../../.env');
-const env: any = dotenv.parse(fs.readFileSync(`.env`));
+// This loads the variables into process.env
+config({ path: join(__dirname, '../../.env') });
 
 export const dataSourceOptions: DataSourceOptions = {
     type: 'postgres',
-    host: env.DATABASE_HOST,
-    port: env.DATABASE_PORT,
-    username: env.DATABASE_USERNAME,
-    password: env.DATABASE_PASSWORD,
-    database: env.DATABASE_NAME,
+    host: process.env.DATABASE_HOST,
+    port: parseInt(process.env.DATABASE_PORT || '5432'),
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/db/migrations/*.js'],
     ssl: {
