@@ -12,7 +12,7 @@ export const dataSourceOptions: DataSourceOptions = {
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
-    entities: ['dist/**/*.entity.js'],
+    entities: [join(__dirname, '/../**/*.entity{.ts,.js}')],
     migrations: ['dist/db/migrations/*.js'],
     ssl: {
         rejectUnauthorized: false
