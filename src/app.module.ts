@@ -16,7 +16,6 @@ import { InquiriesModule } from './inquiries/inquiries.module';
 import { ValidationModule } from './validation/validation.module';
 import { LogsModule } from './logs/logs.module';
 import { GenderModule } from './gender/gender.module';
-import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { CountriesModule } from './countries/countries.module';
@@ -40,11 +39,30 @@ import { ComplaintsModule } from './complaints/complaints.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ReportModule } from './report/report.module';
 import { OnboardingsModule } from './onboardings/onboardings.module';
-import configuration from './config/configuration';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
     imports: [
-        TypeOrmModule.forRoot(dataSourceOptions),
+        ConfigModule.forRoot({
+            isGlobal: true, // Makes variables available everywhere
+        }),
+        TypeOrmModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                type: 'postgres',
+                host: configService.get<string>('DATABASE_HOST'),
+                port: configService.get<number>('DATABASE_PORT'),
+                username: configService.get<string>('DATABASE_USERNAME'),
+                password: configService.get<string>('DATABASE_PASSWORD'),
+                database: configService.get<string>('DATABASE_NAME'),
+                autoLoadEntities: true,
+                synchronize: false, // Set to false in production/RDS
+                ssl: {
+                    rejectUnauthorized: false,
+                },
+            }),
+        }),
         AuthModule,
         SessionsModule,
         EmailsModule,
