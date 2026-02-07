@@ -40,6 +40,7 @@ import { ComplaintsModule } from './complaints/complaints.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ReportModule } from './report/report.module';
 import { OnboardingsModule } from './onboardings/onboardings.module';
+import configuration from './config/configuration';
 
 @Module({
     imports: [
@@ -54,7 +55,10 @@ import { OnboardingsModule } from './onboardings/onboardings.module';
         ValidationModule,
         LogsModule,
         GenderModule,
-        ConfigModule.forRoot(),
+        ConfigModule.forRoot({
+            isGlobal: true,     // makes config available everywhere
+            load: [configuration] // optional (default is .env)
+        }),
         ProductsModule,
         MeasurementsModule,
         CountriesModule,
