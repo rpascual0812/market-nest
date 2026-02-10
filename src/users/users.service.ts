@@ -18,6 +18,7 @@ import { Province } from 'src/provinces/entities/province.entity';
 import { City } from 'src/cities/entities/city.entity';
 import { Area } from 'src/areas/entities/area.entity';
 import { Notification } from 'src/notifications/entities/notification.entity';
+import { int } from 'aws-sdk/clients/datapipeline';
 
 // export type User = {
 //     id: number;
@@ -80,6 +81,7 @@ export class UsersService {
             const users = await dataSource.getRepository(User)
                 .createQueryBuilder('users')
                 .select('users')
+                .leftJoinAndSelect("users.seller", "sellers")
                 .leftJoinAndSelect("users.account", "accounts")
                 .addSelect(["accounts.pk", "accounts.username", "accounts.active", "accounts.verified"])
                 .leftJoinAndSelect("users.gender", "genders")
@@ -653,5 +655,24 @@ export class UsersService {
 
     }
 
+    async approveAsSeller(user_pk) {
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
 
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const user = await EntityManager.findOne(User, { where: { pk: user_pk } });
+                    user.is_seller = true;
+                    await EntityManager.save(user);
+                    return { status: true, data: user };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: err.code };
+        } finally {
+            await queryRunner.release();
+        }
+    }
 }

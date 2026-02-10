@@ -17,7 +17,11 @@ export const dataSourceOptions: DataSourceOptions = {
     migrations: [__dirname + '/migrations/*{.ts,.js}'],
     ssl: {
         rejectUnauthorized: false
-    }
+    },
+    extra: {
+        connectionTimeoutMillis: 5000,
+        query_timeout: 5000,
+    },
 };
 
 const dataSource = new DataSource(dataSourceOptions as DataSourceOptions);

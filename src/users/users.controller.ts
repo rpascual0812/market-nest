@@ -255,6 +255,11 @@ export class UsersController {
         return await this.usersService.delete(req.user);
     }
 
+    @Post(':pk/approve')
+    async approveAsSeller(@Request() req: any) {
+        return await this.usersService.approveAsSeller(req.params.pk);
+    }
+
     // @Get(':id')
     // findOne(@Param('id') id: string) {
     //     return this.usersService.findOne(+id);
