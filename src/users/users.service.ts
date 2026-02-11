@@ -665,6 +665,14 @@ export class UsersService {
                     const user = await EntityManager.findOne(User, { where: { pk: user_pk } });
                     user.is_seller = true;
                     await EntityManager.save(user);
+
+                    const notification = new Notification();
+                    notification.title = 'Seller Approval';
+                    notification.details = user.first_name + ' ' + user.last_name + ' is now a seller.';
+                    notification.user_pk = user.pk;
+                    notification.sender_pk = user.pk;
+                    await EntityManager.save(notification);
+
                     return { status: true, data: user };
                 }
             );

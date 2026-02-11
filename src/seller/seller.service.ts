@@ -178,6 +178,31 @@ export class SellerService {
             ;
     }
 
+    async getSellerDocuments(pks: any, filters: any) {
+        try {
+            return await dataSource.getRepository(SellerDocument)
+                .createQueryBuilder('seller_documents')
+                .select('seller_documents')
+                .leftJoinAndMapOne(
+                    'seller_documents.document',
+                    Document,
+                    'documents',
+                    'seller_documents.document_pk=documents.pk',
+                )
+                .where("seller_documents.seller_pk IN (:...seller_pk)", { seller_pk: pks })
+                // .skip(filters.skip)
+                // .take(filters.take)
+                .getManyAndCount()
+                ;
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
     // async findOne(filters: any) {
     //     try {
     //         return await getRepository(Seller)

@@ -179,6 +179,7 @@ export class SellerController {
     async findOne(@Param('pk') pk: number, @Request() req: any) {
         const account = await this.sellerService.findOne(pk);
         const userDocuments = await this.usersService.getUserDocuments([account['user']['pk']], req.query);
+        const sellerDocuments = await this.sellerService.getSellerDocuments([pk], req.query);
         const userAddresses = await this.usersService.getUserAddresses([account['user']['pk']], req.query);
         const sellerAddresses = account && account['user']['seller'] ? await this.usersService.getSellerAddresses([account['user']['seller']['pk']], req.query) : [];
         const userFollowing = await this.usersService.getUserFollowing([account['user']['pk']], req.query);
@@ -202,6 +203,16 @@ export class SellerController {
             });
 
             account['user']['user_document'] = userDocuments[0];
+        }
+
+        if (sellerDocuments[0]) {
+            sellerDocuments[0].forEach(sellerDocument => {
+                generatePath(sellerDocument.document.path, (path: string) => {
+                    sellerDocument.document.path = path;
+                });
+            });
+
+            account['user']['seller_document'] = sellerDocuments[0];
         }
 
         account['user']['user_addresses'] = [];
