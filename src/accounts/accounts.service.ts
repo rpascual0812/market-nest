@@ -72,7 +72,11 @@ export class AccountsService {
     }
 
     async findByUserName(username: string): Promise<Account | undefined> {
-        return this.accountRepository.findOne({ where: { username } });
+        const pk = Number.isInteger(Number(username)) ? Number(username) : null;
+        return await dataSource.getRepository(Account)
+            .createQueryBuilder('accounts')
+            .where(`accounts.username = :username or accounts.pk = :pk`, { username, pk })
+            .getOne();
     }
 
     async update(pk: number, fields: object): Promise<any> {

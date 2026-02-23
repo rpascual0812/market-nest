@@ -41,7 +41,7 @@ export class OrdersService {
                     user_pk: product.user_pk
                 }
             });
-            // console.log(form, seller, user);
+
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
                     const existing = await dataSource.getRepository(Order)
@@ -170,7 +170,6 @@ export class OrdersService {
     }
 
     async findOrders(filters: any, user: any) {
-        // console.log(filters, user);
         let type = [];
         let hasFutureCrops = false;
         if (Object.prototype.hasOwnProperty.call(filters, 'type') && filters.type) {
