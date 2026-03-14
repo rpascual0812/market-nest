@@ -19,8 +19,8 @@ export const dataSourceOptions: DataSourceOptions = {
         rejectUnauthorized: false
     },
     extra: {
-        connectionTimeoutMillis: 5000,
-        query_timeout: 5000,
+        connectionTimeoutMillis: 50000,
+        query_timeout: 50000,
     },
 };
 

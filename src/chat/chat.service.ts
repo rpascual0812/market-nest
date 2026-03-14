@@ -90,7 +90,7 @@ export class ChatService {
                     'chats.chat_messages_read',
                     ChatMessagesRead,
                     'chat_messages_read',
-                    'chats.pk=chat_messages_read.chat_pk'
+                    'chats.pk=chat_messages_read.chat_pk and chat_messages_read.user_pk = ' + user.pk
                 )
                 .leftJoinAndMapOne(
                     'chat_participants.user',
@@ -442,6 +442,30 @@ export class ChatService {
         }
     }
 
+    async getUnreadMessages(pk: any, user: any) {
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
+        try {
+            return await dataSource.getRepository(ChatMessage)
+                .createQueryBuilder('chat_messages')
+                .select('chat_messages')
+                .leftJoinAndMapOne(
+                    'chat_messages.chat_messages_read',
+                    ChatMessagesRead,
+                    'chat_messages_read',
+                    'chat_messages.pk=chat_messages_read.chat_message_pk and chat_messages_read.user_pk = ' + user.pk + ' and chat_messages_read.chat_pk = ' + pk,
+                )
+                .andWhere("chat_messages.chat_pk IN (:...pk)", { pk: [pk] })
+                .getMany()
+                ;
+        } catch (err) {
+            console.log(err);
+            return [];
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
     async getMessageRead(pk: any, user: any) {
         const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -475,6 +499,30 @@ export class ChatService {
                     const ret = await EntityManager.save(messageRead);
 
                     return { status: true, data: ret };
+                });
+
+        } catch (err) {
+            console.log(err);
+            return [];
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    async updateReadMessage(pk: any, message_pk: any, user: any) {
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const fields = { read: true };
+                    const filters = { 'chat_pk': pk, 'chat_message_pk': message_pk, 'user_pk': user.pk };
+                    const res = await EntityManager.update(ChatMessagesRead, filters, fields);
+
+                    if (res.affected > 0) {
+                        return await EntityManager.findOne(ChatMessagesRead, { where: { 'chat_pk': pk, 'chat_message_pk': message_pk, 'user_pk': user.pk } });
+                    }
+                    return null;
                 });
 
         } catch (err) {

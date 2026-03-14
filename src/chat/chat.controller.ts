@@ -41,23 +41,7 @@ export class ChatController {
                         }
                     });
                 }
-
-                chat.chat_messages_read.forEach(read => {
-                    if (read.user_pk == req.user.pk) {
-                        chat.read = true;
-                    }
-                });
-
-                // if (unread_messages) {
-                //     unread_messages[0].forEach(message => {
-                //         if (chat.pk == message.chat_pk) {
-                //             chat.read++;
-                //         }
-                //     });
-                // }
             });
-
-            // console.log('chats', chats[0]);
         }
         else {
             return {
@@ -95,7 +79,6 @@ export class ChatController {
     @Get('user/:pk')
     async findByUser(@Param('pk') pk: string, @Body() body: any, @Request() req: any) {
         let chat = await this.chatService.findByUser(pk, req.user, req.query);
-        // console.log('chat', chat.length, req.query, pk);
         if (chat.length == 0) {
             const newChat = await this.chatService.create(pk, req.user, req.query);
             // console.log('2 chat', newChat);
@@ -191,12 +174,14 @@ export class ChatController {
 
     @UseGuards(JwtAuthGuard)
     @Post(':pk/messages/read')
-    async readMessages(@Param('pk') pk: string, @Request() req: any, @Response() res: any) {
-        const messages = await this.chatService.getMessages(pk, req.user);
+    async readMessages(@Param('pk') pk: string, @Request() req: any, @Response() res: any, @Body() body: any) {
+        const messages = await this.chatService.getUnreadMessages(pk, req.user);
         messages.forEach(async message => {
-            const chatReads = await this.chatService.getMessageRead(message.pk, req.user);
-            if (chatReads.length == 0) {
+            if (!message.chat_messages_read) {
                 await this.chatService.setReadMessage(pk, message.pk, req.user);
+            }
+            else {
+                await this.chatService.updateReadMessage(pk, message.pk, req.user);
             }
         });
         return res.status(HttpStatus.OK).json(messages);
