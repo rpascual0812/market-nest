@@ -2,7 +2,7 @@ import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, ManyToMany, OneToOne, BaseEntity } from 'typeorm';
 
 @Entity({ name: 'configuration' })
-@Unique(['group', 'name', 'value'])
+@Unique(['group', 'name'])
 export class Configuration extends BaseEntity {
     @PrimaryGeneratedColumn()
     pk: number;
