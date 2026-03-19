@@ -58,13 +58,15 @@ export class ProductsService {
 
                     //Documents
                     documents.forEach((pk, i) => {
-                        const document = new ProductDocument();
-                        document.type = 'slide';
-                        document.product_pk = newProduct.pk;
-                        document.document_pk = pk;
-                        document.user_pk = user.pk;
-                        document.default = i == 0 ? true : false;
-                        EntityManager.save(document);
+                        if (pk) {
+                            const document = new ProductDocument();
+                            document.type = 'slide';
+                            document.product_pk = newProduct.pk;
+                            document.document_pk = pk;
+                            document.user_pk = user.pk;
+                            document.default = i == 0 ? true : false;
+                            EntityManager.save(document);
+                        }
                     });
 
                     if (form.type == 'looking_for') {
@@ -143,13 +145,15 @@ export class ProductsService {
 
                     let documents = form.documents != '' ? form.documents.split(',') : [];
                     documents.forEach((pk, i) => {
-                        const document = new ProductDocument();
-                        document.type = 'slide';
-                        document.product_pk = product.pk;
-                        document.document_pk = pk;
-                        document.user_pk = product.user_pk;
-                        document.default = i == 0 ? true : false;
-                        EntityManager.save(document);
+                        if (pk) {
+                            const document = new ProductDocument();
+                            document.type = 'slide';
+                            document.product_pk = product.pk;
+                            document.document_pk = pk;
+                            document.user_pk = product.user_pk;
+                            document.default = i == 0 ? true : false;
+                            EntityManager.save(document);
+                        }
                     });
 
                     // LOGS

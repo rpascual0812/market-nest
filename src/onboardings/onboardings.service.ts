@@ -96,12 +96,14 @@ export class OnboardingsService {
                             await EntityManager.update(OnboardingDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
                         }
                         else {
-                            let onboardingDocument = new OnboardingDocument();
-                            onboardingDocument.user_pk = user.pk;
-                            onboardingDocument.onboarding_pk = onboardingObj.pk;
-                            onboardingDocument.type = 'background';
-                            onboardingDocument.document_pk = form.image.document.pk;
-                            await EntityManager.save(onboardingDocument);
+                            if (form.image.document.pk) {
+                                let onboardingDocument = new OnboardingDocument();
+                                onboardingDocument.user_pk = user.pk;
+                                onboardingDocument.onboarding_pk = onboardingObj.pk;
+                                onboardingDocument.type = 'background';
+                                onboardingDocument.document_pk = form.image.document.pk;
+                                await EntityManager.save(onboardingDocument);
+                            }
                         }
                     }
 

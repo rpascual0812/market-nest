@@ -128,7 +128,7 @@ export class SlidersService {
                         .orderBy('sliders.order', 'DESC')
                         .getOne()
                         ;
-                    
+
                     const lastSliderOrder = lastSlider ? lastSlider.order : 0;
 
                     slider.type = 'home'; // default type of sliders for now.
@@ -143,12 +143,14 @@ export class SlidersService {
                             await EntityManager.update(SliderDocument, { pk: form.icon.pk }, { document_pk: form.icon.document.pk });
                         }
                         else {
-                            let sliderDocument = new SliderDocument();
-                            sliderDocument.user_pk = user.pk;
-                            sliderDocument.slider_pk = slider.pk;
-                            sliderDocument.type = 'icon';
-                            sliderDocument.document_pk = form.icon.document.pk;
-                            await EntityManager.save(sliderDocument);
+                            if (form.icon.document.pk) {
+                                let sliderDocument = new SliderDocument();
+                                sliderDocument.user_pk = user.pk;
+                                sliderDocument.slider_pk = slider.pk;
+                                sliderDocument.type = 'icon';
+                                sliderDocument.document_pk = form.icon.document.pk;
+                                await EntityManager.save(sliderDocument);
+                            }
                         }
                     }
 
@@ -157,12 +159,14 @@ export class SlidersService {
                             await EntityManager.update(SliderDocument, { pk: form.background.pk }, { document_pk: form.background.document.pk });
                         }
                         else {
-                            let sliderDocument = new SliderDocument();
-                            sliderDocument.user_pk = user.pk;
-                            sliderDocument.slider_pk = slider.pk;
-                            sliderDocument.type = 'background';
-                            sliderDocument.document_pk = form.background.document.pk;
-                            await EntityManager.save(sliderDocument);
+                            if (form.background.document.pk) {
+                                let sliderDocument = new SliderDocument();
+                                sliderDocument.user_pk = user.pk;
+                                sliderDocument.slider_pk = slider.pk;
+                                sliderDocument.type = 'background';
+                                sliderDocument.document_pk = form.background.document.pk;
+                                await EntityManager.save(sliderDocument);
+                            }
                         }
                     }
 

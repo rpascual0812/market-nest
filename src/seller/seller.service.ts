@@ -48,20 +48,24 @@ export class SellerService {
 
                     //Documents
                     documents.forEach(pk => {
-                        const document = new SellerDocument();
-                        document.type = 'document';
-                        document.seller_pk = newSeller.pk;
-                        document.document_pk = pk;
-                        EntityManager.save(document);
+                        if (pk) {
+                            const document = new SellerDocument();
+                            document.type = 'document';
+                            document.seller_pk = newSeller.pk;
+                            document.document_pk = pk;
+                            EntityManager.save(document);
+                        }
                     });
 
                     //Photos
                     photos.forEach(pk => {
-                        const document = new SellerDocument();
-                        document.type = 'profile_photo';
-                        document.seller_pk = newSeller.pk;
-                        document.document_pk = pk;
-                        EntityManager.save(document);
+                        if (pk) {
+                            const document = new SellerDocument();
+                            document.type = 'profile_photo';
+                            document.seller_pk = newSeller.pk;
+                            document.document_pk = pk;
+                            EntityManager.save(document);
+                        }
                     });
 
                     // LOGS

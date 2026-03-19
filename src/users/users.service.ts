@@ -584,11 +584,13 @@ export class UsersService {
                             await EntityManager.update(UserDocument, { pk: displayPhoto.pk }, { document_pk: data.display_photo });
                         }
                         else {
-                            const document = new UserDocument();
-                            document.user_pk = data.pk;
-                            document.type = 'profile_photo';
-                            document.document_pk = data.display_photo;
-                            await EntityManager.save(document);
+                            if (data.display_photo) {
+                                const document = new UserDocument();
+                                document.user_pk = data.pk;
+                                document.type = 'profile_photo';
+                                document.document_pk = data.display_photo;
+                                await EntityManager.save(document);
+                            }
                         }
                     }
 
@@ -598,11 +600,13 @@ export class UsersService {
                             await EntityManager.update(UserDocument, { pk: idPhoto.pk }, { document_pk: data.id_photo });
                         }
                         else {
-                            const document = new UserDocument();
-                            document.user_pk = data.pk;
-                            document.type = 'id_photo';
-                            document.document_pk = data.id_photo;
-                            await EntityManager.save(document);
+                            if (data.id_photo) {
+                                const document = new UserDocument();
+                                document.user_pk = data.pk;
+                                document.type = 'id_photo';
+                                document.document_pk = data.id_photo;
+                                await EntityManager.save(document);
+                            }
                         }
                     }
 

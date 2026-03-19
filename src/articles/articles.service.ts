@@ -106,12 +106,14 @@ export class ArticlesService {
                             await EntityManager.update(ArticleDocument, { pk: form.image.pk }, { document_pk: form.image.document.pk });
                         }
                         else {
-                            let articleDocument = new ArticleDocument();
-                            articleDocument.user_pk = user.pk;
-                            articleDocument.article_pk = articleObj.pk;
-                            articleDocument.type = 'background';
-                            articleDocument.document_pk = form.image.document.pk;
-                            await EntityManager.save(articleDocument);
+                            if (form.image.document.pk) {
+                                let articleDocument = new ArticleDocument();
+                                articleDocument.user_pk = user.pk;
+                                articleDocument.article_pk = articleObj.pk;
+                                articleDocument.type = 'background';
+                                articleDocument.document_pk = form.image.document.pk;
+                                await EntityManager.save(articleDocument);
+                            }
                         }
                     }
 

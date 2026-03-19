@@ -198,17 +198,21 @@ export class AuthService {
                     await EntityManager.save(address);
 
                     // create documents
-                    const display_photo = new UserDocument();
-                    display_photo.user_pk = newUser.pk;
-                    display_photo.type = 'profile_photo';
-                    display_photo.document_pk = data.display_photo;
-                    await EntityManager.save(display_photo);
+                    if (data.display_photo) {
+                        const display_photo = new UserDocument();
+                        display_photo.user_pk = newUser.pk;
+                        display_photo.type = 'profile_photo';
+                        display_photo.document_pk = data.display_photo;
+                        await EntityManager.save(display_photo);
+                    }
 
-                    const id_photo = new UserDocument();
-                    id_photo.user_pk = newUser.pk;
-                    id_photo.type = 'id_photo';
-                    id_photo.document_pk = data.id_photo;
-                    await EntityManager.save(id_photo);
+                    if (data.id_photo) {
+                        const id_photo = new UserDocument();
+                        id_photo.user_pk = newUser.pk;
+                        id_photo.type = 'id_photo';
+                        id_photo.document_pk = data.id_photo;
+                        await EntityManager.save(id_photo);
+                    }
 
                     // save registration email
                     const email = new Email;

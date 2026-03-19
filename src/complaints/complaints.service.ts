@@ -157,10 +157,12 @@ export class ComplaintsService {
 
                     let documents = form.product_photo != '' ? form.product_photo.split(',') : [];
                     documents.forEach(pk => {
-                        let document = new ComplaintDocument();
-                        document.complaint_pk = _complaint.pk;
-                        document.document_pk = pk;
-                        EntityManager.save(document);
+                        if (pk) {
+                            let document = new ComplaintDocument();
+                            document.complaint_pk = _complaint.pk;
+                            document.document_pk = pk;
+                            EntityManager.save(document);
+                        }
                     });
 
                     // LOGS
