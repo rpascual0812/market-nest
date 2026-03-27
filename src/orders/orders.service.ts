@@ -12,6 +12,7 @@ import { Product } from 'src/products/entities/product.entity';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { Account } from 'src/accounts/entities/account.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Notification } from 'src/notifications/entities/notification.entity';
 
 @Injectable()
 export class OrdersService {
@@ -134,6 +135,25 @@ export class OrdersService {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
                     EntityManager.update(Order, orderPks, { status_pk: status.pk });
+
+                    const title = body.status.toLowerCase().replace(/\b[a-z]/g, function (letter) {
+                        return letter.toUpperCase();
+                    });
+
+                    orderPks.forEach(async orderPk => {
+                        const order = await EntityManager.findOne(Order, { where: { pk: orderPk } });
+                        const seller = await EntityManager.findOne(Seller, { where: { pk: order.seller_pk } });
+
+                        const notification = new Notification();
+                        notification.title = title;
+                        notification.details = user.first_name + " " + user.last_name + ' marked the order as ' + body.status + '.';
+                        notification.user_pk = seller.user_pk;
+                        notification.sender_pk = user.pk;
+                        notification.entity = { pk: orderPk, name: 'orders' }
+                        await EntityManager.save(notification);
+                    });
+
+
                     return { status: true, data: { status: true } };
                 }
             );

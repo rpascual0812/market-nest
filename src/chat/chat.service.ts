@@ -10,13 +10,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from './entities/chat-messages.entity';
 import { DateTime } from "luxon";
 import { ChatMessagesRead } from './entities/chat-messages-read.entity';
+import { Notification } from 'src/notifications/entities/notification.entity';
 
 @Injectable()
 export class ChatService {
     async create(pk: any, user: any, params: any) {
         const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
-
+        // console.log(params);
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
@@ -334,13 +335,25 @@ export class ChatService {
                     parent.last_message = data.message;
                     parent.last_message_user_pk = user.pk;
                     parent.last_message_date = DateTime.now().toJSDate();
-                    const updatedChat = await EntityManager.save(parent);
+                    await EntityManager.save(parent);
 
                     const message_read = new ChatMessagesRead();
                     message_read.chat_pk = chat.pk;
                     message_read.user_pk = user.pk;
                     message_read.chat_message_pk = newMessage.pk;
-                    const newChatMessage = await EntityManager.save(message_read);
+                    await EntityManager.save(message_read);
+
+                    // save new notification
+                    const participants = await EntityManager.find(ChatParticipant, { where: { chat_pk: chat.pk } });
+                    participants.forEach(async participant => {
+                        const notification = new Notification();
+                        notification.title = chat.type == 'support' ? 'Chat Support' : 'Chat';
+                        notification.details = user.first_name + " " + user.last_name + ' sent you a message.';
+                        notification.user_pk = participant.user_pk;
+                        notification.sender_pk = user.pk;
+                        notification.entity = { pk: chat.pk, name: 'chats' }
+                        await EntityManager.save(notification);
+                    })
 
                     // await EntityManager.update(ChatParticipant, { chat_pk: chat.pk }, { unread: true }); // set all participants to unread true then,
                     // await EntityManager.update(ChatParticipant, { chat_pk: chat.pk, user_pk: user.pk }, { unread: false }); // set sender to unread false

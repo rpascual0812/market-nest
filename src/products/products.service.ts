@@ -20,6 +20,7 @@ import { ProductSeen } from './entities/product-seen.entity';
 import { DateTime } from "luxon";
 import { Account } from 'src/accounts/entities/account.entity';
 import { ProductInterested } from './entities/product-interested.entity';
+import { Notification } from 'src/notifications/entities/notification.entity';
 
 @Injectable()
 export class ProductsService {
@@ -777,6 +778,7 @@ export class ProductsService {
         try {
             return await queryRunner.manager.transaction(
                 async (EntityManager) => {
+                    const product = await EntityManager.findOne(Product, { where: { pk: filters.product_pk } });
 
                     let interest = await EntityManager.findOne(ProductInterested, { where: { 'user_pk': user.pk, 'product_pk': filters.product_pk } });
 
@@ -809,6 +811,14 @@ export class ProductsService {
                         });
                         log.user_pk = user.pk;
                         await EntityManager.save(log);
+
+                        const notification = new Notification();
+                        notification.title = "Interested";
+                        notification.details = user.first_name + " " + user.last_name + ' is interested in your product.';
+                        notification.user_pk = product.user_pk;
+                        notification.sender_pk = user.pk;
+                        notification.entity = { pk: product.pk, name: 'products' }
+                        await EntityManager.save(notification);
                     }
 
                     return { status: true, data: interest };

@@ -1,3 +1,4 @@
+import { Json } from 'aws-sdk/clients/robomaker';
 import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
 
@@ -17,6 +18,9 @@ export class Notification extends BaseEntity {
 
     @Column({ name: 'sender_pk', nullable: false })
     sender_pk: number;
+
+    @Column("simple-json", { nullable: true })
+    entity: { pk: number; name: string };
 
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
