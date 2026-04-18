@@ -1,5 +1,5 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
-import { Brackets, Repository } from 'typeorm';
+import { Brackets, getRepository, Repository } from 'typeorm';
 import dataSource from 'db/data-source';
 import { Order } from 'src/orders/entities/order.entity';
 import { Status } from 'src/statuses/entities/status.entity';
@@ -95,6 +95,33 @@ export class ReportService {
             group by products.category_pk, categories.name
             `);
         } catch (error) {
+            return {
+                status: false
+            }
+        }
+    }
+
+    async countOrdersByStatuses() {
+        const ordered = 2,
+            cancelled = 3,
+            order_received = 5,
+            fulfilled = 9;
+
+        try {
+            return await dataSource
+                .getRepository(Order)
+                .createQueryBuilder('orders')
+                .leftJoin('statuses', 'statuses', 'orders.status_pk = statuses.pk')
+                .select('orders.status_pk', 'status_pk')
+                .addSelect('statuses.name', 'name')
+                .addSelect('COUNT(orders.pk)', 'total')
+                .groupBy('orders.status_pk, statuses.name')
+                .andWhere('orders.archived = :archived', { archived: false })
+                .andWhere("statuses.pk IN (:...statuses)", { statuses: [ordered, cancelled, order_received, fulfilled] })
+                .getRawMany();
+
+        } catch (error) {
+            console.log(error);
             return {
                 status: false
             }

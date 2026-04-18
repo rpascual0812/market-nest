@@ -52,6 +52,14 @@ export class ReportController {
         return await this.reportService.countOrdersByCategories(req.query, req.user);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('count_orders_by_status')
+    async ordersByStatus(@Body() body: any, @Param() param: any, @Request() req: any,) {
+        const result = await this.reportService.countOrdersByStatuses();
+        console.log(result);
+        return result;
+    }
+
     async orders(@Body() body: any, @Param() param: any, @Request() req: any,) {
         const orders = await this.reportService.countOrders(req.query, req.user);
         if (orders[1] > 0) {
