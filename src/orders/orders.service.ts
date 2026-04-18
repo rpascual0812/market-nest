@@ -86,6 +86,15 @@ export class OrdersService {
                         order.status_pk = status.pk;  //form.country_pk;
                         const newOrder = await EntityManager.save(order);
 
+                        // NOTIFICATIONS
+                        const notification = new Notification();
+                        notification.title = "Order Received";
+                        notification.details = user.first_name + " " + user.last_name + ' has placed an order for your product.';
+                        notification.user_pk = seller.user_pk;
+                        notification.sender_pk = user.pk;
+                        notification.entity = { pk: newOrder.pk, name: 'orders' }
+                        await EntityManager.save(notification);
+
                         // LOGS
                         const log = new Log();
                         log.model = 'orders';
