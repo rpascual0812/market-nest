@@ -138,8 +138,8 @@ export class ChatController {
                 return;
             }
 
-            const title = 'New message',
-                messageText = req.user.first_name + ' ' + req.user.last_name + ' sent you a message';
+            const title = req.user.first_name + ' ' + req.user.last_name,
+                messageText = 'Sent you a message';
             await this.notificationsService.sendPushNotification(participant.user_pk, title, messageText);
         });
 
