@@ -84,7 +84,7 @@ export class NotificationsService {
             await pingram.send({
                 type: 'samdhana_market_push_notification_android',
                 to: {
-                    id: user.fcm_token
+                    id: user.uuid
                 },
                 mobile_push: {
                     title: title,
