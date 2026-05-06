@@ -1,11 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Response, HttpStatus } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ChatService } from './chat.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { generatePath } from '../utilities/generate-s3-path.utils';
 
 @Controller('chats')
 export class ChatController {
-    constructor(private readonly chatService: ChatService) { }
+    constructor(
+        private readonly chatService: ChatService,
+        private readonly notificationsService: NotificationsService,
+    ) { }
 
     @UseGuards(JwtAuthGuard)
     @Get()
@@ -120,11 +124,24 @@ export class ChatController {
     @UseGuards(JwtAuthGuard)
     @Post('messages')
     async saveMessage(@Param('pk') pk: string, @Body() body: any, @Request() req: any, @Response() res: any) {
-        // console.log('message', body);
+        console.log('message', body, req.user);
         const message = await this.chatService.createMessage(body, req.user);
         // console.log('message 2', message['data'].pk);
 
         const newMessage = await this.chatService.findMessage(message['data'].pk);
+
+        // Get all participants of the chat
+        const participants = await this.chatService.getParticipants([message['chat_pk']], req.query);
+        participants[0].forEach(async participant => {
+            // if participant is sender, skip notification
+            if (participant.user_pk == req.user.pk) {
+                return;
+            }
+
+            const title = 'New message',
+                messageText = req.user.first_name + ' ' + req.user.last_name + ' sent you a message';
+            await this.notificationsService.sendPushNotification(participant.user_pk, title, messageText);
+        });
 
         return res.status(message.status ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).json({ status: true, data: newMessage });
     }

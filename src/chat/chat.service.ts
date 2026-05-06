@@ -49,7 +49,7 @@ export class ChatService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code, data: null };
+            return { status: false, code: (err as any)?.code || 500, data: null };
         } finally {
             await queryRunner.release();
         }
@@ -358,12 +358,12 @@ export class ChatService {
                     // await EntityManager.update(ChatParticipant, { chat_pk: chat.pk }, { unread: true }); // set all participants to unread true then,
                     // await EntityManager.update(ChatParticipant, { chat_pk: chat.pk, user_pk: user.pk }, { unread: false }); // set sender to unread false
 
-                    return { status: true, data: newMessage };
+                    return { status: true, data: newMessage, chat_pk: chat.pk };
                 }
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }

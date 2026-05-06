@@ -121,7 +121,7 @@ export class OrdersController {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }

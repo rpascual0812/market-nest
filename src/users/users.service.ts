@@ -511,7 +511,7 @@ export class UsersService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }
@@ -529,7 +529,7 @@ export class UsersService {
                 .execute();
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         }
     }
 
@@ -554,7 +554,6 @@ export class UsersService {
     // }
 
     async update(data: any) {
-        console.log('updating user', data);
         const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
 
@@ -615,7 +614,32 @@ export class UsersService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
+        } finally {
+            await queryRunner.release();
+        }
+
+    }
+
+    async saveFcmToken(data: any) {
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
+
+        try {
+            return await queryRunner.manager.transaction(
+                async (EntityManager) => {
+                    const user = await EntityManager.findOne(User, {
+                        where: { uuid: data.uuid },
+                    });
+                    user.fcm_token = data.token;
+                    const updatedUser = await EntityManager.save(user);
+
+                    return { status: true, data: updatedUser };
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }
@@ -652,7 +676,7 @@ export class UsersService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }
@@ -682,7 +706,7 @@ export class UsersService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }

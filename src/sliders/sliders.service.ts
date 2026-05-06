@@ -188,7 +188,7 @@ export class SlidersService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, data: null, code: err.code };
+            return { status: false, data: null, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }
@@ -212,7 +212,7 @@ export class SlidersService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }
@@ -252,7 +252,7 @@ export class SlidersService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }

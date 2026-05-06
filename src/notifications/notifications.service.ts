@@ -6,6 +6,9 @@ import dataSource from 'db/data-source';
 import { Notification } from './entities/notification.entity';
 import { Document } from 'src/documents/entities/document.entity';
 
+import { Pingram } from 'pingram';
+import { User } from 'src/users/entities/user.entity';
+
 @Injectable()
 export class NotificationsService {
     async findAll(user: any) {
@@ -52,6 +55,42 @@ export class NotificationsService {
                 data: notifications[0],
                 total: notifications[1]
             }
+        } catch (error) {
+            console.log(error);
+            // SAVE ERROR
+            return {
+                status: false
+            }
+        }
+    }
+
+    async sendPushNotification(pk: number, title: string, message: string) {
+        try {
+            // Get user fcm token
+            const user = await dataSource.getRepository(User).findOne({ where: { pk: pk } });
+
+            // if no fcm token, don't send notification
+            if (!user || !user.fcm_token) {
+                return {
+                    status: false
+                }
+            };
+
+            const pingram = new Pingram({
+                apiKey: process.env.PINGRAM_API_KEY,
+                baseUrl: 'https://api.pingram.io'
+            });
+
+            await pingram.send({
+                type: 'samdhana_market_push_notification_android',
+                to: {
+                    id: user.fcm_token
+                },
+                mobile_push: {
+                    title: title,
+                    message: message
+                }
+            });
         } catch (error) {
             console.log(error);
             // SAVE ERROR

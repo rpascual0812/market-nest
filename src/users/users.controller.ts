@@ -260,6 +260,11 @@ export class UsersController {
         return await this.usersService.approveAsSeller(req.params.pk);
     }
 
+    @Post(':uuid/fcm/save')
+    async saveFcmTOken(@Request() req: any, @Body() body: any) {
+        return await this.usersService.saveFcmToken({ 'uuid': req.params.uuid, 'token': body.token });
+    }
+
     // @Get(':id')
     // findOne(@Param('id') id: string) {
     //     return this.usersService.findOne(+id);

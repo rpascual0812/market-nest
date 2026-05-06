@@ -85,6 +85,9 @@ export class User extends BaseEntity {
     @Column({ default: false })
     is_seller: boolean;
 
+    @Column({ type: 'text', nullable: true })
+    fcm_token: string;
+
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     date_created: Date;
 

@@ -63,6 +63,7 @@ export class AuthService {
         const { pk, password, verified, active, date_created, archived, password_reset, ...others } = account;
         const user_data = {
             ...others,
+            uuid: user.user.uuid,
             first_name: user.user.first_name,
             last_name: user.user.last_name,
             middle_name: user.user.middle_name,
@@ -231,7 +232,7 @@ export class AuthService {
             );
         } catch (err) {
             console.log(err);
-            return { status: false, code: err.code };
+            return { status: false, code: (err as any)?.code || 500 };
         } finally {
             await queryRunner.release();
         }
