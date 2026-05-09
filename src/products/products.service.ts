@@ -821,7 +821,7 @@ export class ProductsService {
                         await EntityManager.save(notification);
                     }
 
-                    return { status: true, data: interest };
+                    return { status: true, interest, product };
                 }
             );
         } catch (err) {

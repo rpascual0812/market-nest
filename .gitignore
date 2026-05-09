@@ -39,3 +39,4 @@ lerna-debug.log*
 /assets/images/uploads/
 
 .env
+/src/config/firebase-adminsdk.json

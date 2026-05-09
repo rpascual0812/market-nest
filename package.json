@@ -48,6 +48,7 @@
         "class-validator": "^0.13.2",
         "dotenv": "^16.6.1",
         "express-session": "^1.17.2",
+        "firebase-admin": "^13.9.0",
         "luxon": "3.3.0",
         "node-mailjet": "^6.0.5",
         "nodemailer": "^6.9.9",

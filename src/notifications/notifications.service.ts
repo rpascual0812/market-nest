@@ -6,8 +6,9 @@ import dataSource from 'db/data-source';
 import { Notification } from './entities/notification.entity';
 import { Document } from 'src/documents/entities/document.entity';
 
-import { Pingram } from 'pingram';
 import { User } from 'src/users/entities/user.entity';
+
+import admin from '../firebase/firebase.provider';
 
 @Injectable()
 export class NotificationsService {
@@ -64,40 +65,65 @@ export class NotificationsService {
         }
     }
 
-    async sendPushNotification(pk: number, title: string, message: string) {
-        try {
-            // Get user fcm token
-            const user = await dataSource.getRepository(User).findOne({ where: { pk: pk } });
+    async sendPushNotification(
+        user_pk: number,
+        title: string,
+        body: string,
+        data?: Record<string, string>,
+    ) {
+        const user = await dataSource.getRepository(User).findOne({ where: { pk: user_pk } });
 
-            // if no fcm token, don't send notification
-            if (!user || !user.fcm_token) {
-                return {
-                    status: false
-                }
-            };
+        const message: admin.messaging.Message = {
+            token: user.fcm_token,
 
-            const pingram = new Pingram({
-                apiKey: process.env.PINGRAM_API_KEY,
-                baseUrl: 'https://api.pingram.io'
-            });
+            notification: {
+                title,
+                body,
+            },
 
-            await pingram.send({
-                type: 'samdhana_market_push_notification_android',
-                to: {
-                    id: user.uuid
+            data,
+
+            android: {
+                notification: {
+                    clickAction: 'FLUTTER_NOTIFICATION_CLICK',
                 },
-                mobile_push: {
-                    title: title,
-                    message: message
-                }
-            });
-        } catch (error) {
-            console.log(error);
-            // SAVE ERROR
-            return {
-                status: false
-            }
-        }
+            },
+        };
+
+        return admin.messaging().send(message);
+        // try {
+        //     // Get user fcm token
+        //     const user = await dataSource.getRepository(User).findOne({ where: { pk: pk } });
+
+        //     // if no fcm token, don't send notification
+        //     if (!user || !user.fcm_token) {
+        //         return {
+        //             status: false
+        //         }
+        //     };
+
+        //     const pingram = new Pingram({
+        //         apiKey: process.env.PINGRAM_API_KEY,
+        //         baseUrl: 'https://api.pingram.io'
+        //     });
+
+        //     await pingram.send({
+        //         type: 'samdhana_market_push_notification_android',
+        //         to: {
+        //             id: user.uuid
+        //         },
+        //         mobile_push: {
+        //             title: title,
+        //             message: message
+        //         }
+        //     });
+        // } catch (error) {
+        //     console.log(error);
+        //     // SAVE ERROR
+        //     return {
+        //         status: false
+        //     }
+        // }
     }
 
 }

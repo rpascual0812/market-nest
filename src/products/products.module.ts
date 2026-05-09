@@ -13,12 +13,13 @@ import { UserCart } from 'src/users/entities/user-cart.entity';
 import { ProductRating } from './entities/product-ratings.entity';
 import { ProductInterested } from './entities/product-interested.entity';
 import { ProductSeen } from './entities/product-seen.entity';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Product, ProductDocument, Country, User, UserDocument, Category, UserCart, ProductRating, ProductInterested, ProductSeen]),
     ],
     controllers: [ProductsController],
-    providers: [ProductsService, UsersService]
+    providers: [ProductsService, UsersService, NotificationsService],
 })
 export class ProductsModule { }

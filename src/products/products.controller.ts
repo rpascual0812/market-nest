@@ -3,12 +3,14 @@ import { ProductsService } from './products.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { generatePath } from 'src/utilities/generate-s3-path.utils';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Controller('products')
 export class ProductsController {
     constructor(
         private readonly productsService: ProductsService,
-        private readonly usersService: UsersService
+        private readonly usersService: UsersService,
+        private readonly notificationsService: NotificationsService,
     ) { }
 
     @UseGuards(JwtAuthGuard)
@@ -404,8 +406,12 @@ export class ProductsController {
     @Post(':product_pk/interested')
     async setInterest(@Request() req: any, @Response() res: any) {
         const data = await this.productsService.setInterest(req.params, req.user);
-        if (data) {
-            return res.status(HttpStatus.OK).json({ status: 'success', data: data });
+        if (data.status) {
+            const product = await this.productsService.findOne({ pk: req.params.product_pk });
+            const title = 'You are looking for ' + product['name'],
+                messageText = req.user.first_name + ' ' + req.user.last_name + ' is interested';
+            await this.notificationsService.sendPushNotification(product['user_pk'], title, messageText);
+            return res.status(HttpStatus.OK).json({ status: 'success', data: data['interest'], product: data['product'] });
         }
         return res.status(HttpStatus.FORBIDDEN).json({ status: 'failed' });
     }
