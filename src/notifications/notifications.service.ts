@@ -72,7 +72,6 @@ export class NotificationsService {
         data?: Record<string, string>,
     ) {
         const user = await dataSource.getRepository(User).findOne({ where: { pk: user_pk } });
-
         const message: admin.messaging.Message = {
             token: user.fcm_token,
 
