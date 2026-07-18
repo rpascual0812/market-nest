@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountsService } from 'src/accounts/accounts.service';
 import { Account } from 'src/accounts/entities/account.entity';
+import { EmailsModule } from 'src/emails/emails.module';
+import { Email } from 'src/emails/entities/email.entity';
 import { UserDocument } from './entities/user-document.entity';
 import { User } from './entities/user.entity';
 import { UsersController } from './users.controller';
@@ -27,7 +29,8 @@ import { Feedback } from 'src/feedback/entities/feedback.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, Account, UserDocument, Role, Gender, Log, UserPermission, Permission, Notification, Chat, ChatParticipant, ChatMessage, ChatMessagesRead, UserRating, UserFollow, Configuration, Faq, Complaint, ComplaintMessage, ComplaintDocument, Feedback]),
+        TypeOrmModule.forFeature([User, Account, UserDocument, Role, Gender, Log, UserPermission, Permission, Notification, Chat, ChatParticipant, ChatMessage, ChatMessagesRead, UserRating, UserFollow, Configuration, Faq, Complaint, ComplaintMessage, ComplaintDocument, Feedback, Email]),
+        EmailsModule,
     ],
     controllers: [UsersController],
     providers: [UsersService, AccountsService],

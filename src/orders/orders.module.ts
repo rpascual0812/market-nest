@@ -15,10 +15,13 @@ import { AccountsService } from 'src/accounts/accounts.service';
 import { UserDocument } from 'src/users/entities/user-document.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { NotificationsService } from 'src/notifications/notifications.service';
+import { EmailsModule } from 'src/emails/emails.module';
+import { Email } from 'src/emails/entities/email.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Order, Product, User, Account, UserDocument, Status]),
+        TypeOrmModule.forFeature([Order, Product, User, Account, UserDocument, Status, Email]),
+        EmailsModule,
     ],
     controllers: [OrdersController, ProductsController, UsersController, AccountsController],
     providers: [OrdersService, ProductsService, UsersService, AccountsService, NotificationsService],

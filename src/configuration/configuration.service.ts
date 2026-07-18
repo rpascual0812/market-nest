@@ -81,6 +81,42 @@ export class ConfigurationService {
                                 welcome_email = await EntityManager.save(_welcome_email);
                             }
 
+                            let delete_account_subject = await Configuration.findOne({
+                                where: {
+                                    group: form.group, name: 'delete_account_subject'
+                                }
+                            });
+
+                            if (delete_account_subject) {
+                                await EntityManager.update(Configuration, { group: form.group, name: 'delete_account_subject' }, { value: form.data.delete_account_subject });
+                            }
+                            else {
+                                const _delete_account_subject = new Configuration();
+                                _delete_account_subject.group = form.group;
+                                _delete_account_subject.name = 'delete_account_subject';
+                                _delete_account_subject.value = form.data.delete_account_subject;
+                                _delete_account_subject.user_pk = user.pk;
+                                delete_account_subject = await EntityManager.save(_delete_account_subject);
+                            }
+
+                            let delete_account_email = await Configuration.findOne({
+                                where: {
+                                    group: form.group, name: 'delete_account_email'
+                                }
+                            });
+
+                            if (delete_account_email) {
+                                await EntityManager.update(Configuration, { group: form.group, name: 'delete_account_email' }, { value: form.data.delete_account_email });
+                            }
+                            else {
+                                const _delete_account_email = new Configuration();
+                                _delete_account_email.group = form.group;
+                                _delete_account_email.name = 'delete_account_email';
+                                _delete_account_email.value = form.data.delete_account_email;
+                                _delete_account_email.user_pk = user.pk;
+                                delete_account_email = await EntityManager.save(_delete_account_email);
+                            }
+
                             break;
 
                         case 'agreement':

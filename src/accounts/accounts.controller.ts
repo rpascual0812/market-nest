@@ -130,4 +130,28 @@ export class AccountsController {
     remove(@Param('id') id: string) {
         return this.accountsService.remove(+id);
     }
+
+    @Post('request-deletion')
+    async requestDeletion(@Body() body: { email_address: string }) {
+        try {
+            return await this.accountsService.requestDeletion(body.email_address);
+        } catch (error) {
+            return {
+                error: true,
+                message: error instanceof Error ? error.message : 'An error occurred'
+            };
+        }
+    }
+
+    @Post('confirm-deletion')
+    async confirmDeletion(@Body() body: { token: string }) {
+        try {
+            return await this.accountsService.confirmDeletion(body.token);
+        } catch (error) {
+            return {
+                error: true,
+                message: error instanceof Error ? error.message : 'An error occurred'
+            };
+        }
+    }
 }

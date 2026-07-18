@@ -9,12 +9,16 @@ import { SessionsService } from '../sessions/sessions.service';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { UserDocument } from '../users/entities/user-document.entity';
+import { EmailsModule } from '../emails/emails.module';
+import { Email } from '../emails/entities/email.entity';
+import { EmailsService } from 'src/emails/emails.service';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Account, Session, User, UserDocument]),
+        TypeOrmModule.forFeature([Account, Session, User, UserDocument, Email]),
+        EmailsModule
     ],
-    providers: [AccountsService, SessionsService, UsersService],
+    providers: [AccountsService, SessionsService, UsersService, EmailsService],
     controllers: [AccountsController],
     exports: [AccountsService]
 })

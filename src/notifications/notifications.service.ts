@@ -90,39 +90,6 @@ export class NotificationsService {
         };
 
         return admin.messaging().send(message);
-        // try {
-        //     // Get user fcm token
-        //     const user = await dataSource.getRepository(User).findOne({ where: { pk: pk } });
-
-        //     // if no fcm token, don't send notification
-        //     if (!user || !user.fcm_token) {
-        //         return {
-        //             status: false
-        //         }
-        //     };
-
-        //     const pingram = new Pingram({
-        //         apiKey: process.env.PINGRAM_API_KEY,
-        //         baseUrl: 'https://api.pingram.io'
-        //     });
-
-        //     await pingram.send({
-        //         type: 'samdhana_market_push_notification_android',
-        //         to: {
-        //             id: user.uuid
-        //         },
-        //         mobile_push: {
-        //             title: title,
-        //             message: message
-        //         }
-        //     });
-        // } catch (error) {
-        //     console.log(error);
-        //     // SAVE ERROR
-        //     return {
-        //         status: false
-        //     }
-        // }
     }
 
 }

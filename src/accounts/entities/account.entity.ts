@@ -25,6 +25,9 @@ export class Account extends BaseEntity {
     @Column({ default: false })
     archived: boolean;
 
+    @Column({ type: 'jsonb', nullable: true })
+    deletion_token: any;
+
     /** 
      * Relationship
      */
